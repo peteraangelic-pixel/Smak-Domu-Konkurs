@@ -1,8 +1,7 @@
-"""Diagnostyka kształtu odpowiedzi Qloo — uruchamiana w GitHub Actions.
+"""Diagnostyka odpowiedzi Qloo — uruchamiana w GitHub Actions.
 
-Wypisuje STRUKTURĘ odpowiedzi (klucze, typy, status HTTP), nie treść zapytań
-ani klucz. Służy do sprawdzenia, czy parser (qloo_client.py) rozumie prawdziwe
-odpowiedzi hackathonowego API: wyjaśnialność, rozwiązywanie kotwic, pozycje.
+Wypisuje surowe fragmenty odpowiedzi potrzebne do poprawnego parsowania
+(wyjaśnialność, rozwiązywanie artystów). NIE wypisuje klucza API ani nagłówków.
 """
 
 from __future__ import annotations
@@ -16,55 +15,29 @@ import httpx
 BASE = os.environ.get("QLOO_BASE_URL", "https://hackathon.api.qloo.com").rstrip("/")
 KEY = os.environ.get("QLOO_API_KEY", "").strip()
 HEADERS = {"X-Api-Key": KEY, "accept": "application/json"}
+MAX = 2500
 
 
-def shape(obj, depth=0, max_depth=4):
-    """Zwraca czytelny opis struktury (klucze i typy), bez wartości."""
-    pad = "  " * depth
-    if depth > max_depth:
-        return f"{pad}...\n"
-    if isinstance(obj, dict):
-        out = ""
-        for k, v in list(obj.items())[:25]:
-            if isinstance(v, (dict, list)):
-                out += f"{pad}{k}: {type(v).__name__}({len(v)})\n" + shape(v, depth + 1, max_depth)
-            else:
-                sample = str(v)[:60].replace("\n", " ")
-                out += f"{pad}{k}: {type(v).__name__} = {sample!r}\n"
-        return out
-    if isinstance(obj, list):
-        if not obj:
-            return f"{pad}[] (pusta lista)\n"
-        return shape(obj[0], depth + 1, max_depth)
-    return f"{pad}{type(obj).__name__}\n"
+def items_of(payload):
+    results = (payload or {}).get("results")
+    if isinstance(results, dict):
+        return results.get("entities") or results.get("results") or []
+    return results if isinstance(results, list) else []
 
 
-def call(client: httpx.Client, label: str, path: str, params: dict):
-    print(f"\n===== {label}  GET {path} params={sorted(params)}")
+def get(client, label, path, params):
+    print(f"\n===== {label}  HTTP ", end="")
     r = client.get(path, params=params)
-    print(f"HTTP {r.status_code}")
+    print(r.status_code)
     try:
         data = r.json()
     except ValueError:
-        print("nie-JSON:", r.text[:300])
+        print("nie-JSON")
         return None
     if r.status_code != 200:
-        print("body:", json.dumps(data, ensure_ascii=False)[:400])
+        print(json.dumps(data, ensure_ascii=False)[:300])
         return None
-    print(shape(data))
     return data
-
-
-def first_entity_id(data, want_name: str | None = None):
-    results = (data or {}).get("results")
-    if isinstance(results, dict):
-        results = results.get("results") or results.get("entities") or []
-    if not isinstance(results, list):
-        return None, None
-    for item in results:
-        if want_name is None or want_name.lower() in str(item.get("name", "")).lower():
-            return item.get("entity_id"), item.get("name")
-    return None, None
 
 
 def main() -> int:
@@ -72,55 +45,37 @@ def main() -> int:
         print("Brak QLOO_API_KEY.")
         return 1
     with httpx.Client(base_url=BASE, headers=HEADERS, timeout=30) as c:
-        # 1. Rozwiązywanie kotwic: bez filtra typu i z filtrem artist.
-        s1 = call(c, "search Okean Elzy (bez typu)", "/search", {"query": "Okean Elzy", "take": 3})
-        s2 = call(
-            c,
-            "search Okean Elzy (artist)",
-            "/search",
-            {"query": "Okean Elzy", "types": "urn:entity:artist", "take": 3},
-        )
-        s3 = call(c, "search Amelie (movie)", "/search", {"query": "Amelie", "types": "urn:entity:movie", "take": 3})
+        # 1. Artyści: które nazwy są w katalogu jako urn:entity:artist?
+        for name in ["Okean Elzy", "Okean Elza", "Pixies", "Radiohead", "Skalpel", "Czesław Niemen"]:
+            d = get(c, f"search artist '{name}'", "/search", {"query": name, "types": "urn:entity:artist", "take": 3})
+            if d is not None:
+                for it in d.get("results", [])[:3]:
+                    print(f"   -> {it.get('name')!r} id={it.get('entity_id')} subtype={it.get('subtype') or it.get('types')}")
 
-        amelie_id, amelie_name = first_entity_id(s3)
-        print(f"\nAmélie id={'OK' if amelie_id else 'BRAK'} name={amelie_name!r}")
+        # 2. Amélie jako kotwica filmu.
+        d = get(c, "search movie 'Amelie'", "/search", {"query": "Amelie", "types": "urn:entity:movie", "take": 1})
+        amelie = (d or {}).get("results", [{}])[0].get("entity_id") if d and d.get("results") else None
+        print("Amélie id:", amelie)
 
-        # 2. Insights z wyjaśnialnością — kluczowe dla „dlaczego”.
-        if amelie_id:
-            ins = call(
+        if amelie:
+            # 3. Insights z wyjaśnialnością — surowe `query` pierwszej pozycji i top-level `query`.
+            ins = get(
                 c,
                 "insights movie, interest=Amelie, explainability",
                 "/v2/insights",
-                {
-                    "filter.type": "urn:entity:movie",
-                    "signal.interests.entities": amelie_id,
-                    "feature.explainability": "true",
-                    "take": 3,
-                    "page": 1,
-                },
+                {"filter.type": "urn:entity:movie", "signal.interests.entities": amelie,
+                 "feature.explainability": "true", "take": 2, "page": 1},
             )
             if ins:
-                results = ins.get("results")
-                items = results.get("results") if isinstance(results, dict) else results
-                if isinstance(items, list) and items:
-                    first = items[0]
-                    print("\n--- pierwsza pozycja: klucze top-level:", sorted(first.keys()))
-                    print("--- klucz 'query' (pełna struktura):")
-                    print(shape(first.get("query"), depth=1, max_depth=6) if first.get("query") is not None else "BRAK pola query")
-                    print("--- raw query (obcięte do 900 znaków, bez wartości wrażliwych):")
-                    print(json.dumps(first.get("query"), ensure_ascii=False)[:900])
-                else:
-                    print("\nBrak pozycji w wyniku insights.")
-
-        # 3. Insights bez wyjaśnialności — porównanie, czy pole query pojawia się tylko z flagą.
-        if amelie_id:
-            call(
-                c,
-                "insights movie, interest=Amelie, BEZ explainability",
-                "/v2/insights",
-                {"filter.type": "urn:entity:movie", "signal.interests.entities": amelie_id, "take": 1, "page": 1},
-            )
-
+                print("\n--- top-level keys:", sorted(ins.keys()))
+                print("--- top-level 'query' (surowo):")
+                print(json.dumps(ins.get("query"), ensure_ascii=False, indent=1)[:MAX])
+                its = items_of(ins)
+                print(f"\n--- liczba pozycji: {len(its)}")
+                for it in its[:2]:
+                    print(f"--- pozycja {it.get('name')!r}: klucze query = {sorted((it.get('query') or {}).keys())}")
+                    print("--- item['query'] (surowo):")
+                    print(json.dumps(it.get("query"), ensure_ascii=False, indent=1)[:MAX])
     return 0
 
 
