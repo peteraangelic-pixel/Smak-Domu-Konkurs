@@ -243,7 +243,15 @@ class QlooClient:
     def explainability_for(item: dict[str, Any]) -> list[dict[str, Any]]:
         """Które kotwice wejściowe pociągnęły tę rekomendację i z jaką siłą (0–1)."""
         expl = (item.get("query") or {}).get("explainability") or {}
-        drivers = expl.get("entities") or expl.get("signals") or []
+        # Prawdziwa odpowiedź (sprawdzona w Actions na hackathonowym API):
+        #   query.explainability["signal.interests.entities"] = [{entity_id, score}]
+        # Nazwy kotwic nie ma w tej strukturze — planer uzupełnia je z listy kotwic.
+        drivers = (
+            expl.get("signal.interests.entities")
+            or expl.get("entities")
+            or expl.get("signals")
+            or []
+        )
         out: list[dict[str, Any]] = []
         for d in drivers if isinstance(drivers, list) else []:
             if not isinstance(d, dict):

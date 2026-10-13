@@ -381,3 +381,35 @@ def test_429_after_retries_raises_clear_error(monkeypatch):
     client = make_client(handler)
     with pytest.raises(QlooError, match="limit zapytań"):
         client.insights("urn:entity:movie", results_per_page=1)
+
+
+# ------------------------------------------------- wyjaśnialność (prawdziwy kształt)
+
+
+def test_explainability_parses_real_interest_entities_shape():
+    """Kształt z prawdziwej odpowiedzi hackathonowego API (sprawdzony w Actions):
+
+    query.explainability["signal.interests.entities"] = [{entity_id, score}]
+    """
+    item = {
+        "entity_id": "086E2298-1734-4043-A1C9-0E18121B384C",
+        "name": "Eternal Sunshine of the Spotless Mind",
+        "query": {
+            "affinity": 0.937,
+            "explainability": {
+                "signal.interests.entities": [
+                    {"entity_id": "B7A0731F-EC92-496A-9C40-47D9770489B6", "score": 1},
+                ]
+            },
+        },
+    }
+    drivers = QlooClient.explainability_for(item)
+    assert drivers == [
+        {"entity_id": "B7A0731F-EC92-496A-9C40-47D9770489B6", "entity_name": "", "score": 1.0}
+    ]
+
+
+def test_explainability_empty_when_flag_absent():
+    """Bez feature.explainability=true pola nie ma — parser nie zgaduje."""
+    item = {"entity_id": "x", "query": {"affinity": 0.9, "measurements": {}}}
+    assert QlooClient.explainability_for(item) == []
