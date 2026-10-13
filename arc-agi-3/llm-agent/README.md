@@ -5,7 +5,9 @@ via vLLM for game reasoning with action batching and anti-loop detection.
 
 ## Architecture
 
-Based on the [Duck harness](https://github.com/Tufalabs/duck-harness) (MIT, Tufa Labs):
+Inspirowane podejściem [Duck harness](https://github.com/Tufalabs/duck-harness) (Tufa Labs).
+Uwaga: repozytorium Duck nie ma licencji (`license: null`), więc nie kopiujemy jego kodu.
+Patrz `arc-agi-3/FINDINGS-2026-10-13.md`. Architektura:
 
 1. **vLLM server** serves Qwen3.6-27B-FP8 locally on Kaggle GPU
 2. **LLM policy** sends game state (ASCII grid + segmentation) to the model
