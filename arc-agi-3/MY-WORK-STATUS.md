@@ -1,6 +1,38 @@
 # Status mojej pracy (arena/7911f950-pokemon)
 
-**Data:** 2026-10-13 05:30 UTC
+**Data:** 2026-10-13 13:45 UTC
+
+## Najnowsze ustalenia z drugiej gałęzi (13 X 2026)
+
+### 1. Duck harness nie ma licencji ⚠️
+- `gh api repos/Tufalabs/duck-harness` → `license: null`
+- Nie możemy kopiować ani modyfikować kodu Duck w publicznym repo
+- Konsekwencja: każda poprawka ma być własnym kodem (clean-room) albo dotyczyć wyłącznie własnych agentów
+- **Poprawione w README llm-agent** (usunięte błędne "MIT")
+- Pełny dokument: `arc-agi-3/FINDINGS-2026-10-13.md`
+
+### 2. Pamięć między passami — problem jest w Duck, nie w naszym agencie ✅
+- Duck: `_ensure_session` zeruje `_summarized_knowledge` przy zmianie `runtime_dir`
+- Duck: nowy `ToolAgent` dla każdego passu, plik stanu kasowany w `finally`
+- Nasz `llm-agent`: jeden pass na grę (budżet 400 akcji), `reset_game` czyści wiedzę dopiero przy nowej grze
+- **Ten bug u nas nie występuje**
+
+### 3. Zgłoszenie z atrapą (postmortem 11 X) ⚠️
+- Zgłoszenie 57075036 oceniono na `placeholder` (score 0.0)
+- Notebook zapisał atrapę w fazie "save", a prawdziwa gra wymaga `KAGGLE_IS_COMPETITION_RERUN`
+- **Przyczyna:** API `kaggle competitions submit` bierze istniejące wyjście notebooka, nie uruchamia gry
+- Prawdziwe zgłoszenie wymaga kliknięcia "Submit to Competition" w UI
+- **Zabezpieczenie (13 X):** `baseline/scripts/check_submission.py` + testy odrzuca atrapę
+- `make check-output` pobiera wyjście i waliduje je przed zgłoszeniem
+- **Nieustalone:** czy tryb rerun w ogóle działa end-to-end (brak dostępu do Kaggle z sandboxa)
+
+### 4. Sprzęt lokalny (poprawione)
+- Użytkownik: GPU 8 GB VRAM + RAM 64 GB
+- W LM Studio działają modele ok. 17 GB (część warstw w VRAM, reszta w RAM)
+- Poprzednie założenie "tylko 7-8B" było błędne - poprawione
+- Agent llm-agent łączy się z LM Studio (http://127.0.0.1:1234/v1)
+- Wyniki lokalne: tylko do testów pętli i parsowania, nie do oceny jakości
+- Pełne przebiegi (110 gier × 4 min) tylko na Kaggle
 
 ## Co jest błędne (usunięte)
 
@@ -91,6 +123,14 @@ Dwie zmiany które mogą pomóc z problemem (a):
 - Na razie takiego miejsca nie ma (110 przebiegów = 40s w Pythonie)
 - Rust pomoże tylko jeśli (c) okaże się częstsze niż myślimy
 
+### Następne kroki (z FINDINGS-2026-10-13.md):
+1. ✅ Poprawić README `llm-agent` (usunięte błędne "MIT")
+2. ✅ check_submission.py + testy + make check-output (z commitu cbce83d)
+3. Zweryfikować end-to-end tryb rerun na Kaggle (nie mamy dostępu z sandboxa)
+4. Lokalny smoke test agenta z modelem ~17GB (po stronie użytkownika z GPU + LM Studio)
+
 ---
 
-**Commit:** 7899884 - remove: błędny WIN-CONDITION-HYPOTHESES.md i mock rust-simulator
+**Commity:**
+- 7899884 - remove: błędny WIN-CONDITION-HYPOTHESES.md i mock rust-simulator
+- 4963162 - update: MY-WORK-STATUS.md - usunąłem błędną pracę, czekam na GOAL_CATALOG.md
