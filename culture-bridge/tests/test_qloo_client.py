@@ -348,3 +348,36 @@ def test_popularity_nie_jest_podstawiane_pod_afinacje():
 def test_opis_bierze_sie_z_properties():
     assert "middle-aged Chinese immigrant" in QlooClient.item_description(REAL_QLOO_ITEM)
 
+
+
+# ------------------------------------------------------------ limit zapytań (429)
+
+
+def test_429_is_retried_then_succeeds(monkeypatch):
+    """Limit zapytań przechodzi po ponowieniu — nie opróżnia domeny po cichu."""
+    sleeps: list[float] = []
+    monkeypatch.setattr("app.qloo_client.time.sleep", lambda s: sleeps.append(s))
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] < 3:
+            return httpx.Response(429, json={"error_msg": "Rate limit exceeded"})
+        return httpx.Response(200, json={"results": {"entities": [{"name": "ok"}]}})
+
+    client = make_client(handler)
+    payload = client.insights("urn:entity:movie", results_per_page=1)
+    assert payload["results"]["entities"][0]["name"] == "ok"
+    assert calls["n"] == 3
+    assert sleeps == [1.0, 2.0]
+
+
+def test_429_after_retries_raises_clear_error(monkeypatch):
+    monkeypatch.setattr("app.qloo_client.time.sleep", lambda s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(429, json={"error_msg": "Rate limit exceeded"})
+
+    client = make_client(handler)
+    with pytest.raises(QlooError, match="limit zapytań"):
+        client.insights("urn:entity:movie", results_per_page=1)

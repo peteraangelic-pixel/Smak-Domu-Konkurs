@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 
 import httpx
 
@@ -27,7 +28,13 @@ def items_of(payload):
 
 def get(client, label, path, params):
     print(f"\n===== {label}  HTTP ", end="")
+    time.sleep(2)  # limit zapytań: nie strzelamy seriami
     r = client.get(path, params=params)
+    for _ in range(3):
+        if r.status_code != 429:
+            break
+        time.sleep(5)
+        r = client.get(path, params=params)
     print(r.status_code)
     try:
         data = r.json()

@@ -67,6 +67,32 @@ class QlooClient:
     def _headers(self) -> dict[str, str]:
         return {"X-Api-Key": self.settings.qloo_api_key, "Accept": "application/json"}
 
+    def _request_with_retry(self, path: str, params: dict[str, Any]) -> httpx.Response:
+        """GET z ponowieniem przy 429 (limit zapytań).
+
+        Bez tego limit wyglądał jak „brak danych”: planer po cichu opróżniał
+        domenę. Próbujemy do 3 razy, czekając Retry-After albo 1 s, 2 s.
+        Po wyczerpaniu prób zwracamy 429, a błąd dostaje czytelny komunikat.
+        """
+        attempts = 3
+        for attempt in range(attempts):
+            try:
+                with self._client() as client:
+                    response = client.get(path, params=params, headers=self._headers())
+            except httpx.HTTPError as exc:  # sieć / DNS / timeout
+                raise QlooConnectionError(
+                    f"Nie udało się połączyć z Qloo ({exc.__class__.__name__}). "
+                    f"Sprawdź QLOO_BASE_URL — dla klucza hackathonowego musi to być "
+                    "https://hackathon.api.qloo.com."
+                ) from exc
+
+            if response.status_code != 429 or attempt == attempts - 1:
+                return response
+            retry_after = response.headers.get("Retry-After", "")
+            delay = float(retry_after) if retry_after.replace(".", "", 1).isdigit() else float(2**attempt)
+            time.sleep(min(delay, 10.0))
+        return response  # nieosiągalne, ale domyka typowanie
+
     def _get(self, path: str, params: dict[str, Any], allow_empty_on_404: bool = False) -> dict[str, Any]:
         """Wykonuje GET, mapując udokumentowane kody błędów na czytelne komunikaty."""
         clean = {k: v for k, v in params.items() if v not in (None, "", [], {})}
@@ -75,15 +101,7 @@ class QlooClient:
         if hit and (time.time() - hit[0]) < self.settings.cache_ttl_seconds:
             return hit[1]
 
-        try:
-            with self._client() as client:
-                response = client.get(path, params=clean, headers=self._headers())
-        except httpx.HTTPError as exc:  # sieć / DNS / timeout
-            raise QlooConnectionError(
-                f"Nie udało się połączyć z Qloo ({exc.__class__.__name__}). "
-                f"Sprawdź QLOO_BASE_URL — dla klucza hackathonowego musi to być "
-                "https://hackathon.api.qloo.com."
-            ) from exc
+        response = self._request_with_retry(path, clean)
 
         if response.status_code == 401:
             raise QlooAuthError(
@@ -99,6 +117,11 @@ class QlooClient:
             # /search dokumentuje 404 jako „No results” — to normalny wynik,
             # nie awaria. Zwracamy pusty zestaw zamiast rzucać wyjątkiem.
             return {"results": []}
+        if response.status_code == 429:
+            raise QlooError(
+                "Qloo: przekroczony limit zapytań (429) mimo ponowień. "
+                "Poczekaj chwilę i spróbuj ponownie."
+            )
         if response.status_code >= 400:
             detail = response.text[:300]
             raise QlooError(f"Qloo zwróciło {response.status_code}: {detail}")
