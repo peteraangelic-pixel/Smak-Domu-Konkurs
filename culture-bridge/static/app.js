@@ -84,7 +84,7 @@ function addAnchorRow(value = "", kind = "free") {
   const input = document.createElement("input");
   input.type = "text";
   input.value = value;
-  input.placeholder = "np. Okean Elzy, Amélie, barszcz";
+  input.placeholder = "np. Pixies, Amélie, Pierogi Lwowskie";
 
   const select = document.createElement("select");
   for (const k of ANCHOR_KINDS) {
@@ -320,7 +320,7 @@ $("go").addEventListener("click", () => {
   buildPlan();
 });
 
-addAnchorRow("Okean Elzy", "artist");
+addAnchorRow("Pixies", "artist");
 addAnchorRow("Amélie", "movie");
 addAnchorRow("barszcz", "dish");
 

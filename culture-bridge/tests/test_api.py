@@ -36,7 +36,7 @@ def test_plan_odpowiada_na_pelne_zadanie():
         json={
             "origin": "Ukraina (Lwów)",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
             "domains": ["urn:entity:movie", "urn:entity:artist", "urn:entity:place"],
         },
     )
@@ -73,7 +73,7 @@ def test_pozycja_ma_wyjasnienie_w_odpowiedzi_api():
         json={
             "origin": "Ukraina",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}],
             "domains": ["urn:entity:artist"],
         },
     ).json()
@@ -87,7 +87,7 @@ def test_wykluczenie_zmniejsza_liczbe_pozycji():
     body = {
         "origin": "Ukraina",
         "destination": "Poznań",
-        "anchors": [{"name": "Okean Elzy", "kind": "artist"}],
+        "anchors": [{"name": "Pixies", "kind": "artist"}],
         "domains": ["urn:entity:movie"],
         "per_domain": 10,
     }

@@ -31,7 +31,7 @@ def sample_sections() -> list[DomainSection]:
                     name="DagaDana",
                     domain="urn:entity:artist",
                     affinity=0.86,
-                    why="Dopasowanie 88% przez: Okean Elzy",
+                    why="Dopasowanie 88% przez: Pixies",
                 )
             ],
         )
@@ -39,7 +39,7 @@ def sample_sections() -> list[DomainSection]:
 
 
 def sample_anchors() -> list[Anchor]:
-    return [Anchor(name="Okean Elzy", kind="artist", qloo_id="x1", resolved=True)]
+    return [Anchor(name="Pixies", kind="artist", qloo_id="x1", resolved=True)]
 
 
 # ------------------------------------------------- narrator deterministyczny
@@ -52,7 +52,7 @@ def test_narrator_deterministyczny_wymienia_kotwice_i_miasto():
         anchors=sample_anchors(),
         sections=sample_sections(),
     )
-    assert "Okean Elzy" in text
+    assert "Pixies" in text
     assert "Poznań" in text
     assert "1" in text  # liczba znalezionych pozycji
 

@@ -81,6 +81,10 @@ class Planner:
             search_types = ["urn:entity:artist"]
         elif anchor.kind in ("movie", "tv_show"):
             search_types = ["urn:entity:movie", "urn:entity:tv_show"]
+        elif anchor.kind == "dish":
+            # Bez filtra „barszcz” trafiał w miejscowości (Barszczówka). Danie w
+            # tym API to w praktyce lokal, więc szukamy tylko wśród miejsc.
+            search_types = ["urn:entity:place"]
 
         try:
             hits = self.provider.search_entities(anchor.name, types=search_types, take=3)

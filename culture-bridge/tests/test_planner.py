@@ -23,7 +23,7 @@ class FakeProvider:
     def search_entities(self, query: str, types=None, take: int = 5):
         self.calls.append({"op": "search", "query": query, "types": types})
         table = {
-            "Okean Elzy": {"id": "artist-1", "type": "urn:entity:artist"},
+            "Pixies": {"id": "artist-1", "type": "urn:entity:artist"},
             "Amélie": {"id": "movie-1", "type": "urn:entity:movie"},
         }
         hit = table.get(query)
@@ -45,7 +45,7 @@ class FakeProvider:
                     "description": "Opis testowy",
                     "query": {
                         "explainability": {
-                            "entities": [{"id": "artist-1", "name": "Okean Elzy", "score": 0.74}]
+                            "entities": [{"id": "artist-1", "name": "Pixies", "score": 0.74}]
                         }
                     },
                 }
@@ -68,7 +68,7 @@ def make_request(**overrides) -> PlanRequest:
     base = dict(
         origin="Ukraina (Lwów)",
         destination="Poznań",
-        anchors=[Anchor(name="Okean Elzy", kind="artist"), Anchor(name="Amélie", kind="movie")],
+        anchors=[Anchor(name="Pixies", kind="artist"), Anchor(name="Amélie", kind="movie")],
         domains=["urn:entity:movie", "urn:entity:place"],
     )
     base.update(overrides)
@@ -84,7 +84,7 @@ def test_kotwice_sa_rozwiazywane_na_identyfikatory_qloo():
     plan = planner.build_plan(make_request())
 
     searches = [c for c in provider.calls if c["op"] == "search"]
-    assert {s["query"] for s in searches} == {"Okean Elzy", "Amélie"}
+    assert {s["query"] for s in searches} == {"Pixies", "Amélie"}
     # rozwiązane ID trafiają do sygnału
     insight_calls = [c for c in provider.calls if c["op"] == "insights"]
     assert insight_calls[0]["interest_entities"] == ["artist-1", "movie-1"]
@@ -107,7 +107,7 @@ def test_rodzaj_kotwicy_zawezsza_wyszukiwanie():
     provider = FakeProvider()
     Planner(provider, "qloo").build_plan(make_request())
     searches = {c["query"]: c["types"] for c in provider.calls if c["op"] == "search"}
-    assert searches["Okean Elzy"] == ["urn:entity:artist"]
+    assert searches["Pixies"] == ["urn:entity:artist"]
     assert searches["Amélie"] == ["urn:entity:movie", "urn:entity:tv_show"]
 
 
@@ -160,7 +160,7 @@ def test_powod_wskazuje_kotwice_i_je_sile():
     planner = Planner(FakeProvider(), "qloo")
     plan = planner.build_plan(make_request())
     item = plan.sections[0].items[0]
-    assert "Okean Elzy" in item.why
+    assert "Pixies" in item.why
     assert item.drivers[0].score == pytest.approx(0.74)
 
 
@@ -259,7 +259,7 @@ def test_demo_nie_przypisuje_kotwic_ktorych_uzytkownik_nie_podal():
     planner = Planner(DemoProvider(), "demo")
     plan = planner.build_plan(
         make_request(
-            anchors=[Anchor(name="Okean Elzy", kind="artist"), Anchor(name="Amélie", kind="movie")],
+            anchors=[Anchor(name="Pixies", kind="artist"), Anchor(name="Amélie", kind="movie")],
             domains=list(DOMAIN_LABELS),
             per_domain=10,
         )
@@ -295,10 +295,18 @@ def test_demo_bez_kotwic_nie_zmysla_powodow():
 def test_demo_dostarcza_dane_dla_scenariusza_poznan():
     plan = Planner(DemoProvider(), "demo").build_plan(
         make_request(
-            anchors=[Anchor(name="Okean Elzy", kind="artist"), Anchor(name="Amélie", kind="movie")],
+            anchors=[Anchor(name="Pixies", kind="artist"), Anchor(name="Amélie", kind="movie")],
             destination="Poznań",
             domains=list(DOMAIN_LABELS),
             per_domain=5,
         )
     )
     assert sum(len(s.items) for s in plan.sections) >= 4
+
+
+def test_danie_szukane_tylko_wsrod_miejsc():
+    """„barszcz” bez filtra trafiał w miejscowość (Barszczówka) — danie szukamy jako miejsce."""
+    provider = FakeProvider()
+    Planner(provider, "qloo").resolve_anchor(Anchor(name="Pierogi Lwowskie", kind="dish"))
+    searches = {c["query"]: c["types"] for c in provider.calls if c["op"] == "search"}
+    assert searches["Pierogi Lwowskie"] == ["urn:entity:place"]

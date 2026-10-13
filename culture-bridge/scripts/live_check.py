@@ -20,9 +20,9 @@ from app.planner import Planner  # noqa: E402
 from app.provider import build_provider  # noqa: E402
 
 ANCHORS = [
-    Anchor(name="Okean Elzy", kind="artist"),
+    Anchor(name="Pixies", kind="artist"),
     Anchor(name="Amélie", kind="movie"),
-    Anchor(name="barszcz", kind="dish"),
+    Anchor(name="Pierogi Lwowskie", kind="dish"),
 ]
 
 

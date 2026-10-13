@@ -104,7 +104,7 @@ def qloo_transport() -> httpx.MockTransport:
         if path == "/search":
             query = params.get("query", "").lower()
             table = {
-                "okean elzy": qloo_entity("ART-001", "Okean Elzy", subtype="urn:entity:artist"),
+                "pixies": qloo_entity("ART-001", "Pixies", subtype="urn:entity:artist"),
                 "amélie": qloo_entity("MOV-001", "Amélie"),
             }
             hit = table.get(query)
@@ -139,7 +139,7 @@ def qloo_transport() -> httpx.MockTransport:
                     ),
                     explainable(
                         qloo_entity("ART-100", "DagaDana", subtype="urn:entity:artist", affinity=0.77, tags=[TAG_DRAMA]),
-                        [("ART-001", "Okean Elzy", 0.66)],
+                        [("ART-001", "Pixies", 0.66)],
                     ),
                 ]
             kept = [e for e in entities if e["entity_id"] not in exclude]
@@ -161,7 +161,7 @@ def request(**overrides) -> PlanRequest:
     base = dict(
         origin="Ukraina (Lwów)",
         destination="Poznań",
-        anchors=[Anchor(name="Okean Elzy", kind="artist"), Anchor(name="Amélie", kind="movie")],
+        anchors=[Anchor(name="Pixies", kind="artist"), Anchor(name="Amélie", kind="movie")],
         domains=["urn:entity:movie"],
         per_domain=5,
     )
@@ -322,7 +322,7 @@ def test_api_plan_z_dostawca_qloo(http_z_qloo):
         json={
             "origin": "Ukraina (Lwów)",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
             "domains": ["urn:entity:movie"],
         },
     )
@@ -347,7 +347,7 @@ def test_api_plan_z_qloo_przekazuje_wykluczenie(http_z_qloo):
     body = {
         "origin": "Ukraina (Lwów)",
         "destination": "Poznań",
-        "anchors": [{"name": "Okean Elzy", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
+        "anchors": [{"name": "Pixies", "kind": "artist"}, {"name": "Amélie", "kind": "movie"}],
         "domains": ["urn:entity:movie"],
     }
     before = http_z_qloo.post("/api/plan", json=body).json()
@@ -379,7 +379,7 @@ def test_api_plan_z_qloo_zglasza_bled_qloo_jako_502(qloo_transport, monkeypatch)
         json={
             "origin": "Ukraina",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}],
             "domains": ["urn:entity:movie"],
         },
     )
@@ -411,7 +411,7 @@ def test_api_plan_nieosiagalne_qloo_daje_502(monkeypatch):
         json={
             "origin": "Ukraina",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}],
             "domains": ["urn:entity:movie"],
         },
     )
@@ -430,7 +430,7 @@ def test_blad_pojedynczej_domeny_nie_przerywa_calego_planu(qloo_transport, monke
         params = request.url.params
         if path == "/search":
             return httpx.Response(
-                200, json={"results": [qloo_entity("ART-001", "Okean Elzy", subtype="urn:entity:artist")]}
+                200, json={"results": [qloo_entity("ART-001", "Pixies", subtype="urn:entity:artist")]}
             )
         if path == "/v2/insights":
             if params.get("filter.type") == "urn:entity:book":
@@ -458,7 +458,7 @@ def test_blad_pojedynczej_domeny_nie_przerywa_calego_planu(qloo_transport, monke
         json={
             "origin": "Ukraina",
             "destination": "Poznań",
-            "anchors": [{"name": "Okean Elzy", "kind": "artist"}],
+            "anchors": [{"name": "Pixies", "kind": "artist"}],
             "domains": ["urn:entity:artist", "urn:entity:book"],
         },
     )

@@ -61,9 +61,9 @@ class TasteProvider(Protocol):
 # ----------------------------------------------------------------------------
 
 # Kotwice rozpoznawane w trybie demo. Klucze celowo małe i bez znaków
-# diakrytycznych, żeby „Okean Elzy” i „okean elzy” trafiły w to samo.
+# diakrytycznych, żeby „Pixies” i „pixies” trafiły w to samo.
 _DEMO_ANCHORS: dict[str, dict[str, str]] = {
-    "okean elzy": {"id": "demo-artist-okean", "type": "urn:entity:artist", "name": "Okean Elzy"},
+    "pixies": {"id": "demo-artist-pixies", "type": "urn:entity:artist", "name": "Pixies"},
     "sting": {"id": "demo-artist-sting", "type": "urn:entity:artist", "name": "Sting"},
     "barszcz": {"id": "demo-tag-borscht", "type": "urn:tag:cuisine:ukrainian", "name": "barszcz"},
     "pierogi": {"id": "demo-tag-dumplings", "type": "urn:tag:cuisine:polish", "name": "pierogi"},
@@ -92,7 +92,7 @@ _DEMO_RESULTS: dict[str, list[dict[str, Any]]] = {
             "properties": {"geocode": {"name": "Poznań", "country_code": "PL"}},
             "query": {"explainability": {"entities": [
                 {"id": "demo-movie-amelie", "name": "Amélie", "score": 0.71},
-                {"id": "demo-artist-okean", "name": "Okean Elzy", "score": 0.34},
+                {"id": "demo-artist-pixies", "name": "Pixies", "score": 0.34},
             ]}},
         },
         {
@@ -103,7 +103,7 @@ _DEMO_RESULTS: dict[str, list[dict[str, Any]]] = {
             "description": "Polski film o muzyce i emigracji — naturalny most między domem a nowym krajem.",
             "properties": {"geocode": {"name": "Poznań", "country_code": "PL"}},
             "query": {"explainability": {"entities": [
-                {"id": "demo-artist-okean", "name": "Okean Elzy", "score": 0.66},
+                {"id": "demo-artist-pixies", "name": "Pixies", "score": 0.66},
             ]}},
         },
         {
@@ -127,7 +127,7 @@ _DEMO_RESULTS: dict[str, list[dict[str, Any]]] = {
             "description": "Polsko-ukraiński duet folkowy — dosłownie most między dwiema tradycjami.",
             "properties": {"geocode": {"name": "Poznań", "country_code": "PL"}},
             "query": {"explainability": {"entities": [
-                {"id": "demo-artist-okean", "name": "Okean Elzy", "score": 0.88},
+                {"id": "demo-artist-pixies", "name": "Pixies", "score": 0.88},
             ]}},
         },
         {
@@ -138,7 +138,7 @@ _DEMO_RESULTS: dict[str, list[dict[str, Any]]] = {
             "description": "Współczesny folk z akustycznym rdzeniem; podobna wrażliwość na melodię.",
             "properties": {"geocode": {"name": "Poznań", "country_code": "PL"}},
             "query": {"explainability": {"entities": [
-                {"id": "demo-artist-okean", "name": "Okean Elzy", "score": 0.61},
+                {"id": "demo-artist-pixies", "name": "Pixies", "score": 0.61},
             ]}},
         },
         {
@@ -149,7 +149,7 @@ _DEMO_RESULTS: dict[str, list[dict[str, Any]]] = {
             "description": "Rock z wschodnim akcentem wokalnym — bliski brzmieniu, z którego przyjeżdżasz.",
             "properties": {"geocode": {"name": "Poznań", "country_code": "PL"}},
             "query": {"explainability": {"entities": [
-                {"id": "demo-artist-okean", "name": "Okean Elzy", "score": 0.55},
+                {"id": "demo-artist-pixies", "name": "Pixies", "score": 0.55},
             ]}},
         },
     ],
