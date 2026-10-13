@@ -134,7 +134,12 @@ class Planner:
 
         top = drivers[0] if drivers else None
         if top and top.entity_name:
-            why = f"Dopasowanie {top.score:.0%} przez: {top.entity_name}"
+            # Gdy jedyna kotwica dostaje wynik 1, procent nic nie mówi (Qloo
+            # zwraca 1 dla każdej pozycji) — nie udajemy precyzji.
+            if len(drivers) == 1 and top.score >= 0.999:
+                why = f"Powiązane z: {top.entity_name}"
+            else:
+                why = f"Dopasowanie {top.score:.0%} przez: {top.entity_name}"
         elif drivers:
             why = "Dopasowanie na podstawie Twoich kotwic smakowych"
         else:
