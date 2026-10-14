@@ -413,6 +413,9 @@ class LLMPolicy:
         self._game_notes: list[str] = []
         self._actions_on_level = 0
         self._last_audit_at = 0
+        # Level whose "probe opening" was already queued (scripted opening:
+        # try each safe direction once before spending LLM tokens).
+        self._probe_level: int | None = None
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -425,6 +428,7 @@ class LLMPolicy:
         self._game_notes.clear()
         self._actions_on_level = 0
         self._last_audit_at = 0
+        self._probe_level = None
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -441,6 +445,15 @@ class LLMPolicy:
             self._actions_on_level = 0
             self._last_audit_at = 0
             # Notes are kept: one game = one win condition across levels.
+        
+        # Scripted probe opening (tape-opening idea from PTCG replay analysis):
+        # at the start of each level, execute each safe direction action once,
+        # before any LLM call. Movement is cheap and the resulting state changes
+        # are the raw material for mechanic hypotheses. Confirm-type actions are
+        # NEVER probed blindly (some games check results only on confirm).
+        if self._probe_level != frame.levels_completed:
+            self._probe_level = frame.levels_completed
+            self._action_queue.extend(self._probe_actions(frame))
             # Add level change notification to history
             if self._messages:
                 self._messages.append({
@@ -502,6 +515,20 @@ class LLMPolicy:
         
         self.tracker.record(state_sig, immediate.get("name", RESET))
         return immediate
+    
+    @staticmethod
+    def _probe_actions(frame: FrameInfo) -> list[dict]:
+        """Safe scripted opening for a fresh level: each direction once.
+
+        Only movement actions (ACTION1–ACTION4) are probed — never RESET and
+        never ACTION5/ACTION6-style actions, because some games check the
+        result only on a confirm/click action and give very few attempts.
+        """
+        probes = []
+        for engine in ("ACTION1", "ACTION2", "ACTION3", "ACTION4"):
+            if engine in frame.available_actions:
+                probes.append({"name": engine, "reasoning": {"probe": True}})
+        return probes
     
     def _absorb_notes(self, actions: list[dict]) -> None:
         """Capture the "notes" field from parsed actions into game memory."""

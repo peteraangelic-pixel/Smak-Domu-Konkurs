@@ -294,6 +294,30 @@ os.environ["LLM_MULTIMODAL"] = "0"  # start without images to save tokens
 
 print(f"Agent deployed in {{agent_dir}}")
 print(f"LLM config: {{SERVED_MODEL}} @ {{VLLM_BASE_URL}}")
+
+# --- Agent self-test (lesson from the Pokemon branches: dead code and silent
+# except-pass killed whole runs there; our 14.10 parser bug was the same class).
+# Fails the notebook HERE, before any GPU time is burned on a broken agent.
+import sys as _sys
+_sys.path.insert(0, "/tmp")
+from arc_llm_agent import llm_policy as _lp
+
+_src = (agent_dir / "llm_policy.py").read_text()
+for _marker in ("_extract_action_objects", "FIELD GUIDE", "_probe_actions",
+                "STUCK AUDIT", '"notes"'):
+    assert _marker in _src, f"stale payload: missing {{_marker!r}} in llm_policy.py"
+
+_fi = _lp.FrameInfo(grid=((0, 0), (0, 0)), step=0, level=0,
+                    state_name="PLAYING", levels_completed=0,
+                    available_actions=["ACTION1", "ACTION2", "ACTION6"])
+_pol = _lp.LLMPolicy.__new__(_lp.LLMPolicy)
+_acts = _pol._parse_response(
+    '```json\\n{{"action": "UP", "reasoning": {{"why": {{"nested": 1}}}}}}\\n```', _fi)
+assert _acts and _acts[0]["name"] == "ACTION1", "nested-JSON action was dropped!"
+_probes = _lp.LLMPolicy._probe_actions(_fi)
+assert [p["name"] for p in _probes] == ["ACTION1", "ACTION2"], "probe opening broken"
+assert all(p["name"] != "ACTION6" for p in _probes), "probes must not click blindly"
+print("ARC3_AGENT_SELFTEST_OK: parser + probe opening verified")
 '''))
     
     # Cell 7: Run competition

@@ -624,7 +624,13 @@ agent_dir.mkdir(parents=True, exist_ok=True)
 print(f"Agent deployed to {{agent_dir}} ({{len(agent_code)}} chars)")
 # Verify it compiles
 compile(agent_code, "llm_agent.py", "exec")
-print("Agent code compiles OK")'''))
+print("Agent code compiles OK")
+# --- Agent self-test: stale-payload guard (lesson from the Pokemon branches:
+# dead code silently no-ops; our 14.10 parser bug shipped unnoticed the same way).
+for _marker in ("_extract_action_objects", "isinstance(obj, list)",
+                "FIELD GUIDE", "Deliberate LESS", "CONFIRM"):
+    assert _marker in agent_code, f"stale payload: missing {{_marker!r}}"
+print("ARC3_AGENT_SELFTEST_OK: payload markers verified")'''))
 
     # Cell 6: Run
     cells.append(make_cell('''import torch
