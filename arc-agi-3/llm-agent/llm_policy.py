@@ -197,6 +197,10 @@ FIELD GUIDE (patterns observed across ARC-AGI-3 training games — treat as prio
   never a win. Keep a margin; when it runs low, spend actions only on the safest known
   progress toward the goal.
 
+LESSONS BETWEEN GAMES: at the start of a game you may see "Lessons from earlier
+games in this run" — your own findings from sibling games (patterns common across
+ARC games). Apply them as priors and verify against the new board.
+
 GOAL PERSISTENCE: one game = one win condition for ALL its levels. Once you solve a
 level, you almost certainly know the goal — record it in "notes". Later levels add
 mechanics but do NOT change the goal class. If a level seems to contradict your goal,
@@ -416,6 +420,13 @@ class LLMPolicy:
         # Level whose "probe opening" was already queued (scripted opening:
         # try each safe direction once before spending LLM tokens).
         self._probe_level: int | None = None
+        # No-op detection (SmartExplorer idea from the Pokemon branches):
+        # attribute each executed action to whether the board changed.
+        self._noop_recent: list[tuple[str, bool]] = []
+        self._last_exec: str | None = None
+        self._last_grid: tuple[tuple[int, ...], ...] | None = None
+        # Run-level lessons harvested from finished games (kept across games).
+        self._run_lessons: list[str] = []
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -425,10 +436,19 @@ class LLMPolicy:
         self._action_queue.clear()
         self._last_level = 0
         self._actions_since_last_llm = 0
+        # Harvest this game's notes into run-level lessons first.
+        for note in self._game_notes:
+            if note not in self._run_lessons:
+                self._run_lessons.append(note)
+        if len(self._run_lessons) > 8:
+            del self._run_lessons[:len(self._run_lessons) - 8]
         self._game_notes.clear()
         self._actions_on_level = 0
         self._last_audit_at = 0
         self._probe_level = None
+        self._noop_recent.clear()
+        self._last_exec = None
+        self._last_grid = None
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -436,6 +456,14 @@ class LLMPolicy:
         Returns dict: {name: str, x: int|None, y: int|None, reasoning: dict}
         """
         state_sig = self._state_signature(frame)
+        
+        # Attribute the previous action's effect (no-op detection). Exact grid
+        # equality: in games whose HUD changes every step the detector stays
+        # silent (safe — no false positives), elsewhere it is reliable.
+        if self._last_exec is not None and self._last_grid is not None:
+            self._noop_recent.append((self._last_exec, frame.grid != self._last_grid))
+            if len(self._noop_recent) > 10:
+                del self._noop_recent[0]
         
         # Check for level change — re-plan immediately
         if frame.levels_completed != self._last_level:
@@ -472,6 +500,7 @@ class LLMPolicy:
             self._actions_since_last_llm += 1
             self._actions_on_level += 1
             self.tracker.record(state_sig, action.get("name", RESET))
+            self._mark_executed(frame, action.get("name", RESET))
             return action
         
         # Need to call LLM
@@ -505,6 +534,7 @@ class LLMPolicy:
             action = self._fallback_action(frame)
             self.tracker.record(state_sig, action.get("name", RESET))
             self._actions_on_level += 1
+            self._mark_executed(frame, action.get("name", RESET))
             return action
         
         # First action is immediate, rest go to queue
@@ -514,7 +544,13 @@ class LLMPolicy:
         self._actions_on_level += 1
         
         self.tracker.record(state_sig, immediate.get("name", RESET))
+        self._mark_executed(frame, immediate.get("name", RESET))
         return immediate
+    
+    def _mark_executed(self, frame: FrameInfo, name: str) -> None:
+        """Remember the executed action and the board it acted on."""
+        self._last_exec = name
+        self._last_grid = frame.grid
     
     @staticmethod
     def _probe_actions(frame: FrameInfo) -> list[dict]:
@@ -611,6 +647,23 @@ class LLMPolicy:
             parts.append("\nYour game notes:")
             for note in self._game_notes:
                 parts.append(f"- {note}")
+        
+        # Run-level lessons: injected on the first LLM turn of each game
+        if self._run_lessons and not self.tracker.action_history:
+            parts.append("\nLessons from earlier games in this run:")
+            for lesson in self._run_lessons:
+                parts.append(f"- {lesson}")
+        
+        # No-op feedback (only when there is something worth saying)
+        noop_total = len(self._noop_recent)
+        if noop_total >= 6:
+            noops = [name for name, changed in self._noop_recent if not changed]
+            if len(noops) >= 3:
+                detail = ", ".join(f"{n}×{c}" for n, c in Counter(noops).most_common(3))
+                parts.append(
+                    f"\nNo-op check: {len(noops)}/{noop_total} recent actions did NOT "
+                    f"change the board ({detail}). Such actions likely cannot help in "
+                    "this state — don't repeat them expecting a different result.")
         
         # Actions on this level + periodic stuck audit
         parts.append(f"\nActions on this level: {self._actions_on_level}")

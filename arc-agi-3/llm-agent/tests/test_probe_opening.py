@@ -44,6 +44,10 @@ def _policy_stub(client_content: str = '{"action": "UP"}') -> lp.LLMPolicy:
     p._actions_on_level = 0
     p._last_audit_at = 0
     p._probe_level = None
+    p._noop_recent = []
+    p._last_exec = None
+    p._last_grid = None
+    p._run_lessons = []
     return p
 
 
