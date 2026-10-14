@@ -427,6 +427,11 @@ class LLMPolicy:
         self._last_grid: tuple[tuple[int, ...], ...] | None = None
         # Run-level lessons harvested from finished games (kept across games).
         self._run_lessons: list[str] = []
+        # Token accounting per level (stuck audit fires on tokens OR actions).
+        self._level_start_tokens = 0
+        self._audit_level_tokens = 0
+        # Level whose structured notes are requested in the next user turn.
+        self._pending_notes: int | None = None
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -449,6 +454,9 @@ class LLMPolicy:
         self._noop_recent.clear()
         self._last_exec = None
         self._last_grid = None
+        self._level_start_tokens = self.total_tokens
+        self._audit_level_tokens = 0
+        self._pending_notes = None
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -467,12 +475,18 @@ class LLMPolicy:
         
         # Check for level change — re-plan immediately
         if frame.levels_completed != self._last_level:
+            solved = frame.levels_completed > self._last_level
             self._last_level = frame.levels_completed
             self._action_queue.clear()
             self._actions_since_last_llm = 0
             self._actions_on_level = 0
             self._last_audit_at = 0
+            self._level_start_tokens = self.total_tokens
+            self._audit_level_tokens = 0
             # Notes are kept: one game = one win condition across levels.
+            if solved:
+                # levels_completed = liczba rozwiązanych; ostatnio rozwiązany = -1
+                self._pending_notes = max(0, frame.levels_completed - 1)
         
         # Scripted probe opening (tape-opening idea from PTCG replay analysis):
         # at the start of each level, execute each safe direction action once,
@@ -578,14 +592,28 @@ class LLMPolicy:
                         del self._game_notes[0]
     
     def _stuck_audit(self) -> str | None:
-        """One-line stuck audit every 15 actions past 40 on the same level."""
+        """Stuck audit on the same level: fires on actions (>=40, then every 15)
+        OR on tokens spent this level (>=50k, then every 20k)."""
+        fired = False
+        level_tokens = self.total_tokens - self._level_start_tokens
         if self._actions_on_level >= 40 and self._actions_on_level - self._last_audit_at >= 15:
-            self._last_audit_at = self._actions_on_level
-            return (f"⚠ STUCK AUDIT: {self._actions_on_level} actions on this level, "
-                    "not completed. In notes, mark falsified win-condition hypotheses "
-                    "with ✗, pick a DIFFERENT one, and run the cheapest 1–2 action "
-                    "experiment that distinguishes it.")
-        return None
+            fired = True
+        if level_tokens >= 50000 and level_tokens - self._audit_level_tokens >= 20000:
+            fired = True
+        if not fired:
+            return None
+        self._last_audit_at = self._actions_on_level
+        self._audit_level_tokens = level_tokens
+        return (
+            f"⚠ STRATEGY AUDIT: {self._actions_on_level} actions and "
+            f"~{level_tokens // 1000}k tokens spent on this level without solving it. "
+            "Before more actions, answer in at most 6 short lines: (1) which goal/"
+            "mechanic hypotheses you tested and which are FALSIFIED (mark ✗ in notes), "
+            "(2) which board elements, colors or valid actions you have NOT yet tried, "
+            "(3) whether the goal differs from your assumption (one game = one win "
+            "condition — but later levels add mechanics). Then run the single cheapest "
+            "1–2 action experiment that best distinguishes the remaining hypotheses."
+        )
     
     def _state_signature(self, frame: FrameInfo) -> str:
         """Compact state signature for loop detection."""
@@ -609,6 +637,16 @@ class LLMPolicy:
                     f"Level {frame.level} | Step {frame.step} | "
                     f"State: {frame.state_name} | "
                     f"Levels done: {frame.levels_completed} ===")
+        
+        # One-time structured notes request after solving a level
+        if self._pending_notes is not None:
+            n = self._pending_notes
+            self._pending_notes = None
+            parts.append(
+                f"First, write one short paragraph starting with \u201cLEVEL {n} NOTES:\u201d "
+                "stating the mechanics you verified, the win condition, and the action "
+                "pattern that solved it (max 4 short sentences). Then give the usual "
+                "JSON action(s) for the new level.")
         
         # Available actions
         model_actions = []

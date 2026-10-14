@@ -36,7 +36,7 @@ G_B = ((0, 1), (0, 0))
 def _policy(content='{"action": "UP"}') -> lp.LLMPolicy:
     p = lp.LLMPolicy.__new__(lp.LLMPolicy)
     p.config = None
-    p.client = types.SimpleNamespace(chat=lambda msgs: {"content": content})
+    p.client = types.SimpleNamespace(chat=lambda msgs: {"content": content}, total_tokens=0)
     p.tracker = lp.StateTracker()
     p._messages = []
     p._action_queue = []
@@ -51,6 +51,9 @@ def _policy(content='{"action": "UP"}') -> lp.LLMPolicy:
     p._last_exec = None
     p._last_grid = None
     p._run_lessons = []
+    p._level_start_tokens = 0
+    p._audit_level_tokens = 0
+    p._pending_notes = None
     return p
 
 

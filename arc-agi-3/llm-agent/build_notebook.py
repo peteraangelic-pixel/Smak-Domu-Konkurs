@@ -304,7 +304,7 @@ from arc_llm_agent import llm_policy as _lp
 
 _src = (agent_dir / "llm_policy.py").read_text()
 for _marker in ("_extract_action_objects", "FIELD GUIDE", "_probe_actions",
-                "STUCK AUDIT", '"notes"', "LESSONS BETWEEN GAMES"):
+                "STRATEGY AUDIT", '"notes"', "LESSONS BETWEEN GAMES"):
     assert _marker in _src, f"stale payload: missing {{_marker!r}} in llm_policy.py"
 
 _fi = _lp.FrameInfo(grid=((0, 0), (0, 0)), step=0, level=0,

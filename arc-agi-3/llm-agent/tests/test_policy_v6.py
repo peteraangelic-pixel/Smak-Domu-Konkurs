@@ -22,6 +22,7 @@ from llmagent import llm_policy as lp  # noqa: E402
 def _policy() -> lp.LLMPolicy:
     p = lp.LLMPolicy.__new__(lp.LLMPolicy)
     p.tracker = lp.StateTracker()
+    p.client = types.SimpleNamespace(total_tokens=0)
     p._messages = []
     p._action_queue = []
     p._actions_since_last_llm = 0
@@ -33,6 +34,9 @@ def _policy() -> lp.LLMPolicy:
     p._last_exec = None
     p._last_grid = None
     p._run_lessons = []
+    p._level_start_tokens = 0
+    p._audit_level_tokens = 0
+    p._pending_notes = None
     return p
 
 
@@ -95,7 +99,7 @@ class StuckAuditTest(unittest.TestCase):
         self.p._actions_on_level = 40
         first = self.p._stuck_audit()
         assert first is not None
-        self.assertIn("STUCK AUDIT", first)
+        self.assertIn("STRATEGY AUDIT", first)
         self.assertIsNone(self.p._stuck_audit())  # re-arm: 45 - 40 < 15
         self.p._actions_on_level = 55
         second = self.p._stuck_audit()

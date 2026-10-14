@@ -83,3 +83,19 @@ ARC games). Apply them as priors and verify against the new board.
   na ślepo (u nas oszczędność ~150–250k tokenów/grę przy 2.66 akcji/LLM z r016).
 
 Testy referencyjne: `arc-agi-3/llm-agent/tests/test_run_memory.py` (Smak-Domu-Konkurs).
+
+## Aktualizacja: v6.3 (audyt tokenowy + LEVEL NOTES) — 14.10 noc
+
+1. **Audyt utknięcia 2.0** — wyzwalacz PODWÓJNY (fuzja waszego `_stuck_audit_prompt`
+   z naszym): akcje ≥40 (potem co 15) LUB tokeny na poziomie ≥50k (potem co 20k).
+   Tokeny poziomu: `self._level_start_tokens = self.total_tokens` na zmianie poziomu;
+   delta liczona w `_stuck_audit()`. Treść = wasze 3 pytania + nasze ✗ + najtańszy test.
+   U nas testy: próg 50k, re-arm 20k, cisza poniżej obu progów, struktura tekstu.
+2. **LEVEL NOTES po rozwiązaniu poziomu** (jak wasz `_level_notes_request`): pole
+   `_pending_notes` ustawiane na zmianie poziomu (solved), treść wstrzykiwana JEDNORAZOWO
+   w `_build_user_turn` (nie do historii — działa też, gdy poziom rozwiązany w samych
+   probe'ach, a system prompt i tak trafia do rozmowy przy pierwszym wywołaniu LLM).
+3. Sprostowanie licencji (ponownie): Duck = `license: null` (API GitHub), NIE MIT —
+   używać jako rury, nie kopiować kodu. Wasz generator „z bazy Franzena" jest OK.
+
+Nasz llm_policy.py = referencja (testy 50/50 w `tests/`).
