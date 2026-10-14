@@ -178,8 +178,33 @@ STRATEGIES:
 IMPORTANT:
 - Be decisive. Don't waste actions on indecision.
 - If you've been stuck for 10+ actions, radically change strategy.
-- Track what worked and what didn't.
+- Track what worked and what didn't (use "notes").
 - Compact reasoning is fine, but always output a valid action.
+- Deliberate LESS, act MORE: actions are cheap (~1.5x headroom before extra moves cost
+  points), thinking tokens are the scarce resource. Max ~60 words per response.
+
+FIELD GUIDE (patterns observed across ARC-AGI-3 training games — treat as priors, verify on the board):
+- The win condition is almost always "ALL of something": all goal markers covered, all
+  avatars on exits, all vessels filled, exactly one peg left. Partial progress gives NO
+  signal — don't stop working because "most" of it is done.
+- Dotted outlines, hollow contours, and small markers sharing the color of a movable
+  object are usually the targets.
+- A large area that no action seems to affect, yet looks like it should be editable, is
+  almost always a PATTERN to copy, complete, or translate (≈40% of games).
+- Some games check the result only after a CONFIRM action and give very few attempts:
+  set the whole configuration up first, then confirm exactly once. Never confirm "to test".
+- A counter that decreases every action is a step/lives LIMIT: it reaching 0 is a LOSS,
+  never a win. Keep a margin; when it runs low, spend actions only on the safest known
+  progress toward the goal.
+
+GOAL PERSISTENCE: one game = one win condition for ALL its levels. Once you solve a
+level, you almost certainly know the goal — record it in "notes". Later levels add
+mechanics but do NOT change the goal class. If a level seems to contradict your goal,
+re-check what actually changed on screen; do not invent extra objects to fit an old rule.
+
+STUCK PROTOCOL: if many actions produce no level completion, stop re-trying variants of
+the same idea. In "notes", list win-condition hypotheses you tested and FALSIFIED (✗),
+form a different one, and run the cheapest experiment (1–2 actions) that distinguishes it.
 
 OUTPUT FORMAT — end your response with one or more JSON action objects.
 Single action (when uncertain or after an unexpected result):
@@ -194,6 +219,12 @@ they run in order until the next LLM call:
 ```
 or as one JSON array: `[{{"action": "UP"}}, {{"action": "LEFT"}}]`
 For MOUSE actions: {{"action": "MOUSE", "row": 5, "col": 10, "reasoning": "..."}}
+On the FIRST action object you may add a "notes" field — your compact memory for
+this game: the current goal hypothesis, learned rules, falsified hypotheses (✗).
+It is returned to you every turn; keep it under ~40 words, rewrite it when it changes:
+```json
+{{"action": "UP", "reasoning": "...", "notes": "GOAL: cover all dotted targets with the red cross. ✗ pushing boxes does nothing"}}
+```
 Do not output any other JSON objects.
 
 BATCHING RULES:
@@ -376,6 +407,12 @@ class LLMPolicy:
         self._last_level = 0
         self._actions_since_last_llm = 0
         self._max_actions_per_plan = 15  # re-plan after this many actions
+        
+        # Game notes (agent's own compact memory, from the "notes" field) and
+        # per-level action accounting for the stuck audit.
+        self._game_notes: list[str] = []
+        self._actions_on_level = 0
+        self._last_audit_at = 0
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -385,6 +422,9 @@ class LLMPolicy:
         self._action_queue.clear()
         self._last_level = 0
         self._actions_since_last_llm = 0
+        self._game_notes.clear()
+        self._actions_on_level = 0
+        self._last_audit_at = 0
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -398,6 +438,9 @@ class LLMPolicy:
             self._last_level = frame.levels_completed
             self._action_queue.clear()
             self._actions_since_last_llm = 0
+            self._actions_on_level = 0
+            self._last_audit_at = 0
+            # Notes are kept: one game = one win condition across levels.
             # Add level change notification to history
             if self._messages:
                 self._messages.append({
@@ -414,6 +457,7 @@ class LLMPolicy:
         if self._action_queue and self._actions_since_last_llm < self._max_actions_per_plan:
             action = self._action_queue.pop(0)
             self._actions_since_last_llm += 1
+            self._actions_on_level += 1
             self.tracker.record(state_sig, action.get("name", RESET))
             return action
         
@@ -441,20 +485,44 @@ class LLMPolicy:
         
         # Parse action(s) from response
         actions = self._parse_response(content, frame)
+        self._absorb_notes(actions)
         
         if not actions:
             # Fallback: try different directions
             action = self._fallback_action(frame)
             self.tracker.record(state_sig, action.get("name", RESET))
+            self._actions_on_level += 1
             return action
         
         # First action is immediate, rest go to queue
         immediate = actions[0]
         self._action_queue = actions[1:]
         self._actions_since_last_llm = 1
+        self._actions_on_level += 1
         
         self.tracker.record(state_sig, immediate.get("name", RESET))
         return immediate
+    
+    def _absorb_notes(self, actions: list[dict]) -> None:
+        """Capture the "notes" field from parsed actions into game memory."""
+        for action in actions:
+            note = action.pop("notes", None)
+            if note:
+                text = str(note).strip()
+                if text and (not self._game_notes or self._game_notes[-1] != text):
+                    self._game_notes.append(text)
+                    if len(self._game_notes) > 4:
+                        del self._game_notes[0]
+    
+    def _stuck_audit(self) -> str | None:
+        """One-line stuck audit every 15 actions past 40 on the same level."""
+        if self._actions_on_level >= 40 and self._actions_on_level - self._last_audit_at >= 15:
+            self._last_audit_at = self._actions_on_level
+            return (f"⚠ STUCK AUDIT: {self._actions_on_level} actions on this level, "
+                    "not completed. In notes, mark falsified win-condition hypotheses "
+                    "with ✗, pick a DIFFERENT one, and run the cheapest 1–2 action "
+                    "experiment that distinguishes it.")
+        return None
     
     def _state_signature(self, frame: FrameInfo) -> str:
         """Compact state signature for loop detection."""
@@ -510,6 +578,18 @@ class LLMPolicy:
         if self.tracker.action_history:
             recent = self.tracker.action_history[-5:]
             parts.append(f"\nRecent actions: {' → '.join(ENGINE_TO_MODEL.get(a, a) for a in recent)}")
+        
+        # Agent's own game notes (from earlier "notes" fields)
+        if self._game_notes:
+            parts.append("\nYour game notes:")
+            for note in self._game_notes:
+                parts.append(f"- {note}")
+        
+        # Actions on this level + periodic stuck audit
+        parts.append(f"\nActions on this level: {self._actions_on_level}")
+        audit = self._stuck_audit()
+        if audit:
+            parts.append(f"\n{audit}")
         
         # Anti-loop warning
         if self.tracker.is_looped():

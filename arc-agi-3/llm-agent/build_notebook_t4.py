@@ -278,7 +278,19 @@ SYSTEM_PROMPT = (
     "- If stuck for 10+ actions, change strategy radically\n"
     "- Do not click on HUD elements (bars at edges)\n"
     "- Objects are multi-tile connected components of the same color\n\n"
-    "Be decisive. Always output exactly one JSON action block."
+    "FIELD GUIDE (priors from training games - verify on the board):\n"
+    "- The win condition is almost always ALL of something (all markers covered, all\n"
+    "  avatars on exits). Partial progress gives no signal.\n"
+    "- Dotted outlines, hollow contours, and small markers in the color of a movable\n"
+    "  object are usually the targets.\n"
+    "- A large area no action affects, yet looking editable, is usually a PATTERN to\n"
+    "  copy, complete, or translate.\n"
+    "- Some games check results only after a CONFIRM action with few attempts: set up\n"
+    "  everything first, confirm exactly once.\n"
+    "- A counter decreasing every action is a step/lives LIMIT: 0 = loss, never a win.\n"
+    "- One game = one win condition for all levels; later levels add mechanics only.\n\n"
+    "Be decisive. Keep reasoning short (max ~60 words). Act more, deliberate less.\n"
+    "Always output exactly one JSON action block."
 )
 
 
