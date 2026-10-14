@@ -69,3 +69,20 @@ runner, ewolucja, payload) ORAZ naprawia 3 realne błędy ich klasyfikatora. Ich
 unikalny wkład, który u nas teraz żyje: goal-class detection, drabinka, ValueGate
 feedback. Co dalej bez zmian: prawda jest na Kaggle — paired A/B (GOAL_CLASS 0/1)
 po 17.10 zdecyduje, czy v6.9 startuje jako zgłoszenie.
+
+## AKTUALIZACJA (14.10 wieczór): ich v7.0 @740a993 — weryfikacja po fixach
+
+| Ich twierdzenie | Weryfikacja kodem @740a993 |
+|---|---|
+| Fix 1: fałszywe COPY (density>0.1 + brak 0-vs-0) | ✅ REALNE (L87, L100); 0/200 fałszywych na naszych testach |
+| Fix 2: puste wzorce | ✅ REALNE (ten sam mechanizm) |
+| Fix 3: REDUCE próg 20 | ✅ REALNE (L287); 12 pionków → COVER (nie REDUCE) |
+| Fix 4: hinty w system prompcie | ⚠️ NIE — wstrzykiwana sama etykieta klasy; `get_strategy_hint()` bez konsumenta; 13 testów testuje słownik, nie wiring |
+| Runner | ❌ nadal `llm_policy_v4` |
+| Ewolucja | ❌ nadal bez konsumenta |
+| Detekcja UNKNOWN | bez retry (nasza: retry na kolejnych klatkach) |
+
+Werdykt: ich klasyfikator jest teraz **równy naszemu** (na identycznych testach).
+Różnice jakościowe zostały: wiring hintów (u nas żyje), retry UNKNOWN, runner,
+ewolucja, 104 vs 13 testów. Szacunki 40–50 nadal traktujemy jako sumowanie
+sufitów — pomiary mają pierwszeństwo (24.66 / 27.21).
