@@ -301,6 +301,30 @@ class StateTracker:
 # Main LLM Policy
 # ---------------------------------------------------------------------------
 
+def _extract_action_objects(content: str) -> list[dict]:
+    """Return every top-level JSON object in `content` that has an "action" key.
+
+    Scans from each '{' with json.JSONDecoder.raw_decode, so nested braces
+    and code fences are handled. Invalid fragments are skipped.
+    """
+    decoder = json.JSONDecoder()
+    found: list[dict] = []
+    pos = 0
+    while True:
+        start = content.find("{", pos)
+        if start == -1:
+            break
+        try:
+            obj, end = decoder.raw_decode(content, start)
+        except json.JSONDecodeError:
+            pos = start + 1
+            continue
+        if isinstance(obj, dict) and "action" in obj:
+            found.append(obj)
+        pos = end
+    return found
+
+
 class LLMPolicy:
     """LLM-based policy with direct action output (no tool sandbox)."""
     
@@ -464,20 +488,13 @@ class LLMPolicy:
         """Parse action(s) from LLM response."""
         actions = []
         
-        # Look for JSON blocks
-        json_blocks = re.findall(r'```json\s*(\{.*?\})\s*```', content, re.DOTALL)
-        if not json_blocks:
-            # Try without code fences
-            json_blocks = re.findall(r'\{[^{}]*"action"[^{}]*\}', content)
-        
-        for block in json_blocks:
-            try:
-                parsed = json.loads(block)
-                action = self._normalize_action(parsed, frame)
-                if action:
-                    actions.append(action)
-            except json.JSONDecodeError:
-                continue
+        # Look for JSON objects with an "action" key (also with nested objects,
+        # e.g. {"action": "UP", "reasoning": {...}}; the old non-greedy regex
+        # cut those at the first "}" and silently dropped the action).
+        for parsed in _extract_action_objects(content):
+            action = self._normalize_action(parsed, frame)
+            if action:
+                actions.append(action)
         
         # If no JSON found, try to parse from text
         if not actions:

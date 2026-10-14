@@ -202,6 +202,32 @@ MODEL_TO_ENGINE = {
 ENGINE_TO_MODEL = {v: k for k, v in MODEL_TO_ENGINE.items()}
 ENGINE_TO_MODEL.update({"ACTION1": "UP", "ACTION2": "DOWN", "ACTION3": "LEFT", "ACTION4": "RIGHT"})
 
+
+def _extract_action_objects(content):
+    """Return every JSON object in `content` that has an "action" key.
+
+    Scans from each '{' with json.JSONDecoder.raw_decode, so nested braces
+    (e.g. a "reasoning" object) and code fences are handled. The old
+    non-greedy regex cut nested objects at the first "}" and silently
+    dropped the action.
+    """
+    decoder = json.JSONDecoder()
+    found = []
+    pos = 0
+    while True:
+        start = content.find("{", pos)
+        if start == -1:
+            break
+        try:
+            obj, end = decoder.raw_decode(content, start)
+        except json.JSONDecodeError:
+            pos = start + 1
+            continue
+        if isinstance(obj, dict) and "action" in obj:
+            found.append(obj)
+        pos = end
+    return found
+
 ARC_COLOR_CHARS = "WwgGcBMPRbSYOrNp"
 ARC_COLOR_LEGEND = (
     "W=white, w=light gray, g=gray, G=dark gray, c=charcoal, B=black, "
@@ -430,13 +456,8 @@ class LLMAgent(Agent):
         return self._parse_response(response, frame_info)
 
     def _parse_response(self, text, frame_info):
-        json_blocks = re.findall(r'```json\s*(\{.*?\})\s*```', text, re.DOTALL)
-        if not json_blocks:
-            json_blocks = re.findall(r'\{[^{}]*"action"[^{}]*\}', text)
-
-        for block in json_blocks:
+        for parsed in _extract_action_objects(text):
             try:
-                parsed = json.loads(block)
                 action_name = str(parsed.get("action", "")).upper().strip()
                 if not action_name:
                     continue
@@ -459,7 +480,7 @@ class LLMAgent(Agent):
                 if reasoning:
                     result["reasoning"]["llm"] = str(reasoning)[:200]
                 return result
-            except (json.JSONDecodeError, ValueError):
+            except ValueError:
                 continue
 
         text_upper = text.upper()
