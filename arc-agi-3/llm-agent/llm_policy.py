@@ -95,15 +95,19 @@ class LLMClient:
         self.total_calls = 0
         self.total_time = 0.0
     
-    def chat(self, messages: list[dict]) -> dict:
-        """Call chat completions. Returns the message dict."""
+    def chat(self, messages: list[dict], temperature: float | None = None) -> dict:
+        """Call chat completions. Returns the message dict.
+
+        `temperature` overrides the configured value for THIS call only
+        (adaptive exploration: hotter when deeply stuck, cooler when on a roll).
+        """
         url = f"{self.config.base_url.rstrip('/')}/chat/completions"
         
         payload: dict[str, Any] = {
             "model": self.config.model_id,
             "messages": messages,
             "max_tokens": self.config.max_output_tokens,
-            "temperature": self.config.temperature,
+            "temperature": self.config.temperature if temperature is None else temperature,
             "top_p": self.config.top_p,
             "stream": False,
         }
@@ -471,6 +475,7 @@ class LLMPolicy:
         self._pending_notes = None
         self._level_notes.clear()
         self._game_overs.clear()
+        self._audits_on_level = 0
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -495,6 +500,7 @@ class LLMPolicy:
             self._actions_since_last_llm = 0
             self._actions_on_level = 0
             self._last_audit_at = 0
+            self._audits_on_level = 0
             self._level_start_tokens = self.total_tokens
             self._audit_level_tokens = 0
             # Notes are kept: one game = one win condition across levels.
@@ -546,13 +552,23 @@ class LLMPolicy:
         # Trim context if too long
         self._trim_context()
         
+        # Adaptive temperature (idea from their v6.6, deterministic wiring):
+        # deep stuck (audit #2+) -> hot 0.9 (broad exploration after reset);
+        # fresh level -> 0.7 (encourage exploring the new board); else base.
+        temperature: float | None = None
+        if self._audits_on_level >= 2:
+            temperature = 0.9
+        elif self._actions_on_level < 5:
+            temperature = 0.7
+        
         # Call LLM
-        response = self.client.chat(self._messages)
+        response = self.client.chat(self._messages, temperature=temperature)
         content = response.get("content", "") or ""
         
         # Structured per-level notes survive via _level_notes even after
-        # old history is trimmed (v5.0 idea, adopted).
-        self._absorb_level_notes(content)
+        # old history is trimmed (v5.0 idea, adopted). v6.7: scan reasoning
+        # fields too — some models put the notes paragraph there.
+        self._absorb_level_notes(response)
         
         # Add assistant response to history
         self._messages.append({"role": "assistant", "content": content})
@@ -600,16 +616,36 @@ class LLMPolicy:
     
     _LEVEL_NOTES_RE = re.compile(
         r"LEVEL\s*(\d+)\s*NOTES?:\s*(.+?)(?=\n\s*\n|LEVEL\s*\d+\s*NOTES?:|\Z)",
-        re.DOTALL,
+        re.DOTALL | re.IGNORECASE,
     )
     
-    def _absorb_level_notes(self, content: str) -> None:
-        """Extract 'LEVEL X NOTES: ...' paragraphs from the model reply."""
-        for match in self._LEVEL_NOTES_RE.finditer(content):
-            level = int(match.group(1))
-            text = " ".join(match.group(2).split())
-            if text:
-                self._level_notes[level] = text[:400]
+    def _absorb_level_notes(self, response: Any) -> None:
+        """Extract 'LEVEL X NOTES: ...' paragraphs from the model reply.
+
+        `response` may be a plain string or the message dict; in the dict we
+        scan content AND reasoning/reasoning_content (reasoning models often
+        put the paragraph there)."""
+        if isinstance(response, str):
+            texts = [response]
+        else:
+            texts = []
+            for key in ("content", "reasoning", "reasoning_content"):
+                value = response.get(key) if isinstance(response, dict) else None
+                if isinstance(value, str) and value:
+                    texts.append(value)
+                elif isinstance(value, list):
+                    texts.extend(
+                        part.get("text", "")
+                        for part in value
+                        if isinstance(part, dict) and isinstance(part.get("text"), str)
+                    )
+        for text in texts:
+            for match in self._LEVEL_NOTES_RE.finditer(text):
+                level = int(match.group(1))
+                note = " ".join(match.group(2).replace("`", " ").split())
+                if len(note) < 10 or not (0 <= level < 100):
+                    continue
+                self._level_notes[level] = note[:400]
         # Keep only the 3 most recent levels.
         for lvl in sorted(self._level_notes)[:-3]:
             del self._level_notes[lvl]

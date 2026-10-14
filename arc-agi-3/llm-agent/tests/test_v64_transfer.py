@@ -68,11 +68,13 @@ class LevelNotesExtractionTest(unittest.TestCase):
 
     def test_kilka_notatek_i_nadpisanie(self) -> None:
         p = _policy()
-        p._absorb_level_notes("LEVEL 0 NOTES: aaa.\nLEVEL 1 NOTES: bbb.")
-        self.assertEqual(p._level_notes[0], "aaa.")
-        self.assertEqual(p._level_notes[1], "bbb.")
-        p._absorb_level_notes("LEVEL 0 NOTES: nowa wersja.")
-        self.assertEqual(p._level_notes[0], "nowa wersja.")
+        p._absorb_level_notes(
+            "LEVEL 0 NOTES: collect wagons left to right.\n"
+            "LEVEL 1 NOTES: portals teleport the avatar.")
+        self.assertEqual(p._level_notes[0], "collect wagons left to right.")
+        self.assertEqual(p._level_notes[1], "portals teleport the avatar.")
+        p._absorb_level_notes("LEVEL 0 NOTES: nowa, dluzsza wersja notatki.")
+        self.assertEqual(p._level_notes[0], "nowa, dluzsza wersja notatki.")
 
     def test_kafelek_trzyma_maks_trzy_poziomy(self) -> None:
         p = _policy()

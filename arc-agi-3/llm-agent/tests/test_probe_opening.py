@@ -33,7 +33,7 @@ def _frame(levels: int = 0, actions=None) -> lp.FrameInfo:
 def _policy_stub(client_content: str = '{"action": "UP"}') -> lp.LLMPolicy:
     p = lp.LLMPolicy.__new__(lp.LLMPolicy)
     p.config = None
-    p.client = types.SimpleNamespace(chat=lambda msgs: {"content": client_content}, total_tokens=0)
+    p.client = types.SimpleNamespace(chat=lambda msgs, temperature=None: {"content": client_content}, total_tokens=0)
     p.tracker = lp.StateTracker()
     p._messages = []
     p._action_queue = []
@@ -53,6 +53,7 @@ def _policy_stub(client_content: str = '{"action": "UP"}') -> lp.LLMPolicy:
     p._pending_notes = None
     p._level_notes = {}
     p._game_overs = []
+    p._audits_on_level = 0
     return p
 
 

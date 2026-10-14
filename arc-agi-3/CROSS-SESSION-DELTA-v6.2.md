@@ -127,3 +127,17 @@ są wyrzucane. Kolejka (u nas `_action_queue`, do 15) sprawia, że batching real
    gdy acc ≤ base rate + 10pp. Użycie: `VALUE_MODEL_JSON=plik.json` włącza gate.
 
 Nasz v6.5 = drabinka eskalacji (audit #2+ → STRATEGY RESET) + opcjonalny gate.
+
+## v6.6 (1b09b13): cztery „nowe idee" są u was martwym kodem — sprawdźcie przed zgłoszeniem
+
+1. Adaptive temperature: `ml_value=0.5` bez gate'a → temperatura zawsze 0.6 (martwe).
+2. Confidence batching: to tylko max_tokens; batch akcji nadal nie istnieje
+   (`return actions[0]`) — akcje 2..N z tablicy lecą do kosza (jak w v5.0).
+3. Pattern library: `goal_class` nigdy nie jest ustawiane → `add_pattern` nie odpala.
+4. Multi-hypothesis: `add_hypothesis/update_hypothesis` bez wywołań → `to_prompt()` puste.
+5. `_parse_actions` wciąż non-greedy (`\{.*?\}`) — bug z 14.10; w respuesta z zagnieżdżonym
+   reasoning gubi akcje. Fix: `json.JSONDecoder.raw_decode` (kod u nas).
+
+U nas (v6.7): temperatura adaptacyjna z DETERMINISTYCZNYM wyzwalaczem (audyt #2+ → 0.9,
+świeży poziom → 0.7, inaczej config) + odporna ekstrakcja LEVEL NOTES (reasoning pola,
+re.I, filtr długości). 79/79 testów. Referencja: nasze llm_policy.py + testy.

@@ -130,7 +130,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--lr", type=float, default=0.05)
     args = parser.parse_args(argv)
 
-    import numpy  # noqa: F401  — deklaracja zależności; obliczenia czysty Python
+    try:
+        import numpy  # noqa: F401  — opcjonalny; obliczenia są w czystym Pythonie
+    except ImportError:
+        print("UWAGA: numpy nie jest zainstalowane — nie przeszkadza (czysty Python).")
 
     games, xs, ys = load_csv(args.csv)
     train_ids, val_ids = game_split(games, args.holdout)
