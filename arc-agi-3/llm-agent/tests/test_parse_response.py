@@ -67,6 +67,16 @@ class ParseResponseTest(unittest.TestCase):
     def test_niedozwolona_akcja_jest_pomijana(self) -> None:
         self.assertEqual(self.parse('{"action": "TELEPORT"}'), [])
 
+    def test_batch_z_promptu_konczy_w_kolejce(self) -> None:
+        content = (
+            'Reasoning...\n'
+            '```json\n{"action": "UP", "reasoning": "a"}\n```\n'
+            '```json\n{"action": "UP", "reasoning": "b"}\n```\n'
+            '```json\n{"action": "LEFT", "reasoning": "c"}\n```'
+        )
+        actions = self.parse(content)
+        self.assertEqual([a["name"] for a in actions], ["ACTION1", "ACTION1", "ACTION3"])
+
     def test_uszkodzony_json_nie_wywala_parsera(self) -> None:
         # Brak słów kierunkowych w tekście: fallback tekstowy nic nie znajdzie.
         self.assertEqual(self.parse('{"action": "XYZ", "reasoning": {'), [])
@@ -81,6 +91,19 @@ class ExtractActionObjectsTest(unittest.TestCase):
         objs = lp._extract_action_objects('{"action": "UP", "r": {"k": {"n": 2}}}')
         self.assertEqual(len(objs), 1)
         self.assertEqual(objs[0]["r"]["k"]["n"], 2)
+
+    def test_lista_akcji_jako_plan(self) -> None:
+        objs = lp._extract_action_objects(
+            'Plan:\n```json\n[{"action": "UP"}, {"action": "LEFT"}, {"action": "DOWN"}]\n```'
+        )
+        self.assertEqual([o["action"] for o in objs], ["UP", "LEFT", "DOWN"])
+
+    def test_lista_bez_akcji_jest_pomijana(self) -> None:
+        self.assertEqual(lp._extract_action_objects("[1, 2, {\"x\": 3}]"), [])
+
+    def test_prompt_uczy_batchowania(self) -> None:
+        self.assertIn("Plan several actions", lp.SYSTEM_PROMPT)
+        self.assertIn("STEP LIMIT", lp.SYSTEM_PROMPT)
 
 
 if __name__ == "__main__":

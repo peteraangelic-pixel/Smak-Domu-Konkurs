@@ -181,13 +181,31 @@ IMPORTANT:
 - Track what worked and what didn't.
 - Compact reasoning is fine, but always output a valid action.
 
-OUTPUT FORMAT — you MUST output a JSON object on the LAST line of your response:
+OUTPUT FORMAT — end your response with one or more JSON action objects.
+Single action (when uncertain or after an unexpected result):
 ```json
 {{"action": "ACTION_NAME", "reasoning": "brief explanation"}}
 ```
+Plan several actions at once (preferred for routine sequences, up to 8) —
+they run in order until the next LLM call:
+```json
+{{"action": "UP", "reasoning": "step 1 of path"}}
+{{"action": "LEFT", "reasoning": "step 2 of path"}}
+```
+or as one JSON array: `[{{"action": "UP"}}, {{"action": "LEFT"}}]`
 For MOUSE actions: {{"action": "MOUSE", "row": 5, "col": 10, "reasoning": "..."}}
-For directions: {{"action": "UP", "reasoning": "..."}}
-Always output exactly one JSON action block."""
+Do not output any other JSON objects.
+
+BATCHING RULES:
+- Plan a whole path or repetition (e.g. "move LEFT 5 times") as multiple
+  action objects in ONE response — this saves thinking time for later.
+- Stop the plan early (single action) if the next step depends on what a
+  previous step reveals.
+- The step counter shown in the HUD is the STEP LIMIT for the level, not a
+  timer; nothing bad happens over time, only wasted steps. If it is running
+  low, prioritize the safest known progress toward the goal.
+- Experiment to learn mechanics, but prefer cheap experiments (one or two
+  steps) over long deliberation. Always keep some budget to finish the level."""
 
 
 # ---------------------------------------------------------------------------
@@ -302,16 +320,28 @@ class StateTracker:
 # ---------------------------------------------------------------------------
 
 def _extract_action_objects(content: str) -> list[dict]:
-    """Return every top-level JSON object in `content` that has an "action" key.
+    """Return every action dict found in `content`.
 
-    Scans from each '{' with json.JSONDecoder.raw_decode, so nested braces
-    and code fences are handled. Invalid fragments are skipped.
+    Scans from each '{' or '[' with json.JSONDecoder.raw_decode, so nested
+    braces (e.g. {"action": "UP", "reasoning": {...}}) and code fences are
+    handled. Also unwraps JSON arrays of action objects, e.g.
+    [{"action": "UP"}, {"action": "LEFT"}]. Invalid fragments are skipped.
     """
     decoder = json.JSONDecoder()
     found: list[dict] = []
+
+    def next_pos(p: int) -> int:
+        brace = content.find("{", p)
+        bracket = content.find("[", p)
+        if brace == -1:
+            return bracket
+        if bracket == -1:
+            return brace
+        return min(brace, bracket)
+
     pos = 0
     while True:
-        start = content.find("{", pos)
+        start = next_pos(pos)
         if start == -1:
             break
         try:
@@ -321,6 +351,10 @@ def _extract_action_objects(content: str) -> list[dict]:
             continue
         if isinstance(obj, dict) and "action" in obj:
             found.append(obj)
+        elif isinstance(obj, list):
+            for item in obj:
+                if isinstance(item, dict) and "action" in item:
+                    found.append(item)
         pos = end
     return found
 

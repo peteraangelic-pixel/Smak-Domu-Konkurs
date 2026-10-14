@@ -213,9 +213,19 @@ def _extract_action_objects(content):
     """
     decoder = json.JSONDecoder()
     found = []
+
+    def next_pos(p):
+        brace = content.find("{", p)
+        bracket = content.find("[", p)
+        if brace == -1:
+            return bracket
+        if bracket == -1:
+            return brace
+        return min(brace, bracket)
+
     pos = 0
     while True:
-        start = content.find("{", pos)
+        start = next_pos(pos)
         if start == -1:
             break
         try:
@@ -225,6 +235,10 @@ def _extract_action_objects(content):
             continue
         if isinstance(obj, dict) and "action" in obj:
             found.append(obj)
+        elif isinstance(obj, list):
+            for item in obj:
+                if isinstance(item, dict) and "action" in item:
+                    found.append(item)
         pos = end
     return found
 
