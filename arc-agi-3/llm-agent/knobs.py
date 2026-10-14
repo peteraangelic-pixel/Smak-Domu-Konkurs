@@ -64,4 +64,14 @@ def apply_overrides(raw: str | None) -> None:
             print(f"[KNOBS] pomijam nieznane/złe pole: {key}={value!r}")
 
 
+# Snapshot domyślnych wartości (do resetu w workerach multiprocessing).
+DEFAULTS: dict[str, float] = dict(KNOBS)
+
+
+def reset_to_defaults() -> None:
+    """Przywróć wartości domyślne (worker multiprocessing przed własnym nadpisaniem)."""
+    KNOBS.clear()
+    KNOBS.update(DEFAULTS)
+
+
 apply_overrides(os.environ.get("ARC3_KNOBS_JSON"))

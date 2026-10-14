@@ -105,7 +105,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default="best_knobs.json")
     args = parser.parse_args(argv)
 
-    fitness = toy_fitness if args.fitness is None else load_fitness(args.fitness)
+    raw = toy_fitness if args.fitness is None else load_fitness(args.fitness)
+    try:
+        fitness = raw()  # fabryka (np. local_eval:make_fitness) → zwraca fitness
+        if not callable(fitness):
+            fitness = raw
+    except TypeError:
+        fitness = raw  # zwykła funkcja fitness(knobs)
     best, value = cem(fitness, args.gens, args.pop)
     print(f"best fitness={value:.4f}")
     Path(args.out).write_text(json.dumps(best, indent=1), encoding="utf-8")
