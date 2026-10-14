@@ -20,6 +20,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Sequence
 
+from .knobs import KNOBS
 from .grid_utils import (
     ARC_COLOR_CHARS,
     ARC_COLOR_LEGEND,
@@ -219,7 +220,8 @@ Single action (when uncertain or after an unexpected result):
 ```json
 {{"action": "ACTION_NAME", "reasoning": "brief explanation"}}
 ```
-Plan several actions at once (preferred for routine sequences, up to 8) —
+Plan several actions at once (preferred for routine sequences, up to
+{KNOBS["PROMPT_BATCH_MAX"]}) —
 they run in order until the next LLM call:
 ```json
 {{"action": "UP", "reasoning": "step 1 of path"}}
@@ -414,7 +416,7 @@ class LLMPolicy:
         self._action_queue: list[dict] = []
         self._last_level = 0
         self._actions_since_last_llm = 0
-        self._max_actions_per_plan = 15  # re-plan after this many actions
+        self._max_actions_per_plan = int(KNOBS["QUEUE_MAX"])  # re-plan after this many queued actions
         
         # Game notes (agent's own compact memory, from the "notes" field) and
         # per-level action accounting for the stuck audit.
@@ -461,8 +463,8 @@ class LLMPolicy:
         for note in self._game_notes:
             if note not in self._run_lessons:
                 self._run_lessons.append(note)
-        if len(self._run_lessons) > 8:
-            del self._run_lessons[:len(self._run_lessons) - 8]
+        if len(self._run_lessons) > KNOBS["LESSONS_MAX"]:
+            del self._run_lessons[:len(self._run_lessons) - KNOBS["LESSONS_MAX"]]
         self._game_notes.clear()
         self._actions_on_level = 0
         self._last_audit_at = 0
@@ -489,7 +491,7 @@ class LLMPolicy:
         # silent (safe — no false positives), elsewhere it is reliable.
         if self._last_exec is not None and self._last_grid is not None:
             self._noop_recent.append((self._last_exec, frame.grid != self._last_grid))
-            if len(self._noop_recent) > 10:
+            if len(self._noop_recent) > KNOBS["NOOP_WINDOW"]:
                 del self._noop_recent[0]
         
         # Check for level change — re-plan immediately
@@ -556,10 +558,10 @@ class LLMPolicy:
         # deep stuck (audit #2+) -> hot 0.9 (broad exploration after reset);
         # fresh level -> 0.7 (encourage exploring the new board); else base.
         temperature: float | None = None
-        if self._audits_on_level >= 2:
-            temperature = 0.9
-        elif self._actions_on_level < 5:
-            temperature = 0.7
+        if self._audits_on_level >= int(KNOBS["AUDIT_ESCALATE_FROM"]):
+            temperature = KNOBS["TEMP_STUCK"]
+        elif self._actions_on_level < KNOBS["TEMP_FRESH_ACTIONS"]:
+            temperature = KNOBS["TEMP_FRESH"]
         
         # Call LLM
         response = self.client.chat(self._messages, temperature=temperature)
@@ -610,7 +612,7 @@ class LLMPolicy:
         """
         probes = []
         for engine in ("ACTION1", "ACTION2", "ACTION3", "ACTION4"):
-            if engine in frame.available_actions:
+            if engine in frame.available_actions and len(probes) < int(KNOBS["PROBE_MAX"]):
                 probes.append({"name": engine, "reasoning": {"probe": True}})
         return probes
     
@@ -645,9 +647,9 @@ class LLMPolicy:
                 note = " ".join(match.group(2).replace("`", " ").split())
                 if len(note) < 10 or not (0 <= level < 100):
                     continue
-                self._level_notes[level] = note[:400]
-        # Keep only the 3 most recent levels.
-        for lvl in sorted(self._level_notes)[:-3]:
+                self._level_notes[level] = note[:int(KNOBS["LEVEL_NOTES_CHARS"])]
+        # Keep only the most recent levels (KNOBS).
+        for lvl in sorted(self._level_notes)[:-int(KNOBS["LEVEL_NOTES_KEEP"])]:
             del self._level_notes[lvl]
     
     def note_game_over(self, frame: FrameInfo) -> None:
@@ -656,8 +658,8 @@ class LLMPolicy:
             f"died on level {frame.level}, step {frame.step}, after "
             f"{self._actions_on_level} actions on this level"
         )
-        if len(self._game_overs) > 5:
-            del self._game_overs[:len(self._game_overs) - 5]
+        if len(self._game_overs) > KNOBS["GAME_OVERS_KEEP"]:
+            del self._game_overs[:len(self._game_overs) - KNOBS["GAME_OVERS_KEEP"]]
     
     def _absorb_notes(self, actions: list[dict]) -> None:
         """Capture the "notes" field from parsed actions into game memory."""
@@ -667,7 +669,7 @@ class LLMPolicy:
                 text = str(note).strip()
                 if text and (not self._game_notes or self._game_notes[-1] != text):
                     self._game_notes.append(text)
-                    if len(self._game_notes) > 4:
+                    if len(self._game_notes) > KNOBS["NOTES_MAX"]:
                         del self._game_notes[0]
     
     def _stuck_audit(self, frame: FrameInfo | None = None) -> str | None:
@@ -683,9 +685,11 @@ class LLMPolicy:
             if value is not None and value < gate.low:
                 fired = True
                 gate_note = f" (learned state-value {value:.2f} — this trajectory looks unproductive)"
-        if self._actions_on_level >= 40 and self._actions_on_level - self._last_audit_at >= 15:
+        if (self._actions_on_level >= KNOBS["AUDIT_ACTIONS"]
+                and self._actions_on_level - self._last_audit_at >= KNOBS["AUDIT_ACTIONS_REARM"]):
             fired = True
-        if level_tokens >= 50000 and level_tokens - self._audit_level_tokens >= 20000:
+        if (level_tokens >= KNOBS["AUDIT_TOKENS"]
+                and level_tokens - self._audit_level_tokens >= KNOBS["AUDIT_TOKENS_REARM"]):
             fired = True
         if not fired:
             return None
@@ -703,7 +707,7 @@ class LLMPolicy:
             "condition — but later levels add mechanics). Then run the single cheapest "
             "1–2 action experiment that best distinguishes the remaining hypotheses."
         )
-        if audits >= 2:
+        if audits >= int(KNOBS["AUDIT_ESCALATE_FROM"]):
             base += (
                 f"\n⚠ STRATEGY RESET: this is audit #{audits} on the same level — the "
                 "current approach IS the problem. Abandon it entirely: from the FIELD "
@@ -792,7 +796,7 @@ class LLMPolicy:
         # Failure recovery: what already killed us in this game
         if self._game_overs:
             parts.append("\nGAME OVER HISTORY (avoid repeating these):")
-            for line in self._game_overs[-3:]:
+            for line in self._game_overs[-int(KNOBS["GAME_OVERS_SHOW"]):]:
                 parts.append(f"- {line}")
         
         # Run-level lessons: injected on the first LLM turn of each game
@@ -803,9 +807,9 @@ class LLMPolicy:
         
         # No-op feedback (only when there is something worth saying)
         noop_total = len(self._noop_recent)
-        if noop_total >= 6:
+        if noop_total >= KNOBS["NOOP_MIN_SAMPLES"]:
             noops = [name for name, changed in self._noop_recent if not changed]
-            if len(noops) >= 3:
+            if len(noops) >= KNOBS["NOOP_TRIGGER"]:
                 detail = ", ".join(f"{n}×{c}" for n, c in Counter(noops).most_common(3))
                 parts.append(
                     f"\nNo-op check: {len(noops)}/{noop_total} recent actions did NOT "
