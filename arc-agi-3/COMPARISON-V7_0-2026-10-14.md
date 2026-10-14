@@ -86,3 +86,18 @@ Werdykt: ich klasyfikator jest teraz **równy naszemu** (na identycznych testach
 Różnice jakościowe zostały: wiring hintów (u nas żyje), retry UNKNOWN, runner,
 ewolucja, 104 vs 13 testów. Szacunki 40–50 nadal traktujemy jako sumowanie
 sufitów — pomiary mają pierwszeństwo (24.66 / 27.21).
+
+## AKTUALIZACJA 2 (14.10 21:30, @cc1b657): runner/adapter/notebook
+
+| Wymiar | @740a993 | @cc1b657 (teraz) |
+|---|---|---|
+| Runner | ❌ v4 | ✅ run_games_v7 → v7_0 + realny OpenAI klient (sekwencyjnie, bez MP) |
+| Adapter Kaggle framework | ❌ brak | ✅ llm_agent_v7 (Agent subclass, coords clamp, budżet, auto-RESET) |
+| Notebook z v7 | ❌ stare | ✅ v7.ipynb (3 pliki osadzone; bez self-testu) |
+| Hints w prompcie | ❌ | ❌ nadal import bez wywołania |
+| Ewolucja | ❌ | ❌ nadal martwa |
+| MP | — | ❌ sekwencyjnie |
+
+Zostaje u nas przewagą: 12/12 mechanizmów, 24 knobsy + CEM spięty z ewaluatorem,
+MP w runnerze, retry UNKNOWN, self-test w payloadze, fix TRUE_SUBMISSION,
+104 testy. ich unikalny żywy wkład: etykieta klasy w prompcie + ValueGate feedback.
