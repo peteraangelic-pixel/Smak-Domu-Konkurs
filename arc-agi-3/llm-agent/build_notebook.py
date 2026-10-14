@@ -42,6 +42,7 @@ def build_notebook(output_path: str) -> None:
     grid_utils_b64 = encode_file(str(agent_dir / "grid_utils.py"))
     llm_policy_b64 = encode_file(str(agent_dir / "llm_policy.py"))
     llm_agent_b64 = encode_file(str(agent_dir / "llm_agent.py"))
+    value_gate_b64 = encode_file(str(agent_dir / "value_gate.py"))
     
     cells = []
     
@@ -281,6 +282,7 @@ agent_dir.mkdir(parents=True, exist_ok=True)
 (agent_dir / "grid_utils.py").write_bytes(base64.b64decode({json.dumps(grid_utils_b64)}))
 (agent_dir / "llm_policy.py").write_bytes(base64.b64decode({json.dumps(llm_policy_b64)}))
 (agent_dir / "llm_agent.py").write_bytes(base64.b64decode({json.dumps(llm_agent_b64)}))
+(agent_dir / "value_gate.py").write_bytes(base64.b64decode({json.dumps(value_gate_b64)}))
 
 # Set environment for the agent
 os.environ["LLM_BASE_URL"] = VLLM_BASE_URL
@@ -304,7 +306,8 @@ from arc_llm_agent import llm_policy as _lp
 
 _src = (agent_dir / "llm_policy.py").read_text()
 for _marker in ("_extract_action_objects", "FIELD GUIDE", "_probe_actions",
-                "STRATEGY AUDIT", '"notes"', "LESSONS BETWEEN GAMES"):
+                "STRATEGY AUDIT", '"notes"', "LESSONS BETWEEN GAMES",
+                "class ValueGate"):
     assert _marker in _src, f"stale payload: missing {{_marker!r}} in llm_policy.py"
 
 _fi = _lp.FrameInfo(grid=((0, 0), (0, 0)), step=0, level=0,

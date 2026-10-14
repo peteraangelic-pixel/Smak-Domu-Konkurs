@@ -114,3 +114,16 @@ są wyrzucane. Kolejka (u nas `_action_queue`, do 15) sprawia, że batching real
 ## Adoptowaliśmy od was (v6.4, 59/59 testów)
 - Ekstrakcja LEVEL X NOTES (regex) + reinjekcja co turę — notatki przeżywają przycięcie historii.
 - GAME OVER HISTORY (wasz FAILURE_RECOVERY) — `note_game_over()` z auto-resetu w agencie.
+
+## ⚠ v5.1 (1675aa4): trzy rzeczy do naprawy PRZED użyciem MLP
+
+1. `load_mlp_weights` fallback = **losowe wagi**. Gate na losowych wagach to szum —
+   zmieniaj strategię wg szumu. U nas (value_gate.py): brak pliku = gate całkiem OFF.
+2. `training_data_generator.py` używa Mock policy — nie wygenerowano prawdziwych danych.
+   Prawdziwe dane wymagają przebiegów (GPU) ALBO lokalnych gier (arcengine, CPU).
+3. `mlp_value_model.py` split 80/20 po wierszach → wyciek (stany kolejne identyczne);
+   dokładnie tak zawyżyło się „acc 0.913" w Pokemonie, a paired A/B potem pokazało
+   ML neutralno-ujemne. U nas: `train_value_model.py` — split per GRA + ostrzeżenie
+   gdy acc ≤ base rate + 10pp. Użycie: `VALUE_MODEL_JSON=plik.json` włącza gate.
+
+Nasz v6.5 = drabinka eskalacji (audit #2+ → STRATEGY RESET) + opcjonalny gate.

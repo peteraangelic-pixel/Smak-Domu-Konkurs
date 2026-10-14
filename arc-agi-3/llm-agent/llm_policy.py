@@ -437,6 +437,13 @@ class LLMPolicy:
         self._level_notes: dict[int, str] = {}
         # Game-over history for failure recovery (max 5, last 3 shown).
         self._game_overs: list[str] = []
+        # Optional learned state-value gate (v6.5). OFF unless env
+        # VALUE_MODEL_JSON points to trained weights (train_value_model.py).
+        try:
+            from .value_gate import ValueGate
+            self.value_gate = ValueGate.from_env()
+        except Exception:
+            self.value_gate = None
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -627,11 +634,19 @@ class LLMPolicy:
                     if len(self._game_notes) > 4:
                         del self._game_notes[0]
     
-    def _stuck_audit(self) -> str | None:
+    def _stuck_audit(self, frame: FrameInfo | None = None) -> str | None:
         """Stuck audit on the same level: fires on actions (>=40, then every 15)
-        OR on tokens spent this level (>=50k, then every 20k)."""
+        OR on tokens spent this level (>=50k, then every 20k), or immediately
+        when an optional trained ValueGate rates the state below its low bar."""
         fired = False
+        gate_note = ""
         level_tokens = self.total_tokens - self._level_start_tokens
+        gate = getattr(self, "value_gate", None)
+        if gate is not None and frame is not None:
+            value = gate.value(self, frame)
+            if value is not None and value < gate.low:
+                fired = True
+                gate_note = f" (learned state-value {value:.2f} — this trajectory looks unproductive)"
         if self._actions_on_level >= 40 and self._actions_on_level - self._last_audit_at >= 15:
             fired = True
         if level_tokens >= 50000 and level_tokens - self._audit_level_tokens >= 20000:
@@ -640,8 +655,10 @@ class LLMPolicy:
             return None
         self._last_audit_at = self._actions_on_level
         self._audit_level_tokens = level_tokens
-        return (
-            f"⚠ STRATEGY AUDIT: {self._actions_on_level} actions and "
+        audits = getattr(self, "_audits_on_level", 0) + 1
+        setattr(self, "_audits_on_level", audits)
+        base = (
+            f"⚠ STRATEGY AUDIT{gate_note}: {self._actions_on_level} actions and "
             f"~{level_tokens // 1000}k tokens spent on this level without solving it. "
             "Before more actions, answer in at most 6 short lines: (1) which goal/"
             "mechanic hypotheses you tested and which are FALSIFIED (mark ✗ in notes), "
@@ -650,6 +667,14 @@ class LLMPolicy:
             "condition — but later levels add mechanics). Then run the single cheapest "
             "1–2 action experiment that best distinguishes the remaining hypotheses."
         )
+        if audits >= 2:
+            base += (
+                f"\n⚠ STRATEGY RESET: this is audit #{audits} on the same level — the "
+                "current approach IS the problem. Abandon it entirely: from the FIELD "
+                "GUIDE goal classes pick the one that best matches the board, and do "
+                "NOT repeat any action pattern from the failed approach."
+            )
+        return base
     
     def _state_signature(self, frame: FrameInfo) -> str:
         """Compact state signature for loop detection."""
@@ -753,7 +778,7 @@ class LLMPolicy:
         
         # Actions on this level + periodic stuck audit
         parts.append(f"\nActions on this level: {self._actions_on_level}")
-        audit = self._stuck_audit()
+        audit = self._stuck_audit(frame)
         if audit:
             parts.append(f"\n{audit}")
         
