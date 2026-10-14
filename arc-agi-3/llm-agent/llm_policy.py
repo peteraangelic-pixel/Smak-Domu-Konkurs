@@ -432,6 +432,11 @@ class LLMPolicy:
         self._audit_level_tokens = 0
         # Level whose structured notes are requested in the next user turn.
         self._pending_notes: int | None = None
+        # Structured notes per solved level, extracted from model replies
+        # (survive context trimming; injected into every user turn).
+        self._level_notes: dict[int, str] = {}
+        # Game-over history for failure recovery (max 5, last 3 shown).
+        self._game_overs: list[str] = []
     
     def reset_game(self) -> None:
         """Reset for a new game."""
@@ -457,6 +462,8 @@ class LLMPolicy:
         self._level_start_tokens = self.total_tokens
         self._audit_level_tokens = 0
         self._pending_notes = None
+        self._level_notes.clear()
+        self._game_overs.clear()
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -536,6 +543,10 @@ class LLMPolicy:
         response = self.client.chat(self._messages)
         content = response.get("content", "") or ""
         
+        # Structured per-level notes survive via _level_notes even after
+        # old history is trimmed (v5.0 idea, adopted).
+        self._absorb_level_notes(content)
+        
         # Add assistant response to history
         self._messages.append({"role": "assistant", "content": content})
         
@@ -579,6 +590,31 @@ class LLMPolicy:
             if engine in frame.available_actions:
                 probes.append({"name": engine, "reasoning": {"probe": True}})
         return probes
+    
+    _LEVEL_NOTES_RE = re.compile(
+        r"LEVEL\s*(\d+)\s*NOTES?:\s*(.+?)(?=\n\s*\n|LEVEL\s*\d+\s*NOTES?:|\Z)",
+        re.DOTALL,
+    )
+    
+    def _absorb_level_notes(self, content: str) -> None:
+        """Extract 'LEVEL X NOTES: ...' paragraphs from the model reply."""
+        for match in self._LEVEL_NOTES_RE.finditer(content):
+            level = int(match.group(1))
+            text = " ".join(match.group(2).split())
+            if text:
+                self._level_notes[level] = text[:400]
+        # Keep only the 3 most recent levels.
+        for lvl in sorted(self._level_notes)[:-3]:
+            del self._level_notes[lvl]
+    
+    def note_game_over(self, frame: FrameInfo) -> None:
+        """Record a death for failure recovery (called by the agent wrapper)."""
+        self._game_overs.append(
+            f"died on level {frame.level}, step {frame.step}, after "
+            f"{self._actions_on_level} actions on this level"
+        )
+        if len(self._game_overs) > 5:
+            del self._game_overs[:len(self._game_overs) - 5]
     
     def _absorb_notes(self, actions: list[dict]) -> None:
         """Capture the "notes" field from parsed actions into game memory."""
@@ -685,6 +721,18 @@ class LLMPolicy:
             parts.append("\nYour game notes:")
             for note in self._game_notes:
                 parts.append(f"- {note}")
+        
+        # Structured notes from solved levels (survive context trimming)
+        if self._level_notes:
+            parts.append("\nLevel notes (from solved levels):")
+            for lvl in sorted(self._level_notes)[-3:]:
+                parts.append(f"Level {lvl}: {self._level_notes[lvl]}")
+        
+        # Failure recovery: what already killed us in this game
+        if self._game_overs:
+            parts.append("\nGAME OVER HISTORY (avoid repeating these):")
+            for line in self._game_overs[-3:]:
+                parts.append(f"- {line}")
         
         # Run-level lessons: injected on the first LLM turn of each game
         if self._run_lessons and not self.tracker.action_history:

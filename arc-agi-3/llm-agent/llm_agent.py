@@ -176,6 +176,10 @@ class LLMAgent(Agent):
             
             # Auto-reset on GAME_OVER
             if frame_info.state_name == "GAME_OVER":
+                try:
+                    self.policy.note_game_over(frame_info)
+                except Exception:
+                    pass
                 action = GameAction.RESET
                 action.set_data({})
                 action.reasoning = {"auto_reset": True, "game_over": True}

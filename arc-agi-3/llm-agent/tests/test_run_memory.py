@@ -54,6 +54,8 @@ def _policy(content='{"action": "UP"}') -> lp.LLMPolicy:
     p._level_start_tokens = 0
     p._audit_level_tokens = 0
     p._pending_notes = None
+    p._level_notes = {}
+    p._game_overs = []
     return p
 
 

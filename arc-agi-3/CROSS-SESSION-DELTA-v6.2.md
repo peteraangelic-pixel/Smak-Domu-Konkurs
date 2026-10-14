@@ -99,3 +99,18 @@ Testy referencyjne: `arc-agi-3/llm-agent/tests/test_run_memory.py` (Smak-Domu-Ko
    używać jako rury, nie kopiować kodu. Wasz generator „z bazy Franzena" jest OK.
 
 Nasz llm_policy.py = referencja (testy 50/50 w `tests/`).
+
+## UWAGA KRYTYCZNA dla v5.0 (db1c706): parser gubi zagnieżdżone JSONy
+
+`_parse_actions` w `llm_policy_v5.py` używa `re.search(r'\{.*?\}')` / `r'\[.*?\]'`
+(non-greedy). Przy odpowiedzi z zagnieżdżonym obiektem
+`{"action": "UP", "reasoning": {"why": "..."}}` dopasowanie urywa się na pierwszym `}`
+→ JSONDecodeError → akcja ODRZUCONA (cisza → fallback). To dokładnie bug, który
+naprawiliśmy 14.10 rano (FINDINGS, sekcja „Fix parsera akcji"); fix: `_extract_action_objects`
+z `json.JSONDecoder.raw_decode` — gotowy kod w naszym repo (`llm_policy.py`).
+Druga sprawa: wasz batch czyta tablice, ale `get_action` zwraca `actions[0]` — akcje 2..N
+są wyrzucane. Kolejka (u nas `_action_queue`, do 15) sprawia, że batching realnie działa.
+
+## Adoptowaliśmy od was (v6.4, 59/59 testów)
+- Ekstrakcja LEVEL X NOTES (regex) + reinjekcja co turę — notatki przeżywają przycięcie historii.
+- GAME OVER HISTORY (wasz FAILURE_RECOVERY) — `note_game_over()` z auto-resetu w agencie.
