@@ -42,3 +42,30 @@ port naszego v6.7 — różni się od naszego v6.8 o 489 linii, zero KNOBS.
    — dodać jako knob-gated eksperyment (ARC3_VALUE_GATE, default OFF).
 
 Czego NIE brać: ich szacunków 35–47, MLP bez danych, run_games_fast (v4), martwego CEM.
+
+---
+
+## DODATEK (14.10 wieczór): nasza v6.9 vs ich v7.0 — porównanie po fakcie
+
+v6.9 zbudowana (port ich najlepszych 3 pomysłów + nasze 12 mechanizmów + poprawki
+ich błędów). Porównanie wymiar po wymiarze:
+
+| Wymiar | Nasz v6.9 (`goal_classifier.py` + wiring) | Ich v7.0 (`llm_policy_v7_0.py`) |
+|---|---|---|
+| Mechanizmy bazowe | 12/12 (v6.1–v6.7) + 24 pokrętła KNOBS | ~8–9/12 (brak probe opening, lessons-between-games, self-test, cap kolejki) |
+| Goal classifier | ich port + 4 bugfixy; detekcja 1. klatka gry, UNKNOWN→retry | oryginał: fałszywe COPY na rzadkich planszach (zero-vs-zero), puste wzorce, REDUCE konflikt z COVER |
+| Counter-picking | poziom promptu: STRATEGY_HINTS (8 klas) → system prompt + audyty | StrategyParams (wagi heurystyki) — martwy kod, brak konsumenta |
+| ValueGate | deterministyczny (novelty+change−loop), knob `VALUE_GATE` default 0, zero martwego ML | heurystyczny w polityce (działa), ale bez kalibracji; ich MLP ML dalej niepodłączony |
+| Drabinka eskalacji | w naszych audytach akcyjno-tokenowych (40 akcji/50k tok. + rearm): ✗ FALSIFIED → DIFFERENT | stały próg 40 akcji, bez tokenów i rearmu |
+| Klient LLM | realny OpenAI-compat (vLLM **i** LM Studio) + tryb mock + temperatura adaptacyjna knobowa | tylko MockLLMClient w pliku |
+| Runner + MP | run_local.py / local_eval.py: arcengine bezpośrednio, Pool, knobs per worker | run_games_fast.py importuje **v4**, nie v7.0 |
+| Ewolucja | evolve_knobs (CEM 8 EVOLVABLE) → local_eval.make_fitness, spięte e2e, przetestowane | evolve_parameters.py — martwy (wymaga evaluator, brak) |
+| Testy | 104/104 (+76/76 baseline), w tym 17 nowych v6.9 | brak testów v7.0 |
+| Payload Kaggle | notebook przebudowany; self-test: parser+probe+goal-class; FIX copy-listy TRUE_SUBMISSION | notebooki v2/v3/v4 z OLDER politykami |
+| Wynik Kaggle | linia v6.x: brak (zmierzone: v2 24.66, duck v5 27.21) | brak |
+
+**Werdykt**: v6.9 dominuje v7.0 na każdim wymiarze inżynierskim (kompletność, testy,
+runner, ewolucja, payload) ORAZ naprawia 3 realne błędy ich klasyfikatora. Ich
+unikalny wkład, który u nas teraz żyje: goal-class detection, drabinka, ValueGate
+feedback. Co dalej bez zmian: prawda jest na Kaggle — paired A/B (GOAL_CLASS 0/1)
+po 17.10 zdecyduje, czy v6.9 startuje jako zgłoszenie.

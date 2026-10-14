@@ -42,6 +42,10 @@ KNOBS: dict[str, float] = {
     "NOOP_WINDOW": 10,
     "NOOP_MIN_SAMPLES": 6,
     "NOOP_TRIGGER": 3,
+    # v6.9: runtime detekcja klasy celu (counter-picking z ich v7.0)
+    "GOAL_CLASS": 1,                # 1 = wykryj klasę z 1. planszy i wstrzyknij do promptów
+    # v6.9: deterministyczny feedback wartości stanu (bez ML) w user turn
+    "VALUE_GATE": 0,                # 1 = linia „Deterministic value estimate" w prompcie
 }
 
 

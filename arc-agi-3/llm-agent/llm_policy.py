@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 from .knobs import KNOBS
+from .goal_classifier import detect_goal_class, STRATEGY_HINTS
 from .grid_utils import (
     ARC_COLOR_CHARS,
     ARC_COLOR_LEGEND,
@@ -443,6 +444,8 @@ class LLMPolicy:
         self._level_notes: dict[int, str] = {}
         # Game-over history for failure recovery (max 5, last 3 shown).
         self._game_overs: list[str] = []
+        # v6.9: runtime-detected goal class (counter-picking; port z ich v7.0).
+        self._goal_class: str | None = None
         # Optional learned state-value gate (v6.5). OFF unless env
         # VALUE_MODEL_JSON points to trained weights (train_value_model.py).
         try:
@@ -478,6 +481,7 @@ class LLMPolicy:
         self._level_notes.clear()
         self._game_overs.clear()
         self._audits_on_level = 0
+        self._goal_class = None
     
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
@@ -485,6 +489,17 @@ class LLMPolicy:
         Returns dict: {name: str, x: int|None, y: int|None, reasoning: dict}
         """
         state_sig = self._state_signature(frame)
+        
+        # v6.9 (counter-picking z ich v7.0): detect the goal class from the
+        # first board; UNKNOWN keeps retrying on later frames (early boards
+        # can be near-empty). Exception → give up silently ("" stops retries).
+        if int(KNOBS.get("GOAL_CLASS", 1)) and getattr(self, "_goal_class", None) is None:
+            try:
+                detected = detect_goal_class(frame.grid)
+                if detected != "UNKNOWN":
+                    self._goal_class = detected
+            except Exception:
+                self._goal_class = ""
         
         # Attribute the previous action's effect (no-op detection). Exact grid
         # equality: in games whose HUD changes every step the detector stays
@@ -547,7 +562,19 @@ class LLMPolicy:
         user_content = self._build_user_turn(frame)
         
         if not self._messages:
-            self._messages.append({"role": "system", "content": SYSTEM_PROMPT})
+            # v6.9: system prompt budowany raz na grę (stabilny prefiks dla
+            # KV-cache w llama.cpp) + opcjonalna wykryta klasa celu.
+            sys_text = SYSTEM_PROMPT
+            gc = getattr(self, "_goal_class", None)
+            if gc:
+                hint = STRATEGY_HINTS.get(gc, "")
+                sys_text += (
+                    f"\n\nRUNTIME GOAL-CLASS DETECTION: the first board most "
+                    f"resembles the \"{gc}\" class. Working hypothesis: {hint}. "
+                    "Treat it as a starting point — falsify it in your notes "
+                    "if the board disagrees (mark ✗ CLASS)."
+                )
+            self._messages.append({"role": "system", "content": sys_text})
         
         self._messages.append({"role": "user", "content": user_content})
         
@@ -714,7 +741,37 @@ class LLMPolicy:
                 "GUIDE goal classes pick the one that best matches the board, and do "
                 "NOT repeat any action pattern from the failed approach."
             )
+            # v6.9: drabinka eskalacji klasy celu (z ich v7.0).
+            gc = getattr(self, "_goal_class", None)
+            if gc:
+                base += (
+                    f"\nGoal-class ladder: your working hypothesis was \"{gc}\". "
+                    f"If this level is still unsolved, mark \"{gc}\" as FALSIFIED (✗) "
+                    "in notes and commit to a DIFFERENT class from the FIELD GUIDE."
+                )
+            else:
+                base += (
+                    "\nGoal-class ladder: name the class you commit to in your notes "
+                    "(and ✗-mark the ones you falsified)."
+                )
         return base
+    
+    def _deterministic_value(self, frame: FrameInfo) -> float:
+        """v6.9: deterministic progress estimate in [0,1] — no ML. Inputs:
+        state novelty, recent board-change rate, loop penalty, solved bonus."""
+        total = max(1, self.tracker.total_actions)
+        novelty = min(1.0, len(self.tracker.unique_states_seen) / total)
+        window = list(self._noop_recent)[-int(KNOBS["NOOP_WINDOW"]):]
+        if window:
+            change_rate = sum(1 for _, changed in window if changed) / len(window)
+        else:
+            change_rate = 0.5
+        value = 0.2 + 0.4 * change_rate + 0.4 * novelty
+        if self.tracker.is_looped():
+            value -= 0.25
+        if frame.levels_completed:
+            value = min(1.0, value + 0.1 * frame.levels_completed)
+        return max(0.0, min(1.0, value))
     
     def _state_signature(self, frame: FrameInfo) -> str:
         """Compact state signature for loop detection."""
@@ -761,6 +818,13 @@ class LLMPolicy:
             parts.append(f"Stats: {self.tracker.total_actions} actions taken, "
                         f"{len(self.tracker.unique_states_seen)} unique states seen, "
                         f"{self.tracker.game_over_count} deaths")
+        
+        # v6.9: deterministyczna (bez ML) ocena postępu, knob-gated.
+        if int(KNOBS.get("VALUE_GATE", 0)):
+            v = self._deterministic_value(frame)
+            parts.append(
+                f"\nDeterministic value estimate: {v:.2f} "
+                "(0 = unproductive, 1 = productive; below 0.4 → change approach)")
         
         # Board (compact)
         rows, cols = frame.shape

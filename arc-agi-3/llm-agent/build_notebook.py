@@ -44,6 +44,7 @@ def build_notebook(output_path: str) -> None:
     llm_agent_b64 = encode_file(str(agent_dir / "llm_agent.py"))
     value_gate_b64 = encode_file(str(agent_dir / "value_gate.py"))
     knobs_b64 = encode_file(str(agent_dir / "knobs.py"))
+    goal_classifier_b64 = encode_file(str(agent_dir / "goal_classifier.py"))
     
     cells = []
     
@@ -285,6 +286,7 @@ agent_dir.mkdir(parents=True, exist_ok=True)
 (agent_dir / "llm_agent.py").write_bytes(base64.b64decode({json.dumps(llm_agent_b64)}))
 (agent_dir / "value_gate.py").write_bytes(base64.b64decode({json.dumps(value_gate_b64)}))
 (agent_dir / "knobs.py").write_bytes(base64.b64decode({json.dumps(knobs_b64)}))
+(agent_dir / "goal_classifier.py").write_bytes(base64.b64decode({json.dumps(goal_classifier_b64)}))
 
 # Set environment for the agent
 os.environ["LLM_BASE_URL"] = VLLM_BASE_URL
@@ -309,8 +311,12 @@ from arc_llm_agent import llm_policy as _lp
 _src = (agent_dir / "llm_policy.py").read_text()
 for _marker in ("_extract_action_objects", "FIELD GUIDE", "_probe_actions",
                 "STRATEGY AUDIT", '"notes"', "LESSONS BETWEEN GAMES",
-                "class ValueGate", "KNOBS"):
+                "class ValueGate", "KNOBS", "GOAL_CLASS"):
     assert _marker in _src, f"stale payload: missing {{_marker!r}} in llm_policy.py"
+
+_gc_src = (agent_dir / "goal_classifier.py").read_text()
+assert "detect_goal_class" in _gc_src, "stale payload: goal_classifier.py"
+assert _lp.detect_goal_class(((0, 0), (0, 0))) == "UNKNOWN", "goal classifier broken"
 
 _fi = _lp.FrameInfo(grid=((0, 0), (0, 0)), step=0, level=0,
                     state_name="PLAYING", levels_completed=0,
@@ -342,7 +348,8 @@ if TRUE_SUBMISSION:
     # Copy our agent into the templates directory
     target = framework / "agents" / "templates"
     target.mkdir(parents=True, exist_ok=True)
-    for f in ("__init__.py", "grid_utils.py", "llm_policy.py", "llm_agent.py"):
+    for f in ("__init__.py", "grid_utils.py", "llm_policy.py", "llm_agent.py",
+               "value_gate.py", "knobs.py", "goal_classifier.py"):
         shutil.copy2(Path("/tmp/arc_llm_agent") / f, target / f)
     
     # Register our agent
