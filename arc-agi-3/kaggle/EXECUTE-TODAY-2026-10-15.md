@@ -6,8 +6,13 @@ wczorajszy slot NIE zostal uzyty (sprawdzone: brak commitow po 148be97).
 
 ## TOR 1 (PRIMARY) — galez 98ddb59f (duck owner)
 Znacie dokladne pokretlo z krzywej (100k→24.7, 200k→41.8) i macie CI+sekrety.
-Zadanie na dzis: push waszego kernela duck z budżetem 200k tok/grę (słots 15.10).
-Po runie: check-output (25 gier w wynikach, zero placeholderów) → user klika Submit.
+Zadanie na dzis: push waszego kernela duck z budżetem 200k tok/grę (slot 15.10).
+MECHANIZM POTWIERDZONY: wasze workflows arc-agi-3-submit.yml (Save&Run) +
+arc-agi-3-submit-competition.yml (API submit `kaggle competitions submit -k`,
+trigger: commit na .submit-competition.trigger @7cc8a7e0 albo dispatch; safety:
+odmowa przy Remaining today=0). To wasza rura wyslala v2-think-less (#57125322
+→24.66) — ta sama droga, inny budzet. Check-output po runie (25 gier, zero
+placeholderow).
 
 ## TOR 2 (FALLBACK — user, 1 komenda), gdy tor 1 nie ruszy do południa
 Gotowiec w tym katalogu: `submission.ipynb` = fork publicznego share-notebooka
