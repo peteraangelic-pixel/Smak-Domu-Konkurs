@@ -96,7 +96,7 @@ def op_submissions(args: dict, out_dir: Path) -> str:
 
 
 def op_pull_their_duck(args: dict, out_dir: Path) -> str:
-    code, out = kaggle("kernels", "pull", DUCK_KERNEL, "-p", str(out_dir))
+    code, out = kaggle("kernels", "pull", DUCK_KERNEL, "-p", str(out_dir), "-m")
     text = f"## kernels pull {DUCK_KERNEL}\nrc={code}\n{out}\n"
     src = out_dir / f"{DUCK_KERNEL.split('/')[1]}.ipynb"
     if not src.exists():
@@ -135,12 +135,54 @@ def op_submit(args: dict, out_dir: Path) -> str:
     return f"## competitions submit -k {kernel}\nrc={code}\n{out}\n"
 
 
+def _safe_pkg_dir(raw: str) -> Path:
+    """Tylko pakiety pod arc-agi-3/kaggle/ (zero ścieżek absolute/..)."""
+    candidate = (Path.cwd() / raw).resolve() if not raw.startswith("/") else Path(raw).resolve()
+    root = (Path.cwd() / "arc-agi-3" / "kaggle").resolve()
+    if root not in candidate.parents:
+        raise ValueError(f"push dozwolony tylko pod {root}; dostalem {candidate}")
+    return candidate
+
+
+def op_push(args: dict, out_dir: Path) -> str:
+    if not args.get("confirm"):
+        return "ODMOWA: op push wymaga args.confirm=true.\n"
+    pkg = _safe_pkg_dir(str(args.get("dir") or ""))
+    if not (pkg / "kernel-metadata.json").exists():
+        return f"ODMOWA: {pkg} nie ma kernel-metadata.json.\n"
+    code, out = kaggle("kernels", "push", "-p", str(pkg))
+    return f"## kernels push {pkg}\nrc={code}\n{out}\n"
+
+
+def op_kernel_status(args: dict, out_dir: Path) -> str:
+    slug = str(args.get("kernel") or "")
+    code, out = kaggle("kernels", "status", slug)
+    return f"## kernels status {slug}\nrc={code}\n{out}\n"
+
+
+def op_kernel_output(args: dict, out_dir: Path) -> str:
+    slug = str(args.get("kernel") or "")
+    code, out = kaggle("kernels", "output", slug, "-p", str(out_dir / "output"))
+    text = f"## kernels output {slug}\nrc={code}\n{out}\n"
+    d = out_dir / "output"
+    if d.exists():
+        files = sorted(d.rglob("*"))
+        text += f"\nplików: {len([f for f in files if f.is_file()])}\n"
+        for f in files[:25]:
+            if f.is_file():
+                text += f"  {f.relative_to(d)} ({f.stat().st_size} B)\n"
+    return text
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
     "pull-their-duck": op_pull_their_duck,
     "push-duck200k": op_push_duck200k,
     "submit": op_submit,
+    "push": op_push,
+    "kernel-status": op_kernel_status,
+    "kernel-output": op_kernel_output,
 }
 
 
