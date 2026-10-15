@@ -1,19 +1,12 @@
 name: ARC3 ops
 
-# Jedno CLI do operacji Kaggle z TEGO repo (wzorowane na arc3-ops z Pokemon/c87f7a48).
-# Sekret KAGGLE_API_TOKEN (repo secret) czytany wyłącznie w runie Actions.
+# Jedno CLI do operacji Kaggle z TEGO repo (wzorowane na arc3-ops z Pokemon).
+# Sekret KAGGLE_API_TOKEN czytany wyłącznie w runie Actions (env kroku —
+# CLI kaggle>=2.0 czyta go bezposrednio; bez kaggle.json).
 #
 # Fire:  edytuj arc-agi-3/kaggle/ops/request.json ({"id","op","args"}) i pushuj,
 #        albo Run workflow w UI.
-# Read:  zakladka Actions tego repo albo pliki w arc-agi-3/kaggle/ops/results/.
-#
-# Ops (arc-agi-3/kaggle/ops/ops.py):
-#   preflight        — check creds + lista zgłoszeń (read-only)
-#   submissions      — lista zgłoszeń (read-only)
-#   pull-their-duck  — ściągnij źródło kernela petersharps/arc3-duck (read-only)
-#   push-duck200k    — push kernela arc-agi-3/kaggle/duck-200k (Save & Run)
-#   submit           — kaggle competitions submit -k (GUARDED: limit dzienny,
-#                      tylko po jawnym op; NIE odpala się sam)
+# Read:  arc-agi-3/kaggle/ops/results/<id>-<op>/SUMMARY.md (commitowane z powrotem).
 
 on:
   workflow_dispatch:
@@ -34,13 +27,12 @@ jobs:
   op:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    env:
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Kaggle CLI
         run: pip install --quiet --upgrade "kaggle>=2.0"
@@ -50,14 +42,16 @@ jobs:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
         run: python3 arc-agi-3/kaggle/ops/ops.py
 
-      - name: Commit results (ops/results only)
+      - name: Commit results (always; ops/results only)
+        if: always()
         run: |
-          git config user.name "arc3-ops"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add arc-agi-3/kaggle/ops/results || true
-          if git diff --cached --quiet; then
-            echo "No results to commit"
-          else
-            git commit -m "ops: results ${{ github.run_id }} [skip ci]"
-            git push
+          if [ -n "$(git status --porcelain arc-agi-3/kaggle/ops/results)" ]; then
+            git commit -q -m "ops: results $(date -u +%Y%m%dT%H%M%SZ) [skip ci]"
+            for i in 1 2 3 4 5; do
+              git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
+              sleep 5
+            done
           fi
