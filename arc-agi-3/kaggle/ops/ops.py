@@ -132,10 +132,11 @@ def op_submit(args: dict, out_dir: Path) -> str:
         return f"ODMOWA: limit dzienny już wykorzystany ({len(today)} zgłoszeń dziś):\n{rows}\n"
     msg = str(args.get("message") or "duck @long200 (Smak-Domu-Konkurs arc3-ops)")
     ver = str(args.get("version") or "")
+    file = str(args.get("file") or "submission.parquet")
     cmd = ["competitions", "submit", "-c", COMP, "-k", kernel]
     if ver:
         cmd += ["-v", ver]
-    cmd += ["-m", msg]
+    cmd += ["-f", file, "-m", msg]
     code, out = kaggle(*cmd)
     return f"## competitions submit {cmd}\nrc={code}\n{out}\n"
 
