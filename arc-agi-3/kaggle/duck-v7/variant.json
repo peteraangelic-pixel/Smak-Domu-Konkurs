@@ -1,0 +1,7 @@
+{
+  "name": "v7-abandon",
+  "description": "Budget-reallocation variant. (a) Brain = v2-think-less package (EXPERIMENT_HINT + LEVEL_NOTES + STUCK_AUDIT_TOKENS=60000); world model kept INERT (patches applied, env=0) because v6 LB 23.94 < v2 LB 24.66 showed the wm-nudge costs more than it earns on the competition set. (b) NEW patch 0003: early-abandon a game once ARC3_ABANDON_TOKENS (60000) were generated AND levels_completed <= ARC3_ABANDON_MIN_LEVELS (0) - frees SGLang slots (MAXREQ=10) so surviving games get more tokens each (measured: ~36.5k tok/min aggregate; v6 smoke 166-188k per game, all gave_up). Rationale and math: FINDINGS 15.10 (Smak-Domu-Konkurs). Kill-switch: unset ARC3_ABANDON_TOKENS -> stock behaviour.",
+  "env": {"ARC3_EXPERIMENT_HINT": "1", "ARC3_LEVEL_NOTES": "1", "ARC3_STUCK_AUDIT_TOKENS": "60000", "ARC3_WORLD_MODEL": "0", "ARC3_WORLD_MODEL_NUDGE": "0", "ARC3_ABANDON_TOKENS": "60000", "ARC3_ABANDON_MIN_LEVELS": "0"},
+  "patches": ["0001-level-notes-audit-experiment-hint.patch", "0002-executable-world-model.patch", "0003-early-abandon.patch"],
+  "smoke": {"games": ["cn04", "dc22", "g50t", "ka59", "ls20", "m0r0", "s5i5", "sc25", "su15", "tn36"], "minutes": 48}
+}

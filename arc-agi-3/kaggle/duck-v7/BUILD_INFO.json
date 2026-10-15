@@ -1,0 +1,38 @@
+{
+  "env": {
+    "ARC3_ABANDON_MIN_LEVELS": "0",
+    "ARC3_ABANDON_TOKENS": "60000",
+    "ARC3_EXPERIMENT_HINT": "1",
+    "ARC3_LEVEL_NOTES": "1",
+    "ARC3_STUCK_AUDIT_TOKENS": "60000",
+    "ARC3_WORLD_MODEL": "0",
+    "ARC3_WORLD_MODEL_NUDGE": "0"
+  },
+  "git": "unknown",
+  "name": "v7-abandon",
+  "patch_files": [
+    "/kaggle/duck-extra-00.patch",
+    "/kaggle/duck-extra-01.patch",
+    "/kaggle/duck-extra-02.patch"
+  ],
+  "patches": [
+    "0001-level-notes-audit-experiment-hint.patch",
+    "0002-executable-world-model.patch",
+    "0003-early-abandon.patch"
+  ],
+  "smoke": {
+    "games": [
+      "cn04",
+      "dc22",
+      "g50t",
+      "ka59",
+      "ls20",
+      "m0r0",
+      "s5i5",
+      "sc25",
+      "su15",
+      "tn36"
+    ],
+    "minutes": 48
+  }
+}
