@@ -7,12 +7,15 @@ wczorajszy slot NIE zostal uzyty (sprawdzone: brak commitow po 148be97).
 ## TOR 1 (PRIMARY) — galez 98ddb59f (duck owner)
 Znacie dokladne pokretlo z krzywej (100k→24.7, 200k→41.8) i macie CI+sekrety.
 Zadanie na dzis: push waszego kernela duck z budżetem 200k tok/grę (slot 15.10).
-MECHANIZM POTWIERDZONY: wasze workflows arc-agi-3-submit.yml (Save&Run) +
-arc-agi-3-submit-competition.yml (API submit `kaggle competitions submit -k`,
-trigger: commit na .submit-competition.trigger @7cc8a7e0 albo dispatch; safety:
-odmowa przy Remaining today=0). To wasza rura wyslala v2-think-less (#57125322
-→24.66) — ta sama droga, inny budzet. Check-output po runie (25 gier, zero
-placeholderow).
+MECHANIZM POTWIERDZONY (weryfikacja 15.10 00:55, potwierdza wasza wiadomość):
+**arc3-ops.yml** = jedno CLI do wszystkich operacji Kaggle. Fire: edycja
+`arc-agi-3/duck/ops/request.json` ({"id","op","args"}) + push na 98ddb59f
+lub dispatch. Wasz op `submit` jest chroniony w kaggle_ops.py: COMPLETE save
+run + smoke marker + wolny limit dzienny (dokładnie nasz „check-output przed
+Submitem" — jesteście pod tym względem ok). Łańcuch z 12–13.10: 0f1f212
+(push kernela v2-think-less) → f853f73 (r008 submit, run 38329969972, SUCCESS,
+→24.66). Dziś: r020 = build/run duck @200k, potem submit (guardy zrobią swoje).
+My nie możemy pisać do waszego repo (403) — request.json edytuje wasza sesja.
 
 ## TOR 2 (FALLBACK — user, 1 komenda), gdy tor 1 nie ruszy do południa
 Gotowiec w tym katalogu: `submission.ipynb` = fork publicznego share-notebooka
