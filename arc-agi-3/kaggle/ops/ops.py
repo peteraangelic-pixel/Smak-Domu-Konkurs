@@ -174,6 +174,26 @@ def op_kernel_output(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_kernel_info(args: dict, out_dir: Path) -> str:
+    """Zrzut /api/v1/kernels/list (mine) — szukam numeru wersji kernela."""
+    import base64
+    import urllib.request
+    tok = os.environ.get("KAGGLE_API_TOKEN", "")
+    auth = base64.b64encode(f"petersharps:{tok}".encode()).decode()
+    out = ""
+    for url in (
+        "https://www.kaggle.com/api/v1/kernels/list?mine=true&search=arc3-duck&page_size=5",
+        "https://www.kaggle.com/api/v1/kernels/list?user=petersharps&search=arc3-duck&page_size=5",
+    ):
+        try:
+            req = urllib.request.Request(url, headers={"Authorization": f"Basic {auth}"})
+            body = urllib.request.urlopen(req, timeout=60).read().decode()
+            out += f"## {url}\n{body[:4000]}\n\n"
+        except Exception as exc:  # noqa: BLE001
+            out += f"## {url}\nBŁĄD: {exc}\n\n"
+    return out
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -183,6 +203,7 @@ OPS = {
     "push": op_push,
     "kernel-status": op_kernel_status,
     "kernel-output": op_kernel_output,
+    "kernel-info": op_kernel_info,
 }
 
 
