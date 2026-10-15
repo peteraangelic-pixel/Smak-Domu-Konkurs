@@ -138,18 +138,19 @@ def main() -> int:
     out_dir = RESULTS / f"{op_id}-{op_name}"
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"[ops] {op_id} · {op_name}", flush=True)
+    import traceback
     try:
         text = OPS[op_name](args, out_dir)
         status = "OK"
-        rc = 0
-    except Exception as exc:  # noqa: BLE001 — raportujemy, nie sypiemy się
-        text = f"BŁĄD: {exc}"
+    except Exception as exc:  # noqa: BLE001 — raportujemy pełny ślad do SUMMARY
+        text = f"BŁĄD: {exc}\n\nTRACEBACK:\n{traceback.format_exc()}"
         status = "FAILED"
-        rc = 1
     summary = f"# {op_id} · {op_name}\n\nSTATUS={status} (UTC {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M:%S})\n\n{text}\n"
     (out_dir / "SUMMARY.md").write_text(summary, encoding="utf-8")
     print(summary, flush=True)
-    return rc
+    # ZAWSZE rc=0: step ma przejść, żeby „Commit results" wysłał SUMMARY do repo
+    # (logi Actions są nieczytelne z sandboxa — czytamy wyniki z gita).
+    return 0
 
 
 if __name__ == "__main__":
