@@ -222,6 +222,34 @@ def op_submit_after_midnight(args: dict, out_dir: Path) -> str:
     return text + sub + f"\n## Submissions po submit (rc={code})\n{out[:2000]}\n"
 
 
+def op_try_v7(args: dict, out_dir: Path) -> str:
+    """Po 00:05 UTC: próby push obu v7 (duck-v7 nasz + llm-agent-v7 ich) i statusy.
+    Realistycznie: tygodniowa kwota GPU dalej zamknięta -> odmowa w logu.
+    Jeśli kwota puści: save-runy ruszają same; smoke/submit wg planu sobotniego."""
+    import time as _time
+    started = dt.datetime.now(dt.timezone.utc)
+    target = started.replace(hour=0, minute=5, second=0, microsecond=0)
+    if target > started:
+        wait_min = int((target - started).total_seconds() // 60)
+        text = f"start {started:%H:%M:%S} UTC; czekam ~{wait_min} min do 00:05 UTC\n"
+        print(text, flush=True)
+        for _ in range(20):
+            if dt.datetime.now(dt.timezone.utc) >= target:
+                break
+            _time.sleep(300)
+    text = f"PRÓBY o {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M:%S} UTC\n\n"
+    duck_v7 = OPS_DIR.parent / "duck-v7"
+    agent_v7 = OPS_DIR.parent / "llm-agent-v7"
+    c1, o1 = kaggle("kernels", "push", "-p", str(duck_v7))
+    text += f"## push duck-v7 (nowa wersja petersharps/arc3-duck)\nrc={c1}\n{o1}\n\n"
+    c2, o2 = kaggle("kernels", "push", "-p", str(agent_v7))
+    text += f"## push llm-agent-v7 (nowy kernel petersharps/arc3-llm-agent-v7)\nrc={c2}\n{o2}\n\n"
+    for slug in ("petersharps/arc3-duck", "petersharps/arc3-llm-agent-v7"):
+        cs, os_ = kaggle("kernels", "status", slug)
+        text += f"## status {slug}\nrc={cs}\n{os_}\n\n"
+    return text
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -233,6 +261,7 @@ OPS = {
     "kernel-output": op_kernel_output,
     "kernel-info": op_kernel_info,
     "submit-after-midnight": op_submit_after_midnight,
+    "try-v7": op_try_v7,
 }
 
 
