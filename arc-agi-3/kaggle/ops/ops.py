@@ -63,12 +63,29 @@ def op_preflight(_: dict, out_dir: Path) -> str:
     code, out = kaggle("--version")
     text = f"## CLI\nrc={code}\n{out}\n"
     code2, out2 = kaggle("competitions", "submissions", "-c", COMP)
-    text += f"## Submissions (rc={code2})\n{out2}\n"
-    today = todays_submissions()
-    text += f"## Zgłoszeń dziś (UTC): {len(today)}\n"
-    if today:
-        text += "UWAGA: limit dzienny już wykorzystany — submit dziś odmówi.\n"
+    text += f"## Submissions CLI2.x (rc={code2})\n{out2}\n"
+    if code2 != 0 and "Authentication required" in out2:
+        # Fallback: CLI 1.x czyta kaggle.json {username,key} (legacy sekret).
+        text += "\n## Fallback: kaggle==1.5.12 (legacy auth)\n"
+        rc3, out3 = sh([sys.executable, "-m", "pip", "install", "--quiet", "kaggle==1.5.12"])
+        text += f"pip rc={rc3}\n"
+        rc4, out4 = kaggle("competitions", "submissions", "-c", COMP)
+        text += f"## Submissions CLI1.x (rc={rc4})\n{out4}\n"
+        if rc4 == 0:
+            text += ("WNIOSEK: sekret to LEGACY klucz (kaggle.json) — działa na 1.x.\n"
+                     "Do submitu -k (CLI 2.x) trzeba będzie odnowić token w Kaggle UI.\n")
+            out2 = out4
+        else:
+            text += "WNIOSEK: klucz odrzucony także przez 1.x → token nieaktualny.\n"
     (out_dir / "submissions.txt").write_text(out2, encoding="utf-8")
+    if "## Zgłoszeń dziś" not in text:
+        try:
+            today = todays_submissions()
+            text += f"## Zgłoszeń dziś (UTC): {len(today)}\n"
+            if today:
+                text += "UWAGA: limit dzienny już wykorzystany — submit dziś odmówi.\n"
+        except Exception as exc:  # noqa: BLE001
+            text += f"## Zgłoszeń dziś: nieznane ({exc})\n"
     return text
 
 

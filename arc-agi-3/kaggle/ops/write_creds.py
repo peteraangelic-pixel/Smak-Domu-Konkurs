@@ -50,6 +50,16 @@ def main() -> int:
     legacy.write_text(json.dumps({"username": username, "key": key}), encoding="utf-8")
     legacy.chmod(0o600)
 
+    # Diagnostyka do pliku (logi Actions nieosiągalne z sandboxa — czyta git):
+    # wyłącznie metadane, nigdy wartość sekretu.
+    diag_dir = OPS_RESULTS = Path("arc-agi-3/kaggle/ops/results/_auth")
+    diag_dir.mkdir(parents=True, exist_ok=True)
+    (diag_dir / "diag.txt").write_text(
+        f"secret_len={len(raw)}\nsecret_shape={'json' if raw.startswith('{') else 'plain'}\n"
+        f"username={username}\nkey_len={len(key)}\n"
+        f"key_has_specials={any(not c.isalnum() for c in key)}\n"
+        f"config_dir={cfg_dir}\n", encoding="utf-8")
+
     # Przepnij rozpakowany klucz do kolejnych kroków (bez echo wartości).
     gh_env = os.environ.get("GITHUB_ENV")
     if gh_env:
