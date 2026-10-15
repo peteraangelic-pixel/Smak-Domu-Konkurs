@@ -37,9 +37,14 @@ jobs:
       - name: Install Kaggle CLI
         run: pip install --quiet --upgrade "kaggle>=2.0"
 
-      - name: Run op
+      - name: Prepare auth (never echoes the token)
         env:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: python3 arc-agi-3/kaggle/ops/write_creds.py
+
+      - name: Run op
+        env:
+          KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
         run: python3 arc-agi-3/kaggle/ops/ops.py
 
       - name: Commit results (always; ops/results only)
