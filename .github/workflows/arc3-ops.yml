@@ -35,8 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-      KAGGLE_CONFIG_DIR: /home/runner/.kaggle
     steps:
       - uses: actions/checkout@v4
 
@@ -45,12 +43,11 @@ jobs:
           python-version: "3.11"
 
       - name: Install Kaggle CLI
-        run: pip install --upgrade kaggle
-
-      - name: Configure credentials (never echoed)
-        run: python3 arc-agi-3/kaggle/ops/write_creds.py
+        run: pip install --quiet --upgrade "kaggle>=2.0"
 
       - name: Run op
+        env:
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
         run: python3 arc-agi-3/kaggle/ops/ops.py
 
       - name: Commit results (ops/results only)
