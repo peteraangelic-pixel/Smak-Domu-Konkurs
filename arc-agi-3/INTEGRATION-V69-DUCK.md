@@ -1,3 +1,14 @@
+# ⚠️ KOREKTA (15.10): TEN DOKUMENT BYŁ PISANY NA ŚLEPO
+
+Napisałem go, NIE czytając kodu ducka — po sklonowaniu duck-harness okazało się,
+że duck to własny framework Tufa (tool-agent, Solver, TAAF), **bez punktu wpięcia
+dla naszych plików**. „Integracja krok po kroku" = napisanie adaptera Solver =
+NOWY, NIETESTOWANY KOD. Dokument zostaje jako PLAN pracy po 17.10 (wtedy adapter
+zrobi się w save-runie, nie na slocie). Ścieżka zero-kodu dla v6.9 DZIŚ: własny
+notebook (kernel-metadata.json w llm-agent/) jako SAVE-RUN, nie submit.
+
+---
+
 # Integracja v6.9 (nasz mózg) w rurę duck — instrukcja dla gałęzi 98ddb59f
 
 Cel: **bieg A/B w rurze duck** — dziś: v4.1 @200k (bezpiecznik), jutro: v6.9 @200k.
