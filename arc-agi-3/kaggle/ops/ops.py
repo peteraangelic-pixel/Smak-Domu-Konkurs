@@ -131,8 +131,13 @@ def op_submit(args: dict, out_dir: Path) -> str:
         rows = "\n".join(str(r) for r in today)
         return f"ODMOWA: limit dzienny już wykorzystany ({len(today)} zgłoszeń dziś):\n{rows}\n"
     msg = str(args.get("message") or "duck @long200 (Smak-Domu-Konkurs arc3-ops)")
-    code, out = kaggle("competitions", "submit", "-c", COMP, "-k", kernel, "-m", msg)
-    return f"## competitions submit -k {kernel}\nrc={code}\n{out}\n"
+    ver = str(args.get("version") or "")
+    cmd = ["competitions", "submit", "-c", COMP, "-k", kernel]
+    if ver:
+        cmd += ["-v", ver]
+    cmd += ["-m", msg]
+    code, out = kaggle(*cmd)
+    return f"## competitions submit {cmd}\nrc={code}\n{out}\n"
 
 
 def _safe_pkg_dir(raw: str) -> Path:
