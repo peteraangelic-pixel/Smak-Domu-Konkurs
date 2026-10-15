@@ -129,6 +129,27 @@ class ClassifierTest(unittest.TestCase):
                      for _ in range(rng.randint(3, 40))]
             self.assertNotEqual(detect_goal_class(_grid(marks=marks)), "COPY")
 
+    def test_gesty_copy_nie_jest_local_constraints(self) -> None:
+        """Lekcja z ich v7.0 (15.10): gęsty wzorzec z pełnymi blokami 3×3
+        odpalał LOCAL_CONSTRAINTS przed COPY."""
+        g = [[0] * 20 for _ in range(20)]
+        for r in range(10):
+            for c in range(10):
+                v = 1 if (r % 3 or c % 3) else 2
+                g[r][c] = v
+                g[10 + r][c] = v
+        self.assertEqual(detect_goal_class(g), "COPY")
+
+    def test_uniform_kornij_nie_jest_copy(self) -> None:
+        """BUGFIX #5: uniform róg (1 kolor) nie jest wzorcem — plansza
+        FLOW z dozownikiem nie może dostać COPY."""
+        g = [[7] * 20 for _ in range(20)]
+        for r in range(15, 20):
+            for c in range(0, 20, 3):
+                g[r][c] = 4
+        self.assertNotEqual(detect_goal_class(g), "COPY")
+        self.assertEqual(detect_goal_class(g), "FLOW")
+
     def test_wynik_z_dozwolonego_zbioru(self) -> None:
         self.assertIn(detect_goal_class(_cover_grid()), GOAL_CLASSES)
 

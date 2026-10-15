@@ -75,7 +75,11 @@ def extract_game_features(grid) -> GameFeatures:
     if height >= 10 and width >= 10:
         pattern = [row[:10] for row in rows[:10]]
         pat_nz = [(r, c) for r in range(10) for c in range(10) if pattern[r][c] != 0]
-        if len(pat_nz) >= 4:  # BUGFIX #1: puste „wzorce" nie liczą się
+        pat_colors = {pattern[r][c] for (r, c) in pat_nz}
+        # BUGFIX #5 (15.10, lekcja z ich v7.0): uniform róg (1 kolor) „pasuje"
+        # do innych uniform okien → fałszywe COPY na planszach FLOW/pełnych.
+        # Prawdziwy powtarzalny wzorzec ma strukturę: >=2 kolory.
+        if len(pat_nz) >= 4 and len(pat_colors) >= 2:
             best = 0.0
             for r in range(0, height - 9, 5):
                 for c in range(0, width - 9, 5):
@@ -222,13 +226,17 @@ def detect_goal_class(grid) -> str:
     # fałszywe COPY przez „wzorzec" z samych zer).
     if features.non_zero_cells == 0:
         return "UNKNOWN"
-    # Priorytet: od najbardziej specyficznych.
-    if features.tile_keys_3x3_count > 3:
-        return "LOCAL_CONSTRAINTS"
+    # Priorytet: od najbardziej specyficznych. Lekcje z ich v7.0 (15.10):
+    # (a) gęsty wzorzec COPY ma pełne bloki 3×3 → LOCAL_CONSTRAINTS (tile_keys>3)
+    # muszą czekać na COPY; (b) uniform plansza z dozownikiem ma „gęsty róg",
+    # ale wzorzec bez >=2 kolorów nie liczy się (BUGFIX #5) — FLOW z konkretnym
+    # dozownikiem+naczyniami rozstrzygamy najpierw.
     if features.dispenser_detected and features.vessels_count > 2:
         return "FLOW"
     if features.pattern_in_corner:
         return "COPY"
+    if features.tile_keys_3x3_count > 3:
+        return "LOCAL_CONSTRAINTS"
     if features.boxes_count > 2 and features.target_zone_detected:
         return "PLACE"
     # BUGFIX #4 vs ich wersja: próg 20 zamiast 10 — u nich izolowane markery
