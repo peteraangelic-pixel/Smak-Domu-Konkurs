@@ -200,6 +200,28 @@ def op_kernel_info(args: dict, out_dir: Path) -> str:
     return out
 
 
+def op_submit_after_midnight(args: dict, out_dir: Path) -> str:
+    """Czeka do początku następnego dnia UTC (reset dziennego slotu),
+    potem wykonuje standardowy guarded submit. Limity pętli twarde."""
+    import time as _time
+    started = dt.datetime.now(dt.timezone.utc)
+    text = f"start {started:%Y-%m-%d %H:%M:%S} UTC; czekam na 00:00 UTC...\n"
+    print(text, flush=True)
+    for i in range(40):  # twardy limit ~3.3h
+        now = dt.datetime.now(dt.timezone.utc)
+        if now.date() != started.date():
+            text += f"\nok, nowy dzień UTC o {now:%H:%M:%S}; odpalam submit\n"
+            break
+        _time.sleep(300)
+    else:
+        return text + "PRZEKROCZONY LIMIT CZEKANIA — submit NIE wykonany.\n"
+    sub = op_submit(args, out_dir)
+    # dorzuć aktualną listę zgłoszeń dla pewności
+    code, out = kaggle("competitions", "submissions", "-c", COMP)
+    (out_dir / "submissions.txt").write_text(out, encoding="utf-8")
+    return text + sub + f"\n## Submissions po submit (rc={code})\n{out[:2000]}\n"
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -210,6 +232,7 @@ OPS = {
     "kernel-status": op_kernel_status,
     "kernel-output": op_kernel_output,
     "kernel-info": op_kernel_info,
+    "submit-after-midnight": op_submit_after_midnight,
 }
 
 
