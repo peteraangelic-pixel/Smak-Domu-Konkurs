@@ -401,22 +401,17 @@ def op_midnight_launch(args: dict, out_dir: Path) -> str:
         _time.sleep(300)
     if not pushed:
         return text + "\nWYNIK: push nie przeszedł po retryach — wymaga interwencji\n"
-    # wykryj wersję: regex z outputu pusha, potem kernels list, fallback args/version_hint
+    # wykryj wersję: regex "Kernel version N successfully pushed" (r023: działa),
+    # fallback: version_hint z requestu (tabela kernels list NIE ma kolumny wersji)
     ver = ""
-    m = re.search(r"version[:= ]+(\d+)", out, re.IGNORECASE)
+    m = re.search(r"Kernel version (\d+) successfully pushed", out, re.IGNORECASE) or re.search(r"version[:= ]+(\d+)", out, re.IGNORECASE)
     if m:
         ver = m.group(1)
-    else:
-        c3, o3 = kaggle("kernels", "list", "-m", "-s", kernel.split("/")[-1], "--page-size", "3")
-        text += f"\n## kernels list -m -s {kernel.split('/')[-1]}\nrc={c3}\n{o3}\n"
-        for line in o3.splitlines():
-            if kernel in line:
-                nums = re.findall(r"\d+", line)
-                if nums:
-                    ver = nums[-1]
-                break
     if not ver:
         ver = str(args.get("version_hint") or "1")
+        text += f"\nUWAGA: wersja z version_hint ({ver}) — regex push-output nie pasował\n"
+    c3, o3 = kaggle("kernels", "list", "-m", "-s", kernel.split("/")[-1], "--page-size", "3")
+    text += f"\n## kernels list -m -s {kernel.split('/')[-1]}\nrc={c3}\n{o3}\n"
     text += f"\nwykryta wersja do submitu: {ver}\n"
     for i in range(20):  # 20 x 5 min = ~100 min poll save-runu
         c2, o2 = kaggle("kernels", "status", kernel)
