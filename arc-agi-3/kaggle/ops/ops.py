@@ -463,6 +463,38 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_recon_bundle(args: dict, out_dir: Path) -> str:
+    """Zwiad bundle: pobierz publiczny dataset zrodlowy Tufy (kod harnessu:
+    setup_commands.json, solver, benchmark) + przeszukaj kernele/datasety
+    (nowszy tufa-kernel? nowszy model-snapshot?). Commitujemy tylko teksty."""
+    text = ""
+    for slug in ("jeroencottaar/taaf-kaggle-source-share",):
+        code, out = kaggle("datasets", "files", slug)
+        text += f"## datasets files {slug}\nrc={code}\n{out}\n\n"
+        code, out = kaggle("datasets", "download", slug, "-p", str(out_dir / "bundle"), "--unzip")
+        text += f"## datasets download {slug}\nrc={code}\n{out[:500]}\n\n"
+    bdir = out_dir / "bundle"
+    if bdir.exists():
+        total = 0
+        manifest = []
+        for f in sorted(bdir.rglob("*")):
+            if f.is_file():
+                manifest.append(f"{f.stat().st_size:>10}  {f.relative_to(bdir)}")
+        text += "## manifest bundle\n" + "\n".join(manifest[:200]) + f"\n(plikow: {len(manifest)})\n"
+    for label, args_ in (
+        ("kernels -s tufa", ["kernels", "list", "-s", "tufa", "--page-size", "10"]),
+        ("kernels -s duck-harness", ["kernels", "list", "-s", "duck-harness", "--page-size", "10"]),
+        ("datasets --user driessmit1", ["datasets", "list", "--user", "driessmit1", "--page-size", "20"]),
+        ("datasets --user jeroencottaar", ["datasets", "list", "--user", "jeroencottaar", "--page-size", "20"]),
+        ("datasets -s qwen3", ["datasets", "list", "-s", "qwen3", "--page-size", "15"]),
+        ("datasets -s flash-next", ["datasets", "list", "-s", "flash-next", "--page-size", "10"]),
+        ("datasets -s arc3", ["datasets", "list", "-s", "arc3", "--page-size", "15"]),
+    ):
+        code, out = kaggle(*args_)
+        text += f"## {label}\nrc={code}\n{out[:1800]}\n\n"
+    return text
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -482,6 +514,7 @@ OPS = {
     "push-cpu-test": op_push_cpu_test,
     "midnight-launch": op_midnight_launch,
     "auto-submit": op_auto_submit,
+    "recon-bundle": op_recon_bundle,
 }
 
 
