@@ -288,6 +288,8 @@ def _git_commit_and_push(paths: list[str], message: str) -> str:
     branch = _chain_branch()
     full = [str(repo / p) for p in paths]
     log = []
+    subprocess.run(["git", "config", "user.name", "github-actions[bot]"], cwd=repo, capture_output=True, text=True)
+    subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], cwd=repo, capture_output=True, text=True)
     subprocess.run(["git", "add", *full], cwd=repo, capture_output=True, text=True)
     r = subprocess.run(["git", "commit", "-q", "-m", message], cwd=repo, capture_output=True, text=True)
     log.append(f"commit rc={r.returncode} {r.stdout}{r.stderr}".strip())
