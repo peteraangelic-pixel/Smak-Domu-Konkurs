@@ -415,7 +415,8 @@ def op_midnight_launch(args: dict, out_dir: Path) -> str:
     c3, o3 = kaggle("kernels", "list", "-m", "-s", kernel.split("/")[-1], "--page-size", "3")
     text += f"\n## kernels list -m -s {kernel.split('/')[-1]}\nrc={c3}\n{o3}\n"
     text += f"\nwykryta wersja do submitu: {ver}\n"
-    for i in range(20):  # 20 x 5 min = ~100 min poll save-runu
+    poll_max = int(args.get("poll_max_iters") or 20)
+    for i in range(poll_max):  # poll_max x 5 min
         c2, o2 = kaggle("kernels", "status", kernel)
         text += f"## status[{i}] rc={c2} {o2.strip()}\n"
         if "COMPLETE" in o2 or "ERROR" in o2 or "CANCEL" in o2:
@@ -439,15 +440,18 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
         return "ODMOWA: op auto-submit wymaga args.confirm=true\n"
     text = ""
     status = ""
-    for i in range(20):
+    iters = max(1, int(args.get("max_poll_minutes") or 100) // 5)
+    for i in range(iters):
         c2, o2 = kaggle("kernels", "status", kernel)
         status = o2.strip()
         text += f"## status[{i}] rc={c2} {status}\n"
         if "COMPLETE" in status or "ERROR" in status or "CANCEL" in status:
             break
         _time.sleep(300)
-    if "COMPLETE" not in status:
+    if "COMPLETE" not in status and not args.get("fallback_submit"):
         return text + "\nWYNIK: save-run nie COMPLETE — submit NIE wykonany\n"
+    if "COMPLETE" not in status:
+        text += "\nUWAGA fallback_submit: save-run nie COMPLETE, ale wersja pchnieta — submituje mimo to (Kaggle rerunuje wersje niezaleznie od naszego save-runu)\n"
     sub_args = {
         "confirm": True,
         "kernel": kernel,
@@ -460,6 +464,9 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
     code, out = kaggle("competitions", "submissions", "-c", COMP)
     (out_dir / "submissions.txt").write_text(out, encoding="utf-8")
     text += f"## submissions po submit (rc={code})\n{out[:2500]}\n"
+    nxt = args.get("next")
+    if nxt:
+        text += "\n== dispatch watchdog ==\n" + _dispatch_next(dict(nxt)) + "\n"
     return text
 
 
