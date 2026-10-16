@@ -250,6 +250,33 @@ def op_try_v7(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_pull_original(args: dict, out_dir: Path) -> str:
+    """krok 1 planu 45+: pull publicznego oryginalnego kernela Duck (Tufa)."""
+    code, out = kaggle("kernels", "pull", "jeroencottaar/tufa-labs-duck-harness-june-30-milestone-winner", "-p", str(out_dir), "-m")
+    text = f"## pull oryginalnego Ducka (milestone winner, publiczny)\nrc={code}\n{out}\n"
+    meta = out_dir / "kernel-metadata.json"
+    if meta.exists():
+        text += "\n## ich metadata\n" + meta.read_text(encoding="utf-8")[:1500] + "\n"
+    return text
+
+
+def op_prep_original(args: dict, out_dir: Path) -> str:
+    """krok 2: przygotuj petersharps-metadata na bazie pobleanej."""
+    src_meta = out_dir / "kernel-metadata.json"
+    if not src_meta.exists():
+        return "brak metadata w out_dir (najpierw pull-original)"
+    blob = json.loads(src_meta.read_text(encoding="utf-8"))
+    blob["id"] = "petersharps/arc3-duck-original"
+    blob["title"] = "ARC3 Duck Original (Tufa milestone winner)"
+    blob["is_private"] = True
+    dest = OPS_DIR.parent / "duck-original"
+    dest.mkdir(parents=True, exist_ok=True)
+    (dest / "kernel-metadata.json").write_text(json.dumps(blob, indent=2), encoding="utf-8")
+    for f in out_dir.glob("*.ipynb"):
+        (dest / f.name).write_bytes(f.read_bytes())
+    return f"przygotowane: {dest} -> {[p.name for p in dest.iterdir()]}"
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -262,6 +289,8 @@ OPS = {
     "kernel-info": op_kernel_info,
     "submit-after-midnight": op_submit_after_midnight,
     "try-v7": op_try_v7,
+    "pull-original": op_pull_original,
+    "prep-original": op_prep_original,
 }
 
 
