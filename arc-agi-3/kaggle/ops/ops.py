@@ -19,6 +19,7 @@ import datetime as dt
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -277,6 +278,194 @@ def op_prep_original(args: dict, out_dir: Path) -> str:
     return f"przygotowane: {dest} -> {[p.name for p in dest.iterdir()]}"
 
 
+def _chain_branch() -> str:
+    return os.environ.get("GITHUB_REF_NAME") or "arena/5ed750ef-smak-domu-konkurs"
+
+
+def _git_commit_and_push(paths: list[str], message: str) -> str:
+    """Commit + push z runnera (bot). Rebase-retry (druga sesja może pchać)."""
+    repo = OPS_DIR.parents[2]
+    branch = _chain_branch()
+    full = [str(repo / p) for p in paths]
+    log = []
+    subprocess.run(["git", "add", *full], cwd=repo, capture_output=True, text=True)
+    r = subprocess.run(["git", "commit", "-q", "-m", message], cwd=repo, capture_output=True, text=True)
+    log.append(f"commit rc={r.returncode} {r.stdout}{r.stderr}".strip())
+    if r.returncode != 0:
+        return "\n".join(log)  # nic do komitu (czysto) — nie pushujemy
+    for i in range(5):
+        r = subprocess.run(["git", "push", "-q", "origin", f"HEAD:{branch}"], cwd=repo, capture_output=True, text=True)
+        log.append(f"push[{i}] rc={r.returncode} {r.stdout}{r.stderr}".strip())
+        if r.returncode == 0:
+            break
+        subprocess.run(["git", "pull", "-q", "--rebase", "origin", branch], cwd=repo, capture_output=True, text=True)
+    return "\n".join(log)
+
+
+def _dispatch_next(next_req: dict) -> str:
+    """Zapisz request.json = next, commit+push, dispatch workflow.
+    workflow_dispatch utworzony przez GITHUB_TOKEN JEST udokumentowanym
+    wyjątkiem od blokady eventów bota — odpala nowy run."""
+    req_path = OPS_DIR / "request.json"
+    req_path.write_text(json.dumps(next_req, indent=2) + "\n", encoding="utf-8")
+    log = _git_commit_and_push(
+        ["arc-agi-3/kaggle/ops/request.json"],
+        f"ops: request {next_req.get('id')} ({next_req.get('op')}) [auto-chain]",
+    )
+    code, out = sh(["gh", "workflow", "run", "arc3-ops.yml", "--ref", _chain_branch(),
+                    "-R", "peteraangelic-pixel/Smak-Domu-Konkurs"])
+    return log + f"\ndispatch rc={code}: {out}\n"
+
+
+def op_chain(args: dict, out_dir: Path) -> str:
+    """Segment łańcucha nocnego: śpij do sleep_until_utc / sleep_minutes,
+    potem wykonaj then (op w tym samym runie) i/lub dispatch next request.
+    Twardy limit snu 330 min (timeout joba 355)."""
+    import time as _time
+    now = dt.datetime.now(dt.timezone.utc)
+    text = f"chain start {now:%Y-%m-%d %H:%M:%S} UTC\n"
+    if args.get("sleep_until_utc"):
+        target = dt.datetime.fromisoformat(str(args["sleep_until_utc"])).replace(tzinfo=dt.timezone.utc)
+    elif args.get("sleep_minutes"):
+        target = now + dt.timedelta(minutes=int(args["sleep_minutes"]))
+    else:
+        return text + "brak sleep_until_utc/sleep_minutes\n"
+    print(text + f"cel: {target:%Y-%m-%d %H:%M:%S} UTC\n", flush=True)
+    hard_cap = dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=330)
+    while True:
+        now = dt.datetime.now(dt.timezone.utc)
+        if now >= target or now >= hard_cap:
+            break
+        _time.sleep(60)
+    text += f"koniec snu {now:%Y-%m-%d %H:%M:%S} UTC\n"
+    if now < target:
+        return text + "HARD CAP — nie obudziłem się na czas; NIE dispatchuję (wymaga interwencji)\n"
+    then = args.get("then")
+    if then:
+        t_name = str(then.get("op") or "")
+        t_args = dict(then.get("args") or {})
+        if t_name not in OPS:
+            return text + f"then: nieznany op {t_name!r}\n"
+        text += f"\n== then: {t_name} ==\n" + OPS[t_name](t_args, out_dir) + "\n"
+    nxt = args.get("next")
+    if nxt:
+        text += "\n== dispatch next ==\n" + _dispatch_next(dict(nxt)) + "\n"
+    return text
+
+
+def op_echo(args: dict, out_dir: Path) -> str:
+    return f"echo OK; args={args}\n"
+
+
+def op_push_cpu_test(args: dict, out_dir: Path) -> str:
+    """Push testowy CPU (bez kwoty GPU): waliduje utworzenie NOWEGO kernela
+    (reguła: title musi slugować się do sluga id). Kopiuje pakiet do out_dir,
+    ustawia title/enable_gpu=False, usuwa machine_shape, push, status."""
+    pkg_src = OPS_DIR.parent / str(args.get("dir") or "")
+    title = str(args.get("title") or "")
+    kernel = str(args.get("kernel") or "")
+    if not title or not kernel or not (pkg_src / "kernel-metadata.json").exists():
+        return "ODMOWA: args.title, args.kernel i args.dir (pakiet z metadata) wymagane\n"
+    work = out_dir / "pkg"
+    work.mkdir(parents=True, exist_ok=True)
+    for f in pkg_src.glob("*.ipynb"):
+        (work / f.name).write_bytes(f.read_bytes())
+    meta = json.loads((pkg_src / "kernel-metadata.json").read_text(encoding="utf-8"))
+    meta["title"] = title
+    meta["enable_gpu"] = False
+    meta.pop("machine_shape", None)
+    (work / "kernel-metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    code, out = kaggle("kernels", "push", "-p", str(work))
+    text = f"## push CPU test {kernel} (title={title!r})\nrc={code}\n{out}\n"
+    c2, o2 = kaggle("kernels", "status", kernel)
+    text += f"\n## status {kernel}\nrc={c2}\n{o2}\n"
+    c3, o3 = kaggle("kernels", "list", "-m", "-s", kernel.split("/")[-1], "--page-size", "3")
+    text += f"\n## kernels list -m -s {kernel.split('/')[-1]}\nrc={c3}\n{o3}\n"
+    return text
+
+
+def op_midnight_launch(args: dict, out_dir: Path) -> str:
+    """00:00 UTC: push GPU duck-original (retry aż kwota przepuści; guard po TREŚCI —
+    rc=0 przy kwocie!), potem poll save-runu. COMPLETE/ERROR -> dispatch auto-submit."""
+    import time as _time
+    kernel = str(args.get("kernel") or "petersharps/arc3-duck-original")
+    pkg = OPS_DIR.parent / str(args.get("dir") or "duck-original")
+    text = ""
+    pushed = False
+    for i in range(9):  # 9 x 5 min = 45 min prób pushu
+        code, out = kaggle("kernels", "push", "-p", str(pkg))
+        text += f"## push[{i}] rc={code}\n{out}\n"
+        if code == 0 and "Kernel push error" not in out:
+            pushed = True
+            break
+        _time.sleep(300)
+    if not pushed:
+        return text + "\nWYNIK: push nie przeszedł po retryach — wymaga interwencji\n"
+    # wykryj wersję: regex z outputu pusha, potem kernels list, fallback args/version_hint
+    ver = ""
+    m = re.search(r"version[:= ]+(\d+)", out, re.IGNORECASE)
+    if m:
+        ver = m.group(1)
+    else:
+        c3, o3 = kaggle("kernels", "list", "-m", "-s", kernel.split("/")[-1], "--page-size", "3")
+        text += f"\n## kernels list -m -s {kernel.split('/')[-1]}\nrc={c3}\n{o3}\n"
+        for line in o3.splitlines():
+            if kernel in line:
+                nums = re.findall(r"\d+", line)
+                if nums:
+                    ver = nums[-1]
+                break
+    if not ver:
+        ver = str(args.get("version_hint") or "1")
+    text += f"\nwykryta wersja do submitu: {ver}\n"
+    for i in range(20):  # 20 x 5 min = ~100 min poll save-runu
+        c2, o2 = kaggle("kernels", "status", kernel)
+        text += f"## status[{i}] rc={c2} {o2.strip()}\n"
+        if "COMPLETE" in o2 or "ERROR" in o2 or "CANCEL" in o2:
+            break
+        _time.sleep(300)
+    nxt = dict(args.get("next") or {})
+    if nxt:
+        nxt.setdefault("args", {})
+        if isinstance(nxt["args"], dict):
+            nxt["args"].setdefault("version", ver)
+        text += "\n== dispatch auto-submit ==\n" + _dispatch_next(nxt) + "\n"
+    return text
+
+
+def op_auto_submit(args: dict, out_dir: Path) -> str:
+    """Poll statusu do COMPLETE (max ~100 min), potem guarded submit
+    (limit dzienny + confirm) z parquetem z repo."""
+    import time as _time
+    kernel = str(args.get("kernel") or "petersharps/arc3-duck-original")
+    if not args.get("confirm"):
+        return "ODMOWA: op auto-submit wymaga args.confirm=true\n"
+    text = ""
+    status = ""
+    for i in range(20):
+        c2, o2 = kaggle("kernels", "status", kernel)
+        status = o2.strip()
+        text += f"## status[{i}] rc={c2} {status}\n"
+        if "COMPLETE" in status or "ERROR" in status or "CANCEL" in status:
+            break
+        _time.sleep(300)
+    if "COMPLETE" not in status:
+        return text + "\nWYNIK: save-run nie COMPLETE — submit NIE wykonany\n"
+    sub_args = {
+        "confirm": True,
+        "kernel": kernel,
+        "version": str(args.get("version") or "1"),
+        "file": str(args.get("file") or "arc-agi-3/kaggle/results/submission.parquet"),
+        "message": str(args.get("message")
+                       or "arc3-duck-original: Tufa Labs duck harness (June 30 milestone winner, public MIT) rerun by petersharps; attribution: Tufa Labs / jeroencottaar"),
+    }
+    text += "\n== submit ==\n" + op_submit(sub_args, out_dir) + "\n"
+    code, out = kaggle("competitions", "submissions", "-c", COMP)
+    (out_dir / "submissions.txt").write_text(out, encoding="utf-8")
+    text += f"## submissions po submit (rc={code})\n{out[:2500]}\n"
+    return text
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -291,6 +480,11 @@ OPS = {
     "try-v7": op_try_v7,
     "pull-original": op_pull_original,
     "prep-original": op_prep_original,
+    "chain": op_chain,
+    "echo": op_echo,
+    "push-cpu-test": op_push_cpu_test,
+    "midnight-launch": op_midnight_launch,
+    "auto-submit": op_auto_submit,
 }
 
 
