@@ -33,3 +33,11 @@
 - 17.10 dzień: budowa duck-genius-v1 (base=duck-original + hook rerun-only) →
   push CPU test → save-run smoke po kolei.
 - 18.10 00:00 UTC: submit genius-v1 (kolejny slot).
+
+## AKTUALIZACJA 19.10: formuła scoringu POTWIERDZONA (dane r019)
+- score/poziom = (H/A)^2 × 100 (H=ruchy człowieka, A=agenta); total = mean per gra.
+- Implied H/A v6: śr. 0.697 → replay pass2 (odtwarzanie ścieżek pass1) → 0.95+ = +45-50% pkt/poziom.
+- Dźwignie genius-v1: (1) game_weights realokacja, (2) REPLAY-layer w solverze Tufy
+  (zapis sekwencji per level w pass1; pass2 odtwarza; wymaga weryfikacji przepływu
+  stanu między passami w taaf/benchmark.py — plik w r033-recon-bundle), (3) kolejność
+  gier pod deadline, (4) opcjonalnie nowszy fork boristown jako baza.
