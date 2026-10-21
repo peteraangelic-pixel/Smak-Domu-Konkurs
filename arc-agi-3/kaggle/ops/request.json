@@ -1,20 +1,7 @@
 {
-  "id": "r060",
-  "op": "auto-submit",
+  "id": "r061",
+  "op": "kernel-output",
   "args": {
-    "kernel": "petersharps/arc3-duck-original",
-    "confirm": true,
-    "version": "5",
-    "file": "arc-agi-3/kaggle/results/submission.parquet",
-    "max_poll_minutes": 5,
-    "fallback_submit": true,
-    "message": "arc3-duck-original v5: Tufa Labs duck harness (June 30 milestone winner, public MIT) rerun by petersharps; attribution: Tufa Labs / jeroencottaar",
-    "next": {
-      "id": "r061",
-      "op": "kernel-output",
-      "args": {
-        "kernel": "petersharps/arc3-duck-original"
-      }
-    }
+    "kernel": "petersharps/arc3-duck-original"
   }
 }
