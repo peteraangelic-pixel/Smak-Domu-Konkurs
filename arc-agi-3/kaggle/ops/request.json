@@ -1,5 +1,5 @@
 {
-  "id": "r052",
+  "id": "r054",
   "op": "chain",
   "args": {
     "sleep_minutes": 1,
@@ -8,19 +8,19 @@
       "args": {
         "kernel": "petersharps/arc3-duck-original",
         "dir": "duck-original",
-        "version_hint": "6",
-        "poll_max_iters": 24,
+        "version_hint": "7",
+        "poll_max_iters": 30,
         "next": {
-          "id": "r053",
+          "id": "r055",
           "op": "auto-submit",
           "args": {
             "kernel": "petersharps/arc3-duck-original",
             "confirm": true,
-            "version": "6",
+            "version": "7",
             "file": "arc-agi-3/kaggle/results/submission.parquet",
             "max_poll_minutes": 15,
             "fallback_submit": false,
-            "message": "arc3-duck-original v6 (no-pin): Tufa Labs duck harness (June 30 milestone winner, public MIT) rerun by petersharps; attribution: Tufa Labs / jeroencottaar"
+            "message": "arc3-duck-original v7 (no-pin + gpu-autodetect): Tufa Labs duck harness (June 30 milestone winner, public MIT) rerun by petersharps; attribution: Tufa Labs / jeroencottaar"
           }
         }
       }
