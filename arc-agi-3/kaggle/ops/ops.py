@@ -438,6 +438,11 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
     kernel = str(args.get("kernel") or "petersharps/arc3-duck-original")
     if not args.get("confirm"):
         return "ODMOWA: op auto-submit wymaga args.confirm=true\n"
+    if not args.get("version"):
+        return "ODMOWA: args.version JAWNE wymagane (lekcja r048: domyslna wersja = wypadek)\n"
+    _f = str(args.get("file") or "submission.parquet")
+    if "/" in _f:
+        return f"ODMOWA: file musi byc NAZWA pliku wyjsciowego kernela (CreateCodeSubmission file_name), nie sciezka: {_f}\n"
     text = ""
     status = ""
     iters = max(1, int(args.get("max_poll_minutes") or 100) // 5)
@@ -456,7 +461,7 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
         "confirm": True,
         "kernel": kernel,
         "version": str(args.get("version") or "1"),
-        "file": str(args.get("file") or "arc-agi-3/kaggle/results/submission.parquet"),
+        "file": str(args.get("file") or "submission.parquet"),
         "message": str(args.get("message")
                        or "arc3-duck-original: Tufa Labs duck harness (June 30 milestone winner, public MIT) rerun by petersharps; attribution: Tufa Labs / jeroencottaar"),
     }
@@ -502,6 +507,12 @@ def op_recon_bundle(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_lb(args: dict, out_dir: Path) -> str:
+    """Publiczny leaderboard konkursu — aktualna kotwica miejsc/progu."""
+    code, out = kaggle("competitions", "leaderboard", "-c", COMP, "--show")
+    return f"## leaderboard --show\nrc={code}\n{out[:5000]}\n"
+
+
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
@@ -522,6 +533,7 @@ OPS = {
     "midnight-launch": op_midnight_launch,
     "auto-submit": op_auto_submit,
     "recon-bundle": op_recon_bundle,
+    "lb": op_lb,
 }
 
 
