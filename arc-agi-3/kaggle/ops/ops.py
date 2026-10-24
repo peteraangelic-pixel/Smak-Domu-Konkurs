@@ -445,6 +445,11 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
         return f"ODMOWA: file musi byc NAZWA pliku wyjsciowego kernela (CreateCodeSubmission file_name), nie sciezka: {_f}\n"
     text = ""
     status = ""
+    if args.get("skip_status_poll"):
+        # status kernels = status NAJNOWSZEJ wersji; historyczna wersja moze byc COMPLETE
+        # mimo ERROR na liscie (przypadek v5 vs v8) — poll pomijamy na zyczenie requestu
+        text += "skip_status_poll=true: poll pominiety (wersja historyczna)\n"
+        status = "COMPLETE"
     iters = max(1, int(args.get("max_poll_minutes") or 100) // 5)
     for i in range(iters):
         c2, o2 = kaggle("kernels", "status", kernel)
