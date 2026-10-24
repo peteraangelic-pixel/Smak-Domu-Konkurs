@@ -451,7 +451,7 @@ def op_auto_submit(args: dict, out_dir: Path) -> str:
         text += "skip_status_poll=true: poll pominiety (wersja historyczna)\n"
         status = "COMPLETE"
     iters = max(1, int(args.get("max_poll_minutes") or 100) // 5)
-    for i in range(iters):
+    for i in (range(iters) if status != "COMPLETE" else range(0)):
         c2, o2 = kaggle("kernels", "status", kernel)
         status = o2.strip()
         text += f"## status[{i}] rc={c2} {status}\n"
