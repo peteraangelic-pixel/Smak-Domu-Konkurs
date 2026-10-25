@@ -1,1 +1,29 @@
-{"id": "r072", "op": "kernel-output", "args": {"kernel": "petersharps/arc3-duck-original"}}
+{
+  "id": "r073",
+  "op": "chain",
+  "args": {
+    "sleep_minutes": 1,
+    "then": {
+      "op": "midnight-launch",
+      "args": {
+        "kernel": "petersharps/arc3-duck-c45",
+        "dir": "duck-c45",
+        "version_hint": "1",
+        "poll_max_iters": 15,
+        "next": {
+          "id": "r075",
+          "op": "auto-submit",
+          "args": {
+            "kernel": "petersharps/arc3-duck-c45",
+            "confirm": true,
+            "version": "1",
+            "file": "submission.parquet",
+            "max_poll_minutes": 30,
+            "fallback_submit": true,
+            "message": "arc3-duck-c45: fast-line (SGLang + Qwen3.8-Flash-Next W4A16 + drafter, Franzen-lineage) + level-token-cap 45k + roster probe; harness by Tufa Labs (MIT), Franzen datasets/models; variant by DeepSeek-4.1 package, ops by petersharps"
+          }
+        }
+      }
+    }
+  }
+}
