@@ -22,7 +22,7 @@ permissions:
 
 concurrency:
   group: arc3-ops
-  cancel-in-progress: true   # AWARYJNIE 25.10: r072 (gigantyczny output) blokowal kolejke; powrot do false po operacjach dnia
+  cancel-in-progress: false
 
 jobs:
   op:
