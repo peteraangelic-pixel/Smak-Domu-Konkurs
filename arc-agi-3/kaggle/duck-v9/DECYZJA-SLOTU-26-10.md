@@ -1,3 +1,6 @@
+> **ZAWIESZONE 25.10 12:50 UTC — DECYZJA TYLKO PO WYRAZNYM GO USERA.**
+> Zasada stala (user 25.10): ZADNE pushe kerneli ani submity bez sygnalu, bo nad agentem pracuja rownolegle inne AI i wyniki trzeba porownac. Tryb.monitorowania = tylko odczyt (lb/submissions/status/kernel-output).
+
 # ANALIZA SMOKE c45 (r076) -> decyzja slotu 26.10
 - smoke 10x48min: MEAN 26.78 (v3=29.02, v6=27.21); rerun 2.2h/gra = wiecej glebokosci; LB c45 ~21:30 = prawdziwy pomiar.
 - ZYSKI (cap dziala): cn04 71.4 (47.6), m0r0 46.3 (28.6), ka59 49.9 (17.9), ls20 8.8 (3.3).
