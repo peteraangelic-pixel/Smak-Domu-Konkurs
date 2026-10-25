@@ -9,14 +9,17 @@
   "enable_tpu": false,
   "enable_internet": false,
   "dataset_sources": [
-    "jeroencottaar/taaf-kaggle-source-share",
-    "driessmit1/arc3-vllm-h100-wheelhouse-v3",
-    "driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot"
+    "dfranzen/pennyroyal-v253",
+    "dfranzen/taaf-kaggle-source-bundle-copy"
   ],
   "kernel_sources": [],
   "competition_sources": [
     "arc-prize-2026-arc-agi-3"
   ],
   "docker_image": "gcr.io/kaggle-private-byod/python@sha256:57e612b484cf3df5026ee4dcc3cb176974b22b2bc0937fb1e16132a8be4cb13c",
-  "machine_shape": "NvidiaRtxPro6000"
+  "machine_shape": "NvidiaRtxPro6000",
+  "model_sources": [
+    "dfranzen/albucino-qwen3-8-flash-next-drafter/Transformers/default/1",
+    "dfranzen/intel-qwen3.8-flash-next-w4a16-autoround/Transformers/default/1"
+  ]
 }
