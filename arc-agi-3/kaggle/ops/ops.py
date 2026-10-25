@@ -181,6 +181,45 @@ def op_kernel_output(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_kernel_output_pick(args: dict, out_dir: Path) -> str:
+    """Ściąga ZIP outputu kernela do /tmp (NIE do results) i wyciąga tylko wybrane pliki.
+    args: kernel, pick (lista wzorców fnmatch), max_mb (limit na plik, default 40)."""
+    import fnmatch, io, zipfile, urllib.request, base64 as _b
+    slug = str(args.get("kernel") or "")
+    pats = list(args.get("pick") or ["*.log", "benchmark.json", "*.parquet"])
+    max_mb = int(args.get("max_mb") or 40)
+    owner, _, script = slug.partition("/")
+    tok = os.environ.get("KAGGLE_API_TOKEN", "")
+    auth = _b.b64encode(f"petersharps:{tok}".encode()).decode()
+    url = f"https://www.kaggle.com/api/v1/kernels/output?userName={owner}&script={script}"
+    req = urllib.request.Request(url, headers={"Authorization": auth})
+    tmp_zip = Path("/tmp/kernel_output.zip")
+    n_bytes = 0
+    with urllib.request.urlopen(req, timeout=1800) as r, open(tmp_zip, "wb") as f:
+        while True:
+            chunk = r.read(1 << 22)
+            if not chunk:
+                break
+            f.write(chunk)
+            n_bytes += len(chunk)
+    text = f"## output pick {slug}\nzip: {n_bytes/1e6:.1f} MB -> {tmp_zip}\n"
+    dest = out_dir / "output-pick"
+    dest.mkdir(parents=True, exist_ok=True)
+    taken = 0
+    with zipfile.ZipFile(tmp_zip) as z:
+        for name in z.namelist():
+            if any(fnmatch.fnmatch(name, p) for p in pats):
+                info = z.getinfo(name)
+                keep = dest / Path(name).name
+                with z.open(name) as srcf, open(keep, "wb") as out:
+                    out.write(srcf.read(min(info.file_size, max_mb << 20)))
+                taken += 1
+                text += f"  {name} ({info.file_size} B -> {keep.name})\n"
+    text += f"zabrano plików: {taken}\n"
+    tmp_zip.unlink(missing_ok=True)
+    return text
+
+
 def op_kernel_info(args: dict, out_dir: Path) -> str:
     """Zrzut /api/v1/kernels/list (mine) — szukam numeru wersji kernela."""
     import base64
@@ -521,6 +560,7 @@ def op_lb(args: dict, out_dir: Path) -> str:
 OPS = {
     "preflight": op_preflight,
     "submissions": op_submissions,
+    "kernel_output_pick": op_kernel_output_pick,
     "pull-their-duck": op_pull_their_duck,
     "push-duck200k": op_push_duck200k,
     "submit": op_submit,
