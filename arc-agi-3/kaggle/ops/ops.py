@@ -182,42 +182,36 @@ def op_kernel_output(args: dict, out_dir: Path) -> str:
 
 
 def op_kernel_output_pick(args: dict, out_dir: Path) -> str:
-    """Ściąga ZIP outputu kernela do /tmp (NIE do results) i wyciąga tylko wybrane pliki.
+    """kaggle kernels output -> /tmp (NIE do results), potem selekcja plików do results.
     args: kernel, pick (lista wzorców fnmatch), max_mb (limit na plik, default 40)."""
-    import fnmatch, io, zipfile, urllib.request, base64 as _b
+    import fnmatch, shutil, tempfile
     slug = str(args.get("kernel") or "")
     pats = list(args.get("pick") or ["*.log", "benchmark.json", "*.parquet"])
     max_mb = int(args.get("max_mb") or 40)
-    owner, _, script = slug.partition("/")
-    tok = os.environ.get("KAGGLE_API_TOKEN", "")
-    auth = _b.b64encode(f"petersharps:{tok}".encode()).decode()
-    url = f"https://www.kaggle.com/api/v1/kernels/output?userName={owner}&script={script}"
-    req = urllib.request.Request(url, headers={"Authorization": auth})
-    tmp_zip = Path("/tmp/kernel_output.zip")
-    n_bytes = 0
-    with urllib.request.urlopen(req, timeout=1800) as r, open(tmp_zip, "wb") as f:
-        while True:
-            chunk = r.read(1 << 22)
-            if not chunk:
-                break
-            f.write(chunk)
-            n_bytes += len(chunk)
-    text = f"## output pick {slug}\nzip: {n_bytes/1e6:.1f} MB -> {tmp_zip}\n"
-    dest = out_dir / "output-pick"
-    dest.mkdir(parents=True, exist_ok=True)
-    taken = 0
-    with zipfile.ZipFile(tmp_zip) as z:
-        for name in z.namelist():
-            if any(fnmatch.fnmatch(name, p) for p in pats):
-                info = z.getinfo(name)
-                keep = dest / Path(name).name
-                with z.open(name) as srcf, open(keep, "wb") as out:
-                    out.write(srcf.read(min(info.file_size, max_mb << 20)))
+    tmp = Path(tempfile.mkdtemp(prefix="kopick_"))
+    try:
+        code, out = kaggle("kernels", "output", slug, "-p", str(tmp))
+        text = f"## output pick {slug}\nrc={code}\n{out[:500]}\n"
+        dest = out_dir / "output-pick"
+        dest.mkdir(parents=True, exist_ok=True)
+        taken = 0
+        for f in sorted(tmp.rglob("*")):
+            if f.is_file() and any(fnmatch.fnmatch(f.name, p) for p in pats):
+                keep = dest / f.name
+                shutil.copyfile(f, keep)
+                if keep.stat().st_size > (max_mb << 20):
+                    with open(keep, "rb") as fh:
+                        fh.seek(-(max_mb << 20), 2)
+                        tail = fh.read()
+                    keep.write_bytes(b"...[uciety]...\n" + tail)
+                    text += f"  {f.name} ({f.stat().st_size} B -> OGON {max_mb}MB)\n"
+                else:
+                    text += f"  {f.name} ({f.stat().st_size} B)\n"
                 taken += 1
-                text += f"  {name} ({info.file_size} B -> {keep.name})\n"
-    text += f"zabrano plików: {taken}\n"
-    tmp_zip.unlink(missing_ok=True)
-    return text
+        text += f"zabrano plików: {taken}\n"
+        return text
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def op_kernel_info(args: dict, out_dir: Path) -> str:
