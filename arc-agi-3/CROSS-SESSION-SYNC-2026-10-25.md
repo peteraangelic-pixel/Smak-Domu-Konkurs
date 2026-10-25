@@ -42,3 +42,10 @@ Run z SCOPE='game' jest akceptowany — dźwignię #4 wykreślić NIE trzeba.
 - c45 #57629847: rerun trwa, LB ~21:30-22:00 UTC (PENDING; status w r081+).
 - v9: push 12:44, smoke wg statystyki powinien być MARTWY (cell 10) — potwierdzenie runtime: r081 kernel_status.
 - Kwota: 0 submitów do północy UTC. ZASADA: zero push/submit bez GO usera.
+
+## 7. WYNIK c45: 0.00 — diagnoza (15:05 UTC)
+- c45 #57629847 COMPLETE 0.00; smoke zdrowy; parquet = stub (r019: identyczny 2648 B, 27.21) -> scoring z reruna.
+- Podejrzany nr 1: kom. 21 TRUE_SUBMISSION concurrency=120 przy serwerze MAXREQ=10 (głód slotów / storm połączeń /
+  eksmisja prefiksów -> zero poziomów). r019 (default 16) = 27.21; Franzen 38.85 = własna konfiguracja.
+- v10 dziedziczy 120 -> PRZED jakimkolwiek runem: `bm.solver.concurrency = 10` (albo <= ARC3_MAX_ACTIVE_STREAMS).
+- Szczegóły + alternatywy: duck-v9/DECYZJA-SLOTU-26-10.md (sekcja DIAGNOZA). Log reruna = tylko przez przeglądarkę usera.

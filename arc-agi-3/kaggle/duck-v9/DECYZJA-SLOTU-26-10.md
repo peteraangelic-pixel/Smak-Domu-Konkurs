@@ -21,3 +21,19 @@
   odwrotnie: ls20 13.89->score 3.27; su15 1.85->56.42).
 - Wszystko CZKA NA GO USERA (zasada 25.10). Pre-GO checklist v10: (a) potwierdzić status v9 = ERROR (r081),
   (b) ewent. verify.py --pristine na drzewie da-fr, (c) decyzja usera v10 vs hotfix-v9-vs-c45-faithful.
+
+## DIAGNOZA c45 = 0.00 (25.10 ~15:05 UTC; r083/r085) — GŁÓWNY PODEJRZANY + GOTOWA POPRAWKA (CZEKA NA GO)
+- c45 #57629847 = COMPLETE, publicScore **0.00** (rerun ~2.5 h). Interaktywny smoke zdrowy (26.78, 32 poziomy, crashed=[]).
+- submission.parquet 2648 B = STUB (r019 mial identyczny 2648 B i 27.21) -> scoring czyta WYNIKI RERUNA, nie parquet.
+- kom. 21: `if TRUE_SUBMISSION: bm.solver.concurrency = 120  # game count should be 110` — przy serwerze MAXREQ=10
+  streamów. Smoke = 10 gier/10 slotów (cache-resident, zdrowe); rerun = 110 gier przez 10 slotów.
+- Patchowe komentarze dokumentują patologię: "every game meets a refused connection and has to wait it out",
+  "games each progressing at a fourteenth of the rate", "backend never shows more than 13 concurrent requests".
+- **0.00 = zero ukończonych poziomów we WSZYSTKICH grach** -> głód serwisu/crash serwera, nie słaba gra.
+- ALTERNATYWY do wykluczenia logiem reruna: (a) storm połączeń powalił SGLang na starcie, (b) gateway-gameści
+  (110 prywatnych) zachowują się inaczej niż 10 publicznych.
+- **POPRAWKA (1 linijka, przygotowana, NIE WYSŁANA — czeka na GO):** `bm.solver.concurrency = 120` -> `= 10`
+  (wyrównanie do slotów serwera; r019 z default 16 brał 27.21). Ewent. dodatkowo ARC3_MAX_ACTIVE_STREAMS=10 jawne.
+- **v10 (e499c604) DZIEDZICZY concurrency=120 (kom. 21) — bez tej zmiany powtórzy 0.00.**
+- Potrzebne od usera (jedyna rzecz nieosiągalna z API): LOG RERUNA w przeglądarce — submissions -> #57629847 -> log;
+  pierwsze 20 linii rozstrzygnie mechanizm (server down vs gateway vs głód).
