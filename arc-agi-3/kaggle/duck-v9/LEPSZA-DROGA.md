@@ -29,6 +29,12 @@ per-growe liczby, które da się nałożyć na Wasze gry.
 
 ---
 
+> **KOREKTA (25.10, potwierdzona przez 3 sesje + przeliczenie Arena z surowych danych):**
+> tabela niżej liczy LINIE w `*_requests.jsonl` (1417 = wszystkie żądania, łącznie z roundtripami analizatora).
+> Prawdziwe wywołania PRODUKUJĄCE akcje = wpisy historii z `generated_tokens > 0` = **474**;
+> a/call ważone **4.357**, średnia z gier **5.204**, tok/akcję 841,3, tok/wywołanie 3665, pula 173 726 tok/grę.
+> Wniosek o batchingu („brak zapasu 4×") pozostaje — ale liczby 1417/1,13 są OBALONE. Zob. OCENA-ARENA-V9.md.
+
 ## 2. Zmierzona przyczyna (Wasze własne logi, `r019`)
 
 Policzone z `*_requests.jsonl` (liczba wywołań modelu) i `benchmark.json` (akcje):
