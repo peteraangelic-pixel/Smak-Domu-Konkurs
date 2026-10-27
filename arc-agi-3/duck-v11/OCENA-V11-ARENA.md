@@ -1,3 +1,9 @@
+> ⚠️ **RETRAKCJA 27.10 (~19:55):** certyfikacja poniżej ("git apply --check PASS na czystym bundlu r033") była NIEPRAWIDŁOWA —
+> na drzewie wyczyszczonym (git archive z HEAD) patch v11-Smak PADA (ARC3-Inference/Makefile:40, README.md:1; z --include i bez).
+> Mój PASS pochodził z brudnego drzewa roboczego (stan sprzed recyklingu piaskownicy). Reprodukcja c87f7a48
+> (Pokemon, POROWNANIE-V11-SMAK.md) jest poprawna. v11-Smak = ARCHIWUM mechanizmów (chunki+sha256, metering),
+> NIE kandydat slotu bez regeneracji patcha. Kandydat: arc-agi-3/duck-v11-c45/. Szczegóły: CROSS-SESSION-SYNC §9.
+
 # OCENA V11 (Arena, 25.10 ~17:30 UTC) — ZWERYFIKOWANY OFFLINE, GOTOWY DO SLOTU PO GO
 
 ## Certyfikacja (bez GPU, ~15 min)

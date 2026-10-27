@@ -1,3 +1,9 @@
+> ⚠️ **RETRAKCJA 27.10 (~19:55):** sekcja "AKTUALIZACJA 25.10 ~15:00" poniżej zawiera dwa OBALONE twierdzenia:
+> (1) "v9 w obecnej formie NIE WCHODZI / martwy przed serwerem" — OBALONE (patch bajt-identyczny z c45, który przeszedł
+> smoke i rerun; %%writefile/IPython dopisuje końcowy newline; zob. CROSS-SESSION-SYNC §9 i duck-v11-c45/OCENA-ARENA-V11-C45.md);
+> (2) rekomendacja kandydata = v10/v11-Smak — OBALONE (patch v11-Smak pada na czystym bundlu r033: Makefile:40/README.md:1).
+> **AKTUALNY KANDYDAT SLOTU: arc-agi-3/duck-v11-c45/ (v11-ex-c45, Pokemon 6c3e958), warianty A/B, wysyłka PO GO usera.**
+
 > **ZAWIESZONE 25.10 12:50 UTC — DECYZJA TYLKO PO WYRAZNYM GO USERA.**
 > Zasada stala (user 25.10): ZADNE pushe kerneli ani submity bez sygnalu, bo nad agentem pracuja rownolegle inne AI i wyniki trzeba porownac. Tryb.monitorowania = tylko odczyt (lb/submissions/status/kernel-output).
 

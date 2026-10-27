@@ -12,7 +12,7 @@ Niezależne przeliczenie Arena z `r019-benchmark.json` (semantyka: wywołanie ak
 ## 2. „21/32 poziomów na capie 115" (DeepSeek) — NIE ODTWARZA SIĘ
 Moje przeliczenie: **32/32 ukończonych poziomów** miało <=115 akcji (cap per-level score nigdy nie uciął ukończonego poziomu; nieukończone poziomy mają 0 w actions_per_level). Efekt „wyczerpanej efektywności" jest realny (29.6% budżetu głębokości), ale konkretna liczba 21/32 pochodzi z innej definicji.
 
-## 3. Znalezisko e499c604 (v9/v7 martwe przed serwerem) — POTWIERDZONE, z korektą mechanizmu
+## 3. Znalezisko e499c604 (v9/v7 martwe przed serwerem) — ~~POTWIERDZONE~~ **OBALONE 27.10 (zob. §9): patch bajt-identyczny z c45, który przeszedł; IPython %%writefile dopisuje newline** (kontekst historyczny poniżej)
 - Reprodukcja Arena: kom.5 v9 (498 799 znaków) bez końcowego newline -> `git apply --check` na bundlu r033:
   `error: corrupt patch at line 10087`; kom.10 ma `check=True` -> CalledProcessError przed startem serwera. **v9-as-shipped = DEAD.**
 - KOREKTA ich §1: patch NIE jest ucięty mid-hunk. Z dodanym `\n` przechodzi `git apply --check --include='ARC3-Inference/*'` CZYSTO
@@ -50,7 +50,7 @@ Run z SCOPE='game' jest akceptowany — dźwignię #4 wykreślić NIE trzeba.
 - v10 dziedziczy 120 -> PRZED jakimkolwiek runem: `bm.solver.concurrency = 10` (albo <= ARC3_MAX_ACTIVE_STREAMS).
 - Szczegóły + alternatywy: duck-v9/DECYZJA-SLOTU-26-10.md (sekcja DIAGNOZA). Log reruna = tylko przez przeglądarkę usera.
 
-## 8. PORÓWNANIE: DZISIEJSZA PRACA ARENY vs V11 CODEX-a (~17:30 UTC; ODTWORZONE — pierwotny wpis zgubił reset --hard, zob. CHAT-LOG)
+## 8. PORÓWNANIE: DZISIEJSZA PRACA ARENY vs V11 CODEX-a (~17:30 UTC; ODTWORZONE) — ⚠️ certyfikacja z tej sekcji OBALONA 27.10 (zob. §9: patch pada na Makefile/README na czystym drzewie; v11-Smak = archiwum)
 Context: Codex przeczytał nasze notatki (DECYZJA-SLOTU-26-10.md + ta synchronizacja) i zbudował v11 = v10 + fix concurrency.
 v11 wgrana przez usera (ac096de, arc3-duck-v11.zip), certyfikowana offline przez Arenę -> arc-agi-3/duck-v11/ (komit 0e485c6).
 
