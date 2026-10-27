@@ -94,3 +94,9 @@ Pełne treści: duck-v11-c45/OCENA-ARENA-V11-C45.md. W skrócie:
    przepada — do potwierdzenia w rules przez usera.
 5. Rekomendacja: slot A = v11-c45 PLAN_COMMIT="0" (czysty test fixa concurrency), potem slot B = "1" (commit()).
    Wszystko CZEKA NA GO.
+
+## 10. SPRZĄTANIE DRZEWA (27.10 ~20:10)
+Usunięte z tipa (historia zachowana): outputy r019/r072/r076 (GB!; wnioski w §1/§7 + r085 output-pick), new/ (duplikat v9),
+zepsuty zip v11-Smak, kernel v9 (notebook/metadata/src), v11-Smak (notebook/metadata), e499/v10 (banerowana notka arch. zostaje).
+ŻYWE: duck-v11-c45 (kandydat), duck-c45 (baza), ops (r086 read-only), r033-bundle, dokumenty decyzyjne z banerami.
+Dla sesji czytających repo: KANDYDAT = arc-agi-3/duck-v11-c45 (slot A: PLAN_COMMIT=0 -> slot B: =1). Wysyłka = PO GO usera.

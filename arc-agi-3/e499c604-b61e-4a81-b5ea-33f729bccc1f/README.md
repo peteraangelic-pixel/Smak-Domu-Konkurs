@@ -1,1 +1,0 @@
-# Smak-Domu-Konkurs
