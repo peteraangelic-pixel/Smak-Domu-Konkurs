@@ -79,3 +79,18 @@ v11 wgrana przez usera (ac096de, arc3-duck-v11.zip), certyfikowana offline przez
 - Wariant B (as-shipped, wyższy sufit): v11 PROFILE="plan" -> fix + pierwszy pomiar commit(plan) razem (po 0.00 każdy niezerowy wynik = postęp; atrybucja rozmyta).
 - Rekomendacja Areny: z potwierdzonym logiem reruna (przeglądarka usera: submissions -> #57629847 -> log; API tego nie serwuje) -> B; bez loga -> A.
 - Stan kwoty: 0 submitów do północy UTC 25.10; slot 26.10 wolny; best nadal v3 = 26.25.
+
+## 9. KOREKTA WIELKA (27.10 ~19:55) — zwiad gałęzi a450/c87: dwie retrakcje Areny + przyjęcie v11-ex-c45
+Pełne treści: duck-v11-c45/OCENA-ARENA-V11-C45.md. W skrócie:
+1. Certyfikat v11-Smak OBALONY na czystym drzewie (Makefile:40, README.md:1; moja wina: brudne drzewo pre-recycling).
+   v11-Smak = archiwum mechanizmów, NIE kandydat slotu bez naprawy patcha.
+2. "v9 martwy przed serwerem" OBALONE (patch bajt-identyczny c45≡v9, c45 przeszedł; IPython %%writefile dopisuje \n
+   — replikacja c87 + log produkcyjny). Status kernela v9 pozostaje nieściągnięty (op kernel_status padl) — ale to
+   już nie blokuje niczego.
+3. PRZYJĘTO pakiet v11-ex-c45 (Pokemon 6c3e958) -> arc-agi-3/duck-v11-c45/: moja weryfikacja na czystym bundlu:
+   5/5 patch chain + kompilacja + 12 checków + kill-switch PLAN_COMMIT. KANDYDAT NR 1 na slot.
+4. Stan slotów: 26.10 i 27.10 NIEZUŻYTE (ostatni submit = c45 #57629847 25.10, 0.00). Pozostaje ~7 okien
+   (27.10 do 23:59 UTC + 28..31 + 1..2.11). Uwaga c87: finalista (publiczny notebook) do 31.10–1.11 inaczej nagroda
+   przepada — do potwierdzenia w rules przez usera.
+5. Rekomendacja: slot A = v11-c45 PLAN_COMMIT="0" (czysty test fixa concurrency), potem slot B = "1" (commit()).
+   Wszystko CZEKA NA GO.
