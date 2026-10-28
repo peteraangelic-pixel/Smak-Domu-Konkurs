@@ -161,6 +161,22 @@ def op_push(args: dict, out_dir: Path) -> str:
     return f"## kernels push {pkg}\nrc={code}\n{out}\n"
 
 
+def op_push_v11(args: dict, out_dir: Path) -> str:
+    """Push the v11 slot package (Save & Run, never submit).
+
+    The generic op_push is deliberately restricted to arc-agi-3/kaggle/;
+    the v11 candidate lives at arc-agi-3/duck-v11-c45, so it needs an
+    explicit, named path instead of a broad allowlist.
+    """
+    if not args.get("confirm"):
+        return "ODMOWA: op push-v11 wymaga args.confirm=true.\n"
+    pkg = (Path.cwd() / "arc-agi-3" / "duck-v11-c45").resolve()
+    if not (pkg / "kernel-metadata.json").exists():
+        return f"ODMOWA: {pkg} nie ma kernel-metadata.json.\n"
+    code, out = kaggle("kernels", "push", "-p", str(pkg))
+    return f"## kernels push v11 {pkg}\nrc={code}\n{out}\n"
+
+
 def op_kernel_status(args: dict, out_dir: Path) -> str:
     slug = str(args.get("kernel") or "")
     code, out = kaggle("kernels", "status", slug)
@@ -559,6 +575,7 @@ OPS = {
     "push-duck200k": op_push_duck200k,
     "submit": op_submit,
     "push": op_push,
+    "push-v11": op_push_v11,
     "kernel-status": op_kernel_status,
     "kernel-output": op_kernel_output,
     "kernel-info": op_kernel_info,
