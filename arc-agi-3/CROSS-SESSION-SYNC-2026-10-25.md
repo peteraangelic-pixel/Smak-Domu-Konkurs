@@ -100,3 +100,16 @@ Usunięte z tipa (historia zachowana): outputy r019/r072/r076 (GB!; wnioski w §
 zepsuty zip v11-Smak, kernel v9 (notebook/metadata/src), v11-Smak (notebook/metadata), e499/v10 (banerowana notka arch. zostaje).
 ŻYWE: duck-v11-c45 (kandydat), duck-c45 (baza), ops (r086 read-only), r033-bundle, dokumenty decyzyjne z banerami.
 Dla sesji czytających repo: KANDYDAT = arc-agi-3/duck-v11-c45 (slot A: PLAN_COMMIT=0 -> slot B: =1). Wysyłka = PO GO usera.
+
+## 11. NOC 28/29.10: ANALIZA 23.89 + LOKALNY SILNIK + v12 (Arena)
+- v11 slot A #57737623 = 23.89 (fix concurrency DZIALA — linia znow punktuje; best wciaz v3 26.25).
+- REGRESJA SMOKE v11: 18.55 vs c45 26.78 (per-gra: cn04 -66.7, m0r0 -34.8, g50t -21.4; wiecej tokenow, mniej poziomow
+  => side-effect patch 0005/ONLY_RESET w rekonstrukcji). Wniosek: rekonstrukcje bazy NIOSA ryzyko; minimal-delta wygrywa.
+- LB vs smoke niespójne kierunkowo (v3 -2.8 vs v11 +5.3) => kalibracja slaba, nie przegrywac slotow na "strojenie smoke".
+- LOKALNY SILNIK (arcengine 0.9.3 + arc-agi 0.9.9 z PyPI na py3.11 przez sys.path + kody 25 gier w repo): dziala (local-engine/).
+  official_110() = klon 110 gier = pelna symulacja reruna lokalnie. Null-vuln z papera AERA: reprodukowana (camera
+  TypeError), na 0.9.9 nie daje WIN — i TAK NIE UYWAMY (etyka/ryzyko DQ).
+- v12 WYPUSZCZONA: duck-v12/ = c45 bajt + 2 linie fix (jedyne diff). Do decyzji GO: push+smoke (ranek 29.10).
+- Droga do 50+ (szczerze): (1) potwierdzic strukture 110-klonow (log reruna w przegladarce!), (2) playbook miedzy grami
+  (replay sekwencji per hash-startu klatki), (3) otwieracze z zrodel (parser placements), (4) ew. 27B (v13-27b innej
+  sesji w smoke), (5) deep/commit na c45. Bez (1)-(3) sufit linii ~30-40; z (2)+(3) realnie 45-55. Nic nie wysylane bez GO.
