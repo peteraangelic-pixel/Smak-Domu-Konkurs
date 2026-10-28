@@ -161,22 +161,6 @@ def op_push(args: dict, out_dir: Path) -> str:
     return f"## kernels push {pkg}\nrc={code}\n{out}\n"
 
 
-def op_push_v11(args: dict, out_dir: Path) -> str:
-    """Push the v11 slot package (Save & Run, never submit).
-
-    The generic op_push is deliberately restricted to arc-agi-3/kaggle/;
-    the v11 candidate lives at arc-agi-3/duck-v11-c45, so it needs an
-    explicit, named path instead of a broad allowlist.
-    """
-    if not args.get("confirm"):
-        return "ODMOWA: op push-v11 wymaga args.confirm=true.\n"
-    pkg = (Path.cwd() / "arc-agi-3" / "duck-v11-c45").resolve()
-    if not (pkg / "kernel-metadata.json").exists():
-        return f"ODMOWA: {pkg} nie ma kernel-metadata.json.\n"
-    code, out = kaggle("kernels", "push", "-p", str(pkg))
-    return f"## kernels push v11 {pkg}\nrc={code}\n{out}\n"
-
-
 def op_kernel_status(args: dict, out_dir: Path) -> str:
     slug = str(args.get("kernel") or "")
     code, out = kaggle("kernels", "status", slug)
@@ -561,6 +545,28 @@ def op_recon_bundle(args: dict, out_dir: Path) -> str:
     return text
 
 
+def op_kernels_list(args: dict, out_dir: Path) -> str:
+    """Publiczne notebooki konkursu — szukamy gotowego stacku 50+ do użycia jako pipe.
+
+    args: sort (scoreDescending|voteCount|dateRun), page_size (default 50), search (opcjonalnie).
+    """
+    sort = str(args.get("sort") or "scoreDescending")
+    page = str(int(args.get("page_size") or 50))
+    search = str(args.get("search") or "")
+    text = ""
+    variants = [
+        ("competition", ["kernels", "list", "--competition", COMP, "--sort-by", sort,
+                         "--page-size", page, "--csv"]),
+    ]
+    if search:
+        variants.append(("search", ["kernels", "list", "-s", search, "--sort-by", sort,
+                                    "--page-size", page, "--csv"]))
+    for label, argv in variants:
+        code, out = kaggle(*argv)
+        text += f"## kernels list ({label}, sort={sort})\nrc={code}\n{out[:6000]}\n\n"
+    return text
+
+
 def op_lb(args: dict, out_dir: Path) -> str:
     """Publiczny leaderboard konkursu — aktualna kotwica miejsc/progu."""
     code, out = kaggle("competitions", "leaderboard", "-c", COMP, "--show")
@@ -575,7 +581,6 @@ OPS = {
     "push-duck200k": op_push_duck200k,
     "submit": op_submit,
     "push": op_push,
-    "push-v11": op_push_v11,
     "kernel-status": op_kernel_status,
     "kernel-output": op_kernel_output,
     "kernel-info": op_kernel_info,
@@ -590,6 +595,7 @@ OPS = {
     "auto-submit": op_auto_submit,
     "recon-bundle": op_recon_bundle,
     "lb": op_lb,
+    "kernels-list": op_kernels_list,
 }
 
 
