@@ -1,0 +1,916 @@
+[{"stream_name":"stderr","time":4.504473417,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":4.504497457,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":4.504499267,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":4.504500277,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":4.817604216,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":4.817616846,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":4.817618326,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":4.817619306,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":5.498674181,"data":"petersharps gpu patch: KAGGLE_GPU_TYPE=rtx-pro-6000 COUNT=1 (nvidia rtx pro 6000 blackwell server edition)\n"}
+,{"stream_name":"stdout","time":5.49915533,"data":"taaf.kaggle: TRUE_SUBMISSION=False\n"}
+,{"stream_name":"stdout","time":7.969838841,"data":"taaf.kaggle: source bundle = /kaggle/input/datasets/jeroencottaar/taaf-kaggle-source-share\n"}
+,{"stream_name":"stdout","time":7.969855851,"data":"taaf.kaggle: input paths = {\"driessmit1/arc3-vllm-h100-wheelhouse-v3\": \"/kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3\", \"driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot\": \"/kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot\", \"jeroencottaar/taaf-kaggle-source-share\": \"/kaggle/input/datasets/jeroencottaar/taaf-kaggle-source-share\"}\n"}
+,{"stream_name":"stdout","time":7.993526021,"data":"taaf.kaggle: wrote /usr/local/lib/python3.12/dist-packages/taaf_kaggle_sources.pth (3 source roots)\n"}
+,{"stream_name":"stdout","time":7.993534331,"data":"taaf.kaggle: setup command: \"$PYTHON\" - \u003c\u003c'PYSETUP'\n"}
+,{"stream_name":"stdout","time":7.993536331,"data":"import json\n"}
+,{"stream_name":"stdout","time":7.993537211,"data":"import os\n"}
+,{"stream_name":"stdout","time":7.993538031,"data":"import shutil\n"}
+,{"stream_name":"stdout","time":7.993538771,"data":"import subprocess\n"}
+,{"stream_name":"stdout","time":7.993539481,"data":"import sys\n"}
+,{"stream_name":"stdout","time":7.993540171,"data":"import time\n"}
+,{"stream_name":"stdout","time":7.993540841,"data":"import urllib.request\n"}
+,{"stream_name":"stdout","time":7.993541531,"data":"from pathlib import Path\n"}
+,{"stream_name":"stdout","time":7.993542221,"data":"\n"}
+,{"stream_name":"stdout","time":7.993542941,"data":"WHEELHOUSE_OWNER = 'driessmit1'\n"}
+,{"stream_name":"stdout","time":7.993543691,"data":"WHEELHOUSE_SLUG = 'arc3-vllm-h100-wheelhouse-v3'\n"}
+,{"stream_name":"stdout","time":7.993544451,"data":"MODEL_OWNER = 'driessmit1'\n"}
+,{"stream_name":"stdout","time":7.993545181,"data":"MODEL_SLUG = 'vrfai-qwen3-6-27b-fp8-hf-snapshot'\n"}
+,{"stream_name":"stdout","time":7.993545891,"data":"SERVED_MODEL_NAME = 'vrfai/Qwen3.6-27B-FP8'\n"}
+,{"stream_name":"stdout","time":7.993546591,"data":"VLLM_HOST = '127.0.0.1'\n"}
+,{"stream_name":"stdout","time":7.993547281,"data":"VLLM_PORT = 1234\n"}
+,{"stream_name":"stdout","time":7.993548021,"data":"VLLM_BASE_URL = f'http://{VLLM_HOST}:{VLLM_PORT}/v1'\n"}
+,{"stream_name":"stdout","time":7.993548761,"data":"VLLM_MAX_MODEL_LEN = 65536\n"}
+,{"stream_name":"stdout","time":7.993549451,"data":"ANALYZER_CONTEXT_WINDOW = 32768\n"}
+,{"stream_name":"stdout","time":7.993555721,"data":"VLLM_TENSOR_PARALLEL_SIZE = 1\n"}
+,{"stream_name":"stdout","time":7.9935566609999995,"data":"WORKING_DIR = Path(os.environ['TAAF_KAGGLE_WORKING_DIR'])\n"}
+,{"stream_name":"stdout","time":7.993557401,"data":"SITE_PACKAGES = WORKING_DIR / 'vllm-site-packages'\n"}
+,{"stream_name":"stdout","time":7.9935581110000005,"data":"VLLM_SERVER_LOG = WORKING_DIR / 'vllm-openai-server.log'\n"}
+,{"stream_name":"stdout","time":7.9935588509999995,"data":"VLLM_SERVER_PID = WORKING_DIR / 'vllm-openai-server.pid'\n"}
+,{"stream_name":"stdout","time":7.9935595710000005,"data":"INSTALL_STAMP = SITE_PACKAGES / f'.{WHEELHOUSE_SLUG}'\n"}
+,{"stream_name":"stdout","time":7.993560281,"data":"STAMP_TEXT = 'vllm==0.19.0 torch==2.10.0 flashinfer==0.6.6\\n'\n"}
+,{"stream_name":"stdout","time":7.993561101,"data":"\n"}
+,{"stream_name":"stdout","time":7.993561851,"data":"GPU_NAME_PATTERNS = {'rtx-pro-6000': ('rtx pro 6000',), 'h100': ('h100',), 'l4': ('l4',)}\n"}
+,{"stream_name":"stdout","time":7.993562631,"data":"\n"}
+,{"stream_name":"stdout","time":7.993563311,"data":"\n"}
+,{"stream_name":"stdout","time":7.993563971,"data":"def taaf_kaggle_input_paths() -\u003e dict[str, Path]:\n"}
+,{"stream_name":"stdout","time":7.993564781,"data":"    raw = os.getenv('TAAF_KAGGLE_INPUT_PATHS', '').strip()\n"}
+,{"stream_name":"stdout","time":7.993565521,"data":"    if not raw:\n"}
+,{"stream_name":"stdout","time":7.993566251,"data":"        return {}\n"}
+,{"stream_name":"stdout","time":7.993566941,"data":"    data = json.loads(raw)\n"}
+,{"stream_name":"stdout","time":7.993567631,"data":"    if not isinstance(data, dict):\n"}
+,{"stream_name":"stdout","time":7.993568381,"data":"        raise RuntimeError('TAAF_KAGGLE_INPUT_PATHS must contain a JSON object.')\n"}
+,{"stream_name":"stdout","time":7.993569161,"data":"    return {str(ref): Path(str(path)) for ref, path in data.items()}\n"}
+,{"stream_name":"stdout","time":7.993569921,"data":"\n"}
+,{"stream_name":"stdout","time":7.993570601,"data":"\n"}
+,{"stream_name":"stdout","time":7.993571261,"data":"def resolve_kaggle_dataset_path(owner: str, slug: str) -\u003e Path:\n"}
+,{"stream_name":"stdout","time":7.993572051,"data":"    mapped = taaf_kaggle_input_paths().get(f'{owner}/{slug}')\n"}
+,{"stream_name":"stdout","time":7.993572941,"data":"    if mapped is not None:\n"}
+,{"stream_name":"stdout","time":7.993573671,"data":"        return mapped\n"}
+,{"stream_name":"stdout","time":7.993574401,"data":"    for dataset_path in (Path('/kaggle/input') / slug, Path('/kaggle/input/datasets') / owner / slug):\n"}
+,{"stream_name":"stdout","time":7.993575201,"data":"        if dataset_path.exists():\n"}
+,{"stream_name":"stdout","time":7.993575911,"data":"            return dataset_path\n"}
+,{"stream_name":"stdout","time":7.993576611,"data":"    return Path('/kaggle/input') / slug\n"}
+,{"stream_name":"stdout","time":7.993577331,"data":"\n"}
+,{"stream_name":"stdout","time":7.993578001,"data":"\n"}
+,{"stream_name":"stdout","time":7.993578671,"data":"WHEELHOUSE = resolve_kaggle_dataset_path(WHEELHOUSE_OWNER, WHEELHOUSE_SLUG)\n"}
+,{"stream_name":"stdout","time":7.993579411,"data":"MODEL_PATH = resolve_kaggle_dataset_path(MODEL_OWNER, MODEL_SLUG)\n"}
+,{"stream_name":"stdout","time":7.993580121,"data":"\n"}
+,{"stream_name":"stdout","time":7.993580781,"data":"\n"}
+,{"stream_name":"stdout","time":7.993581421,"data":"def assert_expected_cuda_gpu() -\u003e None:\n"}
+,{"stream_name":"stdout","time":7.993582441,"data":"    if not Path('/kaggle/input').exists():\n"}
+,{"stream_name":"stdout","time":7.993584521,"data":"        return\n"}
+,{"stream_name":"stdout","time":7.993585281,"data":"    assert shutil.which('nvidia-smi'), 'CUDA GPU check failed: nvidia-smi is not available.'\n"}
+,{"stream_name":"stdout","time":7.9935860309999995,"data":"    result = subprocess.run(['nvidia-smi', '--query-gpu=name', '--format=csv,noheader'], capture_output=True, text=True)\n"}
+,{"stream_name":"stdout","time":7.993586811,"data":"    assert result.returncode == 0, f'nvidia-smi failed: {result.stderr.strip()}'\n"}
+,{"stream_name":"stdout","time":7.993587531,"data":"    gpu_names = [line.strip() for line in result.stdout.splitlines() if line.strip()]\n"}
+,{"stream_name":"stdout","time":7.993588271,"data":"    assert gpu_names, 'nvidia-smi did not report any CUDA GPUs.'\n"}
+,{"stream_name":"stdout","time":7.993589011,"data":"    expected_gpu_type = os.getenv('KAGGLE_GPU_TYPE', 'rtx-pro-6000').strip().lower()\n"}
+,{"stream_name":"stdout","time":7.993589741,"data":"    expected_count = os.getenv('KAGGLE_GPU_COUNT', '1')\n"}
+,{"stream_name":"stdout","time":7.993590481,"data":"    if expected_count.isdigit():\n"}
+,{"stream_name":"stdout","time":7.993591201,"data":"        assert len(gpu_names) == int(expected_count), f'Expected {expected_count} CUDA GPU(s), found {gpu_names}'\n"}
+,{"stream_name":"stdout","time":7.993591951,"data":"    patterns = GPU_NAME_PATTERNS.get(expected_gpu_type, (expected_gpu_type.replace('-', ' '),))\n"}
+,{"stream_name":"stdout","time":7.993592721,"data":"    mismatched = [name for name in gpu_names if not any(pattern in name.lower() for pattern in patterns)]\n"}
+,{"stream_name":"stdout","time":7.993593501,"data":"    assert not mismatched, f'Expected GPU type {expected_gpu_type!r}, found {gpu_names}'\n"}
+,{"stream_name":"stdout","time":7.993594241,"data":"    print(f'CUDA GPU check passed for {expected_gpu_type} x{expected_count}: {gpu_names}', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993595021,"data":"\n"}
+,{"stream_name":"stdout","time":7.993595681,"data":"\n"}
+,{"stream_name":"stdout","time":7.993596331,"data":"def vllm_env() -\u003e dict[str, str]:\n"}
+,{"stream_name":"stdout","time":7.993597081,"data":"    env = os.environ.copy()\n"}
+,{"stream_name":"stdout","time":7.993598201,"data":"    existing = env.get('PYTHONPATH', '')\n"}
+,{"stream_name":"stdout","time":7.993598941,"data":"    env['PYTHONPATH'] = str(SITE_PACKAGES) if not existing else f'{SITE_PACKAGES}{os.pathsep}{existing}'\n"}
+,{"stream_name":"stdout","time":7.993599711,"data":"    env.update(\n"}
+,{"stream_name":"stdout","time":7.993600411,"data":"        {\n"}
+,{"stream_name":"stdout","time":7.993601101,"data":"            'USE_TF': '0',\n"}
+,{"stream_name":"stdout","time":7.993601791,"data":"            'TRANSFORMERS_NO_TF': '1',\n"}
+,{"stream_name":"stdout","time":7.993602521,"data":"            'TRANSFORMERS_NO_TORCHVISION': '1',\n"}
+,{"stream_name":"stdout","time":7.993603241,"data":"            'VLLM_NO_USAGE_STATS': '1',\n"}
+,{"stream_name":"stdout","time":7.993603941,"data":"        }\n"}
+,{"stream_name":"stdout","time":7.993604601,"data":"    )\n"}
+,{"stream_name":"stdout","time":7.993605281,"data":"    return env\n"}
+,{"stream_name":"stdout","time":7.993606011,"data":"\n"}
+,{"stream_name":"stdout","time":7.993606651,"data":"\n"}
+,{"stream_name":"stdout","time":7.993607301,"data":"def cached_install_is_usable() -\u003e bool:\n"}
+,{"stream_name":"stdout","time":7.993608031,"data":"    if not INSTALL_STAMP.exists() or INSTALL_STAMP.read_text(encoding='utf-8') != STAMP_TEXT:\n"}
+,{"stream_name":"stdout","time":7.993608781,"data":"        return False\n"}
+,{"stream_name":"stdout","time":7.993610461,"data":"    result = subprocess.run(\n"}
+,{"stream_name":"stdout","time":7.993611231,"data":"        [sys.executable, '-c', \"import vllm, torch; print(f'Cached vLLM {vllm.__version__}, torch {torch.__version__}')\"],\n"}
+,{"stream_name":"stdout","time":7.993612121,"data":"        env=vllm_env(),\n"}
+,{"stream_name":"stdout","time":7.993612821,"data":"        text=True,\n"}
+,{"stream_name":"stdout","time":7.993613531,"data":"    )\n"}
+,{"stream_name":"stdout","time":7.993614201,"data":"    return result.returncode == 0\n"}
+,{"stream_name":"stdout","time":7.993614951,"data":"\n"}
+,{"stream_name":"stdout","time":7.993615631,"data":"\n"}
+,{"stream_name":"stdout","time":7.9936162710000005,"data":"def install_vllm_wheelhouse() -\u003e None:\n"}
+,{"stream_name":"stdout","time":7.993617181,"data":"    requirements = WHEELHOUSE / 'requirements.lock'\n"}
+,{"stream_name":"stdout","time":7.993618011,"data":"    if not requirements.exists():\n"}
+,{"stream_name":"stdout","time":7.993618741,"data":"        raise FileNotFoundError(f'Missing wheelhouse lock file: {requirements}')\n"}
+,{"stream_name":"stdout","time":7.993620721,"data":"    if cached_install_is_usable():\n"}
+,{"stream_name":"stdout","time":7.993621491,"data":"        print(f'Using cached vLLM target install at {SITE_PACKAGES}', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993622301,"data":"        return\n"}
+,{"stream_name":"stdout","time":7.993623001,"data":"    shutil.rmtree(SITE_PACKAGES, ignore_errors=True)\n"}
+,{"stream_name":"stdout","time":7.993623821,"data":"    SITE_PACKAGES.mkdir(parents=True, exist_ok=True)\n"}
+,{"stream_name":"stdout","time":7.993624561,"data":"    cmd = [\n"}
+,{"stream_name":"stdout","time":7.993625271,"data":"        sys.executable,\n"}
+,{"stream_name":"stdout","time":7.993625951,"data":"        '-m',\n"}
+,{"stream_name":"stdout","time":7.993626671,"data":"        'pip',\n"}
+,{"stream_name":"stdout","time":7.993627321,"data":"        'install',\n"}
+,{"stream_name":"stdout","time":7.993628021,"data":"        '--no-index',\n"}
+,{"stream_name":"stdout","time":7.993628731,"data":"        '--find-links',\n"}
+,{"stream_name":"stdout","time":7.993629411,"data":"        str(WHEELHOUSE),\n"}
+,{"stream_name":"stdout","time":7.993630121,"data":"        '--requirement',\n"}
+,{"stream_name":"stdout","time":7.993630791,"data":"        str(requirements),\n"}
+,{"stream_name":"stdout","time":7.993631491,"data":"        '--target',\n"}
+,{"stream_name":"stdout","time":7.993632151,"data":"        str(SITE_PACKAGES),\n"}
+,{"stream_name":"stdout","time":7.993632881,"data":"        '--upgrade',\n"}
+,{"stream_name":"stdout","time":7.993633601,"data":"        '--ignore-installed',\n"}
+,{"stream_name":"stdout","time":7.993634341,"data":"        '--only-binary',\n"}
+,{"stream_name":"stdout","time":7.993635061,"data":"        ':all:',\n"}
+,{"stream_name":"stdout","time":7.993635761,"data":"        '--no-compile',\n"}
+,{"stream_name":"stdout","time":7.993636501,"data":"        '--disable-pip-version-check',\n"}
+,{"stream_name":"stdout","time":7.993637241,"data":"        '--no-warn-conflicts',\n"}
+,{"stream_name":"stdout","time":7.993637961,"data":"    ]\n"}
+,{"stream_name":"stdout","time":7.993638651,"data":"    print('Installing vLLM wheelhouse into', SITE_PACKAGES, flush=True)\n"}
+,{"stream_name":"stdout","time":7.993639431,"data":"    subprocess.run(cmd, check=True)\n"}
+,{"stream_name":"stdout","time":7.993640201,"data":"    INSTALL_STAMP.write_text(STAMP_TEXT, encoding='utf-8')\n"}
+,{"stream_name":"stdout","time":7.993641861,"data":"\n"}
+,{"stream_name":"stdout","time":7.993642571,"data":"\n"}
+,{"stream_name":"stdout","time":7.993643251,"data":"def request_json(url: str, payload: dict | None = None, timeout: int = 30) -\u003e dict:\n"}
+,{"stream_name":"stdout","time":7.993644071,"data":"    data = None if payload is None else json.dumps(payload).encode('utf-8')\n"}
+,{"stream_name":"stdout","time":7.993644861,"data":"    request = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})\n"}
+,{"stream_name":"stdout","time":7.993645651,"data":"    with urllib.request.urlopen(request, timeout=timeout) as response:\n"}
+,{"stream_name":"stdout","time":7.993646411,"data":"        return json.loads(response.read().decode('utf-8'))\n"}
+,{"stream_name":"stdout","time":7.993647141,"data":"\n"}
+,{"stream_name":"stdout","time":7.993647811,"data":"\n"}
+,{"stream_name":"stdout","time":7.993648461,"data":"def tail_server_log(lines: int = 80) -\u003e str:\n"}
+,{"stream_name":"stdout","time":7.993649211,"data":"    if not VLLM_SERVER_LOG.exists():\n"}
+,{"stream_name":"stdout","time":7.993649941,"data":"        return ''\n"}
+,{"stream_name":"stdout","time":7.9936506309999995,"data":"    return '\\n'.join(VLLM_SERVER_LOG.read_text(encoding='utf-8', errors='replace').splitlines()[-lines:])\n"}
+,{"stream_name":"stdout","time":7.993651461,"data":"\n"}
+,{"stream_name":"stdout","time":7.993652111,"data":"\n"}
+,{"stream_name":"stdout","time":7.993652781,"data":"def wait_for_vllm_server(timeout_seconds: int = 900) -\u003e None:\n"}
+,{"stream_name":"stdout","time":7.993653521,"data":"    deadline = time.monotonic() + timeout_seconds\n"}
+,{"stream_name":"stdout","time":7.993654211,"data":"    url = f'{VLLM_BASE_URL}/models'\n"}
+,{"stream_name":"stdout","time":7.993654921,"data":"    while time.monotonic() \u003c deadline:\n"}
+,{"stream_name":"stdout","time":7.993655651,"data":"        if VLLM_SERVER_PID.exists():\n"}
+,{"stream_name":"stdout","time":7.993656401,"data":"            try:\n"}
+,{"stream_name":"stdout","time":7.993657111,"data":"                os.kill(int(VLLM_SERVER_PID.read_text().strip()), 0)\n"}
+,{"stream_name":"stdout","time":7.993657861,"data":"            except OSError as exc:\n"}
+,{"stream_name":"stdout","time":7.993658591,"data":"                raise RuntimeError(f'vLLM server process is not alive: {exc}\\n{tail_server_log()}') from exc\n"}
+,{"stream_name":"stdout","time":7.993659571,"data":"        try:\n"}
+,{"stream_name":"stdout","time":7.993660291,"data":"            models = request_json(url, timeout=5)\n"}
+,{"stream_name":"stdout","time":7.993660981,"data":"            print('vLLM server ready:', models, flush=True)\n"}
+,{"stream_name":"stdout","time":7.9936617210000005,"data":"            return\n"}
+,{"stream_name":"stdout","time":7.993662421,"data":"        except Exception:\n"}
+,{"stream_name":"stdout","time":7.993663131,"data":"            time.sleep(5)\n"}
+,{"stream_name":"stdout","time":7.993663821,"data":"    raise TimeoutError(f'Timed out waiting for vLLM server at {url}.\\nLast server log lines:\\n{tail_server_log()}')\n"}
+,{"stream_name":"stdout","time":7.993664661,"data":"\n"}
+,{"stream_name":"stdout","time":7.993665331,"data":"\n"}
+,{"stream_name":"stdout","time":7.993666021,"data":"def start_vllm_server() -\u003e None:\n"}
+,{"stream_name":"stdout","time":7.993666811,"data":"    install_vllm_wheelhouse()\n"}
+,{"stream_name":"stdout","time":7.993667541,"data":"    VLLM_SERVER_LOG.parent.mkdir(parents=True, exist_ok=True)\n"}
+,{"stream_name":"stdout","time":7.993668261,"data":"    VLLM_SERVER_PID.unlink(missing_ok=True)\n"}
+,{"stream_name":"stdout","time":7.993669871,"data":"    log_handle = VLLM_SERVER_LOG.open('w', encoding='utf-8')\n"}
+,{"stream_name":"stdout","time":7.993670651,"data":"    cmd = [\n"}
+,{"stream_name":"stdout","time":7.993671341,"data":"        sys.executable,\n"}
+,{"stream_name":"stdout","time":7.993672041,"data":"        '-m',\n"}
+,{"stream_name":"stdout","time":7.993672951,"data":"        'vllm.entrypoints.openai.api_server',\n"}
+,{"stream_name":"stdout","time":7.993673971,"data":"        '--model',\n"}
+,{"stream_name":"stdout","time":7.993674651,"data":"        str(MODEL_PATH),\n"}
+,{"stream_name":"stdout","time":7.993675331,"data":"        '--served-model-name',\n"}
+,{"stream_name":"stdout","time":7.993676051,"data":"        SERVED_MODEL_NAME,\n"}
+,{"stream_name":"stdout","time":7.993676761,"data":"        '--host',\n"}
+,{"stream_name":"stdout","time":7.993677421,"data":"        VLLM_HOST,\n"}
+,{"stream_name":"stdout","time":7.993678121,"data":"        '--port',\n"}
+,{"stream_name":"stdout","time":7.993678801,"data":"        str(VLLM_PORT),\n"}
+,{"stream_name":"stdout","time":7.993679491,"data":"        '--tensor-parallel-size',\n"}
+,{"stream_name":"stdout","time":7.993680201,"data":"        str(VLLM_TENSOR_PARALLEL_SIZE),\n"}
+,{"stream_name":"stdout","time":7.993680911,"data":"        '--enable-auto-tool-choice',\n"}
+,{"stream_name":"stdout","time":7.9936816109999995,"data":"        '--tool-call-parser',\n"}
+,{"stream_name":"stdout","time":7.993682321,"data":"        'qwen3_coder',\n"}
+,{"stream_name":"stdout","time":7.993683021,"data":"        '--generation-config',\n"}
+,{"stream_name":"stdout","time":7.993683711,"data":"        'vllm',\n"}
+,{"stream_name":"stdout","time":7.993684381,"data":"        '--enable-prefix-caching',\n"}
+,{"stream_name":"stdout","time":7.993685071,"data":"        '--default-chat-template-kwargs',\n"}
+,{"stream_name":"stdout","time":7.993685801,"data":"        '{\"preserve_thinking\": true}',\n"}
+,{"stream_name":"stdout","time":7.993686581,"data":"        '--reasoning-parser',\n"}
+,{"stream_name":"stdout","time":7.993687291,"data":"        'qwen3',\n"}
+,{"stream_name":"stdout","time":7.993687961,"data":"        '--max-model-len',\n"}
+,{"stream_name":"stdout","time":7.993688661,"data":"        str(VLLM_MAX_MODEL_LEN),\n"}
+,{"stream_name":"stdout","time":7.993689351,"data":"    ]\n"}
+,{"stream_name":"stdout","time":7.993690021,"data":"    print('Starting vLLM OpenAI server:', ' '.join(cmd), flush=True)\n"}
+,{"stream_name":"stdout","time":7.993690791,"data":"    process = subprocess.Popen(cmd, env=vllm_env(), stdout=log_handle, stderr=subprocess.STDOUT, text=True)\n"}
+,{"stream_name":"stdout","time":7.993691571,"data":"    VLLM_SERVER_PID.write_text(str(process.pid), encoding='utf-8')\n"}
+,{"stream_name":"stdout","time":7.9936922809999995,"data":"    wait_for_vllm_server()\n"}
+,{"stream_name":"stdout","time":7.993692991,"data":"\n"}
+,{"stream_name":"stdout","time":7.993693671,"data":"\n"}
+,{"stream_name":"stdout","time":7.993694351,"data":"def run_vllm_api_smoke_test() -\u003e None:\n"}
+,{"stream_name":"stdout","time":7.993695071,"data":"    payload = {\n"}
+,{"stream_name":"stdout","time":7.993695751,"data":"        'model': SERVED_MODEL_NAME,\n"}
+,{"stream_name":"stdout","time":7.993696501,"data":"        'messages': [{'role': 'user', 'content': 'Answer in one short sentence: what is 2 + 2?'}],\n"}
+,{"stream_name":"stdout","time":7.993697241,"data":"        'temperature': 0.0,\n"}
+,{"stream_name":"stdout","time":7.993698741,"data":"        'max_tokens': 96,\n"}
+,{"stream_name":"stdout","time":7.993699461,"data":"        'chat_template_kwargs': {'enable_thinking': False},\n"}
+,{"stream_name":"stdout","time":7.993700181,"data":"    }\n"}
+,{"stream_name":"stdout","time":7.993700871,"data":"    response = request_json(f'{VLLM_BASE_URL}/chat/completions', payload=payload, timeout=120)\n"}
+,{"stream_name":"stdout","time":7.993701641,"data":"    generated = response['choices'][0]['message'].get('content', '').strip()\n"}
+,{"stream_name":"stdout","time":7.993702421,"data":"    print('\\n' + '=' * 88, flush=True)\n"}
+,{"stream_name":"stdout","time":7.993703311,"data":"    print('VLLM OPENAI SERVER QWEN SMOKE TEST REAL MODEL OUTPUT', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993704061,"data":"    print('Generated:', generated, flush=True)\n"}
+,{"stream_name":"stdout","time":7.993704761,"data":"    print('=' * 88 + '\\n', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993705521,"data":"\n"}
+,{"stream_name":"stdout","time":7.993706201,"data":"\n"}
+,{"stream_name":"stdout","time":7.993706851,"data":"print(f'vLLM wheelhouse path: {WHEELHOUSE}', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993707561,"data":"print(f'Qwen model path: {MODEL_PATH}', flush=True)\n"}
+,{"stream_name":"stdout","time":7.993708301,"data":"assert_expected_cuda_gpu()\n"}
+,{"stream_name":"stdout","time":7.993709031,"data":"missing = [str(path) for path in (WHEELHOUSE, MODEL_PATH) if not path.exists()]\n"}
+,{"stream_name":"stdout","time":7.993709771,"data":"if missing:\n"}
+,{"stream_name":"stdout","time":7.993710481,"data":"    raise FileNotFoundError('Missing attached dataset path(s): ' + ', '.join(missing))\n"}
+,{"stream_name":"stdout","time":7.993711221,"data":"start_vllm_server()\n"}
+,{"stream_name":"stdout","time":7.993711931,"data":"run_vllm_api_smoke_test()\n"}
+,{"stream_name":"stdout","time":7.993712641,"data":"setup_env = {\n"}
+,{"stream_name":"stdout","time":7.9937133209999995,"data":"    'USE_TF': '0',\n"}
+,{"stream_name":"stdout","time":7.993714011,"data":"    'TRANSFORMERS_NO_TF': '1',\n"}
+,{"stream_name":"stdout","time":7.993714711,"data":"    'TRANSFORMERS_NO_TORCHVISION': '1',\n"}
+,{"stream_name":"stdout","time":7.993715391,"data":"    'VLLM_NO_USAGE_STATS': '1',\n"}
+,{"stream_name":"stdout","time":7.993716101,"data":"    'PYTHONPATH': str(SITE_PACKAGES) + os.pathsep + os.environ.get('PYTHONPATH', ''),\n"}
+,{"stream_name":"stdout","time":7.993716871,"data":"    'LOCAL_ANALYZER_BASE_URL': VLLM_BASE_URL,\n"}
+,{"stream_name":"stdout","time":7.993717571,"data":"    'OPENAI_BASE_URL': VLLM_BASE_URL,\n"}
+,{"stream_name":"stdout","time":7.993718301,"data":"    'LOCAL_ANALYZER_PROVIDER': 'vllm',\n"}
+,{"stream_name":"stdout","time":7.993719031,"data":"    'OPENAI_PROVIDER': 'vllm',\n"}
+,{"stream_name":"stdout","time":7.993719751,"data":"    'LOCAL_ANALYZER_MODEL_ID': SERVED_MODEL_NAME,\n"}
+,{"stream_name":"stdout","time":7.993720481,"data":"    'INFERENCE_ANALYZER_MODEL': SERVED_MODEL_NAME,\n"}
+,{"stream_name":"stdout","time":7.993721211,"data":"    'LOCAL_ANALYZER_APP_NAME': 'ARC3 Agent Harness',\n"}
+,{"stream_name":"stdout","time":7.993721951,"data":"    'LOCAL_ANALYZER_CONTEXT_WINDOW': str(ANALYZER_CONTEXT_WINDOW),\n"}
+,{"stream_name":"stdout","time":7.993722691,"data":"    'LOCAL_ANALYZER_MAX_OUTPUT': '0',\n"}
+,{"stream_name":"stdout","time":7.993723371,"data":"    'LOCAL_ANALYZER_TOOL_STEPS': '0',\n"}
+,{"stream_name":"stdout","time":7.993724091,"data":"    'LOCAL_ANALYZER_TOOL_TIMEOUT': '30',\n"}
+,{"stream_name":"stdout","time":7.993724801,"data":"    'LOCAL_ANALYZER_TOOL_OUTPUT_TOKENS': '1024',\n"}
+,{"stream_name":"stdout","time":7.993726341,"data":"    'LOCAL_ANALYZER_YIELD_SECONDS': '60',\n"}
+,{"stream_name":"stdout","time":7.993727091,"data":"    'LOCAL_ANALYZER_TEMPERATURE': '0.6',\n"}
+,{"stream_name":"stdout","time":7.9937277810000005,"data":"    'LOCAL_ANALYZER_TOP_P': '0.95',\n"}
+,{"stream_name":"stdout","time":7.993728471,"data":"    'LOCAL_ANALYZER_TOP_K': '20',\n"}
+,{"stream_name":"stdout","time":7.993729171,"data":"    'LOCAL_ANALYZER_ENABLE_THINKING': 'true',\n"}
+,{"stream_name":"stdout","time":7.993729891,"data":"    'MULTIMODAL_CONTEXT': 'current_grid',\n"}
+,{"stream_name":"stdout","time":7.993730601,"data":"    'MULTIMODAL_UPSCALE': '4',\n"}
+,{"stream_name":"stdout","time":7.993731291,"data":"}\n"}
+,{"stream_name":"stdout","time":7.993732001,"data":"setup_env_path = Path(os.environ['TAAF_KAGGLE_SETUP_ENV'])\n"}
+,{"stream_name":"stdout","time":7.993732761,"data":"existing_setup_env = {}\n"}
+,{"stream_name":"stdout","time":7.993733471,"data":"if setup_env_path.exists():\n"}
+,{"stream_name":"stdout","time":7.993734201,"data":"    existing_setup_env = json.loads(setup_env_path.read_text(encoding='utf-8'))\n"}
+,{"stream_name":"stdout","time":7.993734971,"data":"    if not isinstance(existing_setup_env, dict):\n"}
+,{"stream_name":"stdout","time":7.993735681,"data":"        raise RuntimeError('TAAF_KAGGLE_SETUP_ENV must contain a JSON object.')\n"}
+,{"stream_name":"stdout","time":7.993736421,"data":"existing_setup_env.update(setup_env)\n"}
+,{"stream_name":"stdout","time":7.993737141,"data":"setup_env_path.write_text(json.dumps(existing_setup_env, indent=2), encoding='utf-8')\n"}
+,{"stream_name":"stdout","time":7.993737931,"data":"\n"}
+,{"stream_name":"stdout","time":7.993738611,"data":"PYSETUP\n"}
+,{"stream_name":"stdout","time":8.052274776,"data":"vLLM wheelhouse path: /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3\n"}
+,{"stream_name":"stdout","time":8.052291546,"data":"Qwen model path: /kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot\n"}
+,{"stream_name":"stdout","time":8.064611001,"data":"CUDA GPU check passed for rtx-pro-6000 x1: ['NVIDIA RTX PRO 6000 Blackwell Server Edition']\n"}
+,{"stream_name":"stdout","time":8.06694214,"data":"Installing vLLM wheelhouse into /kaggle/working/vllm-site-packages\n"}
+,{"stream_name":"stdout","time":8.170364927,"data":"vLLM wheelhouse path: /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3\n"}
+,{"stream_name":"stdout","time":8.170370437,"data":"Qwen model path: /kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot\n"}
+,{"stream_name":"stdout","time":8.170371417,"data":"CUDA GPU check passed for rtx-pro-6000 x1: ['NVIDIA RTX PRO 6000 Blackwell Server Edition']\n"}
+,{"stream_name":"stdout","time":8.170372737,"data":"Installing vLLM wheelhouse into /kaggle/working/vllm-site-packages\n"}
+,{"stream_name":"stdout","time":8.403869269,"data":"Looking in links: /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3\n"}
+,{"stream_name":"stdout","time":8.42522076,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiohappyeyeballs-2.6.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 1))\n"}
+,{"stream_name":"stdout","time":8.436075435,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiohttp-3.13.5-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 2))\n"}
+,{"stream_name":"stdout","time":8.459239575,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiosignal-1.4.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 3))\n"}
+,{"stream_name":"stdout","time":8.47299644,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/annotated_doc-0.0.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 4))\n"}
+,{"stream_name":"stdout","time":8.483434095,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/annotated_types-0.7.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 5))\n"}
+,{"stream_name":"stdout","time":8.494271341,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/anthropic-0.97.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 6))\n"}
+,{"stream_name":"stdout","time":8.512275513,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/anyio-4.13.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 7))\n"}
+,{"stream_name":"stdout","time":8.523578088,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/apache_tvm_ffi-0.1.10-cp312-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 8))\n"}
+,{"stream_name":"stdout","time":8.548658448,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/astor-0.8.1-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 9))\n"}
+,{"stream_name":"stdout","time":8.558777274,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/attrs-26.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 10))\n"}
+,{"stream_name":"stdout","time":8.568619619,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/blake3-1.0.8-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 11))\n"}
+,{"stream_name":"stdout","time":8.605101514,"data":"Looking in links: /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3\n"}
+,{"stream_name":"stdout","time":8.605113084,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiohappyeyeballs-2.6.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 1))\n"}
+,{"stream_name":"stdout","time":8.605114844,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiohttp-3.13.5-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 2))\n"}
+,{"stream_name":"stdout","time":8.605116464,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/aiosignal-1.4.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 3))\n"}
+,{"stream_name":"stdout","time":8.605117344,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/annotated_doc-0.0.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 4))\n"}
+,{"stream_name":"stdout","time":8.605118294,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/annotated_types-0.7.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 5))\n"}
+,{"stream_name":"stdout","time":8.605131604,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/anthropic-0.97.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 6))\n"}
+,{"stream_name":"stdout","time":8.605132504,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/anyio-4.13.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 7))\n"}
+,{"stream_name":"stdout","time":8.605133404,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/apache_tvm_ffi-0.1.10-cp312-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 8))\n"}
+,{"stream_name":"stdout","time":8.605134734,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/astor-0.8.1-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 9))\n"}
+,{"stream_name":"stdout","time":8.605135604,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/attrs-26.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 10))\n"}
+,{"stream_name":"stdout","time":8.605136483999999,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/blake3-1.0.8-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 11))\n"}
+,{"stream_name":"stdout","time":8.609156432,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cachetools-7.0.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 12))\n"}
+,{"stream_name":"stdout","time":8.618191939,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cbor2-6.0.1-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 13))\n"}
+,{"stream_name":"stdout","time":8.630110434,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/certifi-2026.4.22-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 14))\n"}
+,{"stream_name":"stdout","time":8.640104229,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cffi-2.0.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 15))\n"}
+,{"stream_name":"stdout","time":8.651656234,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 16))\n"}
+,{"stream_name":"stdout","time":8.691827658,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/click-8.3.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 17))\n"}
+,{"stream_name":"stdout","time":8.701196884,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cloudpickle-3.1.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 18))\n"}
+,{"stream_name":"stdout","time":8.710486790000001,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/compressed_tensors-0.14.0.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 19))\n"}
+,{"stream_name":"stdout","time":8.721615095,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cryptography-47.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 20))\n"}
+,{"stream_name":"stdout","time":8.809992439,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cachetools-7.0.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 12))\n"}
+,{"stream_name":"stdout","time":8.810005099,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cbor2-6.0.1-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 13))\n"}
+,{"stream_name":"stdout","time":8.810006779,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/certifi-2026.4.22-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 14))\n"}
+,{"stream_name":"stdout","time":8.810007939,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cffi-2.0.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 15))\n"}
+,{"stream_name":"stdout","time":8.810008929,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 16))\n"}
+,{"stream_name":"stdout","time":8.810010089,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/click-8.3.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 17))\n"}
+,{"stream_name":"stdout","time":8.810010959,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cloudpickle-3.1.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 18))\n"}
+,{"stream_name":"stdout","time":8.810011879,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/compressed_tensors-0.14.0.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 19))\n"}
+,{"stream_name":"stdout","time":8.810012759,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cryptography-47.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 20))\n"}
+,{"stream_name":"stdout","time":8.812445788,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_bindings-12.9.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 21))\n"}
+,{"stream_name":"stdout","time":9.013194553,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_bindings-12.9.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 21))\n"}
+,{"stream_name":"stdout","time":9.06639512,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_pathfinder-1.5.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 22))\n"}
+,{"stream_name":"stdout","time":9.076910836,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_python-12.9.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 23))\n"}
+,{"stream_name":"stdout","time":9.085783002,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/depyf-0.20.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 24))\n"}
+,{"stream_name":"stdout","time":9.096250778,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/dill-0.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 25))\n"}
+,{"stream_name":"stdout","time":9.105948574,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/diskcache-5.6.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 26))\n"}
+,{"stream_name":"stdout","time":9.116430759,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/distro-1.9.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 27))\n"}
+,{"stream_name":"stdout","time":9.126273105,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/dnspython-2.8.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 28))\n"}
+,{"stream_name":"stdout","time":9.140394259,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/docstring_parser-0.18.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 29))\n"}
+,{"stream_name":"stdout","time":9.149692645,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/einops-0.8.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 30))\n"}
+,{"stream_name":"stdout","time":9.16085379,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/email_validator-2.3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 31))\n"}
+,{"stream_name":"stdout","time":9.172293646,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi_cli-0.0.24-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 32))\n"}
+,{"stream_name":"stdout","time":9.182960491,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi_cloud_cli-0.17.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 33))\n"}
+,{"stream_name":"stdout","time":9.193772437,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi-0.136.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 34))\n"}
+,{"stream_name":"stdout","time":9.207118261,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastar-0.11.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 35))\n"}
+,{"stream_name":"stdout","time":9.267190966,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_pathfinder-1.5.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 22))\n"}
+,{"stream_name":"stdout","time":9.267195776,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/cuda_python-12.9.4-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 23))\n"}
+,{"stream_name":"stdout","time":9.267200586,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/depyf-0.20.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 24))\n"}
+,{"stream_name":"stdout","time":9.267202246,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/dill-0.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 25))\n"}
+,{"stream_name":"stdout","time":9.267203086,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/diskcache-5.6.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 26))\n"}
+,{"stream_name":"stdout","time":9.267203926,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/distro-1.9.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 27))\n"}
+,{"stream_name":"stdout","time":9.267204866,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/dnspython-2.8.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 28))\n"}
+,{"stream_name":"stdout","time":9.267206156,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/docstring_parser-0.18.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 29))\n"}
+,{"stream_name":"stdout","time":9.267207546,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/einops-0.8.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 30))\n"}
+,{"stream_name":"stdout","time":9.267208956,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/email_validator-2.3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 31))\n"}
+,{"stream_name":"stdout","time":9.267209836,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi_cli-0.0.24-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 32))\n"}
+,{"stream_name":"stdout","time":9.267210676,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi_cloud_cli-0.17.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 33))\n"}
+,{"stream_name":"stdout","time":9.267211506,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastapi-0.136.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 34))\n"}
+,{"stream_name":"stdout","time":9.267212396,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fastar-0.11.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 35))\n"}
+,{"stream_name":"stdout","time":9.282750209,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/filelock-3.29.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 36))\n"}
+,{"stream_name":"stdout","time":9.293552035,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/flashinfer_cubin-0.6.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 37))\n"}
+,{"stream_name":"stdout","time":9.483546285,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/filelock-3.29.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 36))\n"}
+,{"stream_name":"stdout","time":9.483555545,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/flashinfer_cubin-0.6.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 37))\n"}
+,{"stream_name":"stdout","time":13.737397347,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/flashinfer_python-0.6.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 38))\n"}
+,{"stream_name":"stdout","time":13.835216986,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 39))\n"}
+,{"stream_name":"stdout","time":13.848713671,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fsspec-2026.4.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 40))\n"}
+,{"stream_name":"stdout","time":13.876933899,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/gguf-0.18.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 41))\n"}
+,{"stream_name":"stdout","time":13.888410804,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/googleapis_common_protos-1.74.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 42))\n"}
+,{"stream_name":"stdout","time":13.901628758,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/grpcio-1.80.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 43))\n"}
+,{"stream_name":"stdout","time":13.938761153,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/flashinfer_python-0.6.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 38))\n"}
+,{"stream_name":"stdout","time":13.938765293,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 39))\n"}
+,{"stream_name":"stdout","time":13.938766483,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/fsspec-2026.4.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 40))\n"}
+,{"stream_name":"stdout","time":13.938767563,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/gguf-0.18.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 41))\n"}
+,{"stream_name":"stdout","time":13.938768373,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/googleapis_common_protos-1.74.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 42))\n"}
+,{"stream_name":"stdout","time":13.938769443,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/grpcio-1.80.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 43))\n"}
+,{"stream_name":"stdout","time":13.982667404,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/h11-0.16.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 44))\n"}
+,{"stream_name":"stdout","time":13.993493,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/hf_xet-1.4.3-cp37-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 45))\n"}
+,{"stream_name":"stdout","time":14.059062952,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpcore-1.0.9-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 46))\n"}
+,{"stream_name":"stdout","time":14.070354207,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 47))\n"}
+,{"stream_name":"stdout","time":14.084321772,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpx_sse-0.4.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 48))\n"}
+,{"stream_name":"stdout","time":14.094668607,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpx-0.28.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 49))\n"}
+,{"stream_name":"stdout","time":14.106089692,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/huggingface_hub-0.36.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 50))\n"}
+,{"stream_name":"stdout","time":14.134262201,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/idna-3.13-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 51))\n"}
+,{"stream_name":"stdout","time":14.145497086,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/ijson-3.5.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 52))\n"}
+,{"stream_name":"stdout","time":14.15839498,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/importlib_metadata-8.7.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 53))\n"}
+,{"stream_name":"stdout","time":14.169790116,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/interegular-0.3.3-py37-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 54))\n"}
+,{"stream_name":"stdout","time":14.179741271,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jinja2-3.1.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 55))\n"}
+,{"stream_name":"stdout","time":14.18350997,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/h11-0.16.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 44))\n"}
+,{"stream_name":"stdout","time":14.18352706,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/hf_xet-1.4.3-cp37-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 45))\n"}
+,{"stream_name":"stdout","time":14.18352878,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpcore-1.0.9-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 46))\n"}
+,{"stream_name":"stdout","time":14.18353594,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 47))\n"}
+,{"stream_name":"stdout","time":14.18353739,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpx_sse-0.4.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 48))\n"}
+,{"stream_name":"stdout","time":14.18353824,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/httpx-0.28.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 49))\n"}
+,{"stream_name":"stdout","time":14.18353909,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/huggingface_hub-0.36.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 50))\n"}
+,{"stream_name":"stdout","time":14.18353991,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/idna-3.13-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 51))\n"}
+,{"stream_name":"stdout","time":14.1835408,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/ijson-3.5.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 52))\n"}
+,{"stream_name":"stdout","time":14.18354223,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/importlib_metadata-8.7.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 53))\n"}
+,{"stream_name":"stdout","time":14.18354311,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/interegular-0.3.3-py37-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 54))\n"}
+,{"stream_name":"stdout","time":14.18354396,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jinja2-3.1.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 55))\n"}
+,{"stream_name":"stdout","time":14.190983167,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jiter-0.14.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 56))\n"}
+,{"stream_name":"stdout","time":14.20789071,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jmespath-1.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 57))\n"}
+,{"stream_name":"stdout","time":14.217390256,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jsonschema_specifications-2025.9.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 58))\n"}
+,{"stream_name":"stdout","time":14.232988859,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jsonschema-4.26.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 59))\n"}
+,{"stream_name":"stdout","time":14.244360724,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/lark-1.2.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 60))\n"}
+,{"stream_name":"stdout","time":14.25519763,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/llguidance-1.3.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 61))\n"}
+,{"stream_name":"stdout","time":14.287537446,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/llvmlite-0.44.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 62))\n"}
+,{"stream_name":"stdout","time":14.391747112000001,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jiter-0.14.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 56))\n"}
+,{"stream_name":"stdout","time":14.391752432,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jmespath-1.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 57))\n"}
+,{"stream_name":"stdout","time":14.391753592,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jsonschema_specifications-2025.9.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 58))\n"}
+,{"stream_name":"stdout","time":14.391754462,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/jsonschema-4.26.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 59))\n"}
+,{"stream_name":"stdout","time":14.391755772,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/lark-1.2.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 60))\n"}
+,{"stream_name":"stdout","time":14.391757302,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/llguidance-1.3.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 61))\n"}
+,{"stream_name":"stdout","time":14.391758192,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/llvmlite-0.44.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 62))\n"}
+,{"stream_name":"stdout","time":14.733284039,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/lm_format_enforcer-0.11.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 63))\n"}
+,{"stream_name":"stdout","time":14.744174274,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/loguru-0.7.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 64))\n"}
+,{"stream_name":"stdout","time":14.757595269,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/markdown_it_py-4.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 65))\n"}
+,{"stream_name":"stdout","time":14.769789964,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 66))\n"}
+,{"stream_name":"stdout","time":14.780630749,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mcp-1.27.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 67))\n"}
+,{"stream_name":"stdout","time":14.794331703,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mdurl-0.1.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 68))\n"}
+,{"stream_name":"stdout","time":14.805220589,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mistral_common-1.11.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 69))\n"}
+,{"stream_name":"stdout","time":14.92094424,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/model_hosting_container_standards-0.1.14-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 70))\n"}
+,{"stream_name":"stdout","time":14.932538325,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mpmath-1.3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 71))\n"}
+,{"stream_name":"stdout","time":14.934106934999999,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/lm_format_enforcer-0.11.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 63))\n"}
+,{"stream_name":"stdout","time":14.934118075,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/loguru-0.7.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 64))\n"}
+,{"stream_name":"stdout","time":14.934119835,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/markdown_it_py-4.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 65))\n"}
+,{"stream_name":"stdout","time":14.934120995,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 66))\n"}
+,{"stream_name":"stdout","time":14.934122495,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mcp-1.27.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 67))\n"}
+,{"stream_name":"stdout","time":14.934123425,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mdurl-0.1.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 68))\n"}
+,{"stream_name":"stdout","time":14.934124225,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mistral_common-1.11.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 69))\n"}
+,{"stream_name":"stdout","time":14.934125175,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/model_hosting_container_standards-0.1.14-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 70))\n"}
+,{"stream_name":"stdout","time":14.934126215,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/mpmath-1.3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 71))\n"}
+,{"stream_name":"stdout","time":14.950056388,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/msgspec-0.21.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 72))\n"}
+,{"stream_name":"stdout","time":14.961958323,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/multidict-6.7.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 73))\n"}
+,{"stream_name":"stdout","time":14.974031948,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/networkx-3.6.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 74))\n"}
+,{"stream_name":"stdout","time":15.057204543,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 75))\n"}
+,{"stream_name":"stdout","time":15.068548618,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/numba-0.61.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 76))\n"}
+,{"stream_name":"stdout","time":15.117421877,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 77))\n"}
+,{"stream_name":"stdout","time":15.150852523,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/msgspec-0.21.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 72))\n"}
+,{"stream_name":"stdout","time":15.150862013,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/multidict-6.7.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 73))\n"}
+,{"stream_name":"stdout","time":15.150863813,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/networkx-3.6.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 74))\n"}
+,{"stream_name":"stdout","time":15.150864923,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 75))\n"}
+,{"stream_name":"stdout","time":15.150865893,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/numba-0.61.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 76))\n"}
+,{"stream_name":"stdout","time":15.150866863,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 77))\n"}
+,{"stream_name":"stdout","time":15.27704027,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 78))\n"}
+,{"stream_name":"stdout","time":15.477833226,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 78))\n"}
+,{"stream_name":"stdout","time":20.91744472,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 79))\n"}
+,{"stream_name":"stdout","time":21.018461428,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 80))\n"}
+,{"stream_name":"stdout","time":21.118646666,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 79))\n"}
+,{"stream_name":"stdout","time":21.118669026,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 80))\n"}
+,{"stream_name":"stdout","time":21.838915423,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 81))\n"}
+,{"stream_name":"stdout","time":21.861641924,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 82))\n"}
+,{"stream_name":"stdout","time":22.040084389,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 81))\n"}
+,{"stream_name":"stdout","time":22.040103679,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 82))\n"}
+,{"stream_name":"stdout","time":28.309888264,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cudnn_frontend-1.18.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 83))\n"}
+,{"stream_name":"stdout","time":28.338629252,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 84))\n"}
+,{"stream_name":"stdout","time":28.511104159,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cudnn_frontend-1.18.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 83))\n"}
+,{"stream_name":"stdout","time":28.511128159,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 84))\n"}
+,{"stream_name":"stdout","time":29.940091759,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 85))\n"}
+,{"stream_name":"stdout","time":29.964824678,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 86))\n"}
+,{"stream_name":"stdout","time":30.141169944,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 85))\n"}
+,{"stream_name":"stdout","time":30.141193964,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 86))\n"}
+,{"stream_name":"stdout","time":30.55535579,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 87))\n"}
+,{"stream_name":"stdout","time":30.756260456,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 87))\n"}
+,{"stream_name":"stdout","time":32.886727511,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 88))\n"}
+,{"stream_name":"stdout","time":33.087985896,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 88))\n"}
+,{"stream_name":"stdout","time":35.630019368,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 89))\n"}
+,{"stream_name":"stdout","time":35.831115294,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 89))\n"}
+,{"stream_name":"stdout","time":37.972438444,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cutlass_dsl_libs_base-4.5.0.dev0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 90))\n"}
+,{"stream_name":"stdout","time":38.175602158,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cutlass_dsl_libs_base-4.5.0.dev0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 90))\n"}
+,{"stream_name":"stdout","time":38.653041448,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cutlass_dsl-4.5.0.dev0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 91))\n"}
+,{"stream_name":"stdout","time":38.665254843,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_ml_py-13.595.45-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 92))\n"}
+,{"stream_name":"stdout","time":38.676584268,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nccl_cu12-2.27.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 93))\n"}
+,{"stream_name":"stdout","time":38.853967523,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_cutlass_dsl-4.5.0.dev0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 91))\n"}
+,{"stream_name":"stdout","time":38.853987033,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_ml_py-13.595.45-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 92))\n"}
+,{"stream_name":"stdout","time":38.853988833,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nccl_cu12-2.27.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 93))\n"}
+,{"stream_name":"stdout","time":41.401687473,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 94))\n"}
+,{"stream_name":"stdout","time":41.602943891,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 94))\n"}
+,{"stream_name":"stdout","time":41.769952663,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvshmem_cu12-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 95))\n"}
+,{"stream_name":"stdout","time":41.970820702,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvshmem_cu12-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 95))\n"}
+,{"stream_name":"stdout","time":42.844670456,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 96))\n"}
+,{"stream_name":"stdout","time":42.855485032,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/openai_harmony-0.0.8-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 97))\n"}
+,{"stream_name":"stdout","time":42.888590798,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/openai-2.33.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 98))\n"}
+,{"stream_name":"stdout","time":42.912935309,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opencv_python_headless-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 99))\n"}
+,{"stream_name":"stdout","time":43.045595625,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 96))\n"}
+,{"stream_name":"stdout","time":43.045612615,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/openai_harmony-0.0.8-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 97))\n"}
+,{"stream_name":"stdout","time":43.045614335,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/openai-2.33.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 98))\n"}
+,{"stream_name":"stdout","time":43.045615455,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opencv_python_headless-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 99))\n"}
+,{"stream_name":"stdout","time":43.408643347,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_api-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 100))\n"}
+,{"stream_name":"stdout","time":43.419071333,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_common-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 101))\n"}
+,{"stream_name":"stdout","time":43.429907978,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_grpc-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 102))\n"}
+,{"stream_name":"stdout","time":43.441151974,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_http-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 103))\n"}
+,{"stream_name":"stdout","time":43.45180969,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 104))\n"}
+,{"stream_name":"stdout","time":43.461785455,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_proto-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 105))\n"}
+,{"stream_name":"stdout","time":43.472323481,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_sdk-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 106))\n"}
+,{"stream_name":"stdout","time":43.484572136,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_semantic_conventions_ai-0.5.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 107))\n"}
+,{"stream_name":"stdout","time":43.493731613,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_semantic_conventions-0.62b1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 108))\n"}
+,{"stream_name":"stdout","time":43.506876567,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/outlines_core-0.2.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 109))\n"}
+,{"stream_name":"stdout","time":43.535849265,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/packaging-26.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 110))\n"}
+,{"stream_name":"stdout","time":43.546986251,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/partial_json_parser-0.2.1.1.post7-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 111))\n"}
+,{"stream_name":"stdout","time":43.556967777,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pillow-12.2.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 112))\n"}
+,{"stream_name":"stdout","time":43.609480565,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_api-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 100))\n"}
+,{"stream_name":"stdout","time":43.609487855,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_common-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 101))\n"}
+,{"stream_name":"stdout","time":43.609489255,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_grpc-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 102))\n"}
+,{"stream_name":"stdout","time":43.609490375,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp_proto_http-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 103))\n"}
+,{"stream_name":"stdout","time":43.609491255,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_exporter_otlp-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 104))\n"}
+,{"stream_name":"stdout","time":43.609492205,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_proto-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 105))\n"}
+,{"stream_name":"stdout","time":43.609493035,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_sdk-1.41.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 106))\n"}
+,{"stream_name":"stdout","time":43.609493845,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_semantic_conventions_ai-0.5.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 107))\n"}
+,{"stream_name":"stdout","time":43.609494935,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/opentelemetry_semantic_conventions-0.62b1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 108))\n"}
+,{"stream_name":"stdout","time":43.609495915,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/outlines_core-0.2.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 109))\n"}
+,{"stream_name":"stdout","time":43.609506125,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/packaging-26.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 110))\n"}
+,{"stream_name":"stdout","time":43.609508185,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/partial_json_parser-0.2.1.1.post7-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 111))\n"}
+,{"stream_name":"stdout","time":43.609509215,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pillow-12.2.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 112))\n"}
+,{"stream_name":"stdout","time":43.624233019,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/prometheus_client-0.25.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 113))\n"}
+,{"stream_name":"stdout","time":43.635139255,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/prometheus_fastapi_instrumentator-7.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 114))\n"}
+,{"stream_name":"stdout","time":43.646124531,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/propcache-0.4.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 115))\n"}
+,{"stream_name":"stdout","time":43.664332483,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/protobuf-6.33.6-cp39-abi3-manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 116))\n"}
+,{"stream_name":"stdout","time":43.678220858,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 117))\n"}
+,{"stream_name":"stdout","time":43.691485112,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/py_cpuinfo-9.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 118))\n"}
+,{"stream_name":"stdout","time":43.701189878,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 119))\n"}
+,{"stream_name":"stdout","time":43.712042904,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pycountry-26.2.16-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 120))\n"}
+,{"stream_name":"stdout","time":43.779350676,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pycparser-3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 121))\n"}
+,{"stream_name":"stdout","time":43.789712812,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_core-2.46.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 122))\n"}
+,{"stream_name":"stdout","time":43.817965661,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_extra_types-2.11.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 123))\n"}
+,{"stream_name":"stdout","time":43.825050988,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/prometheus_client-0.25.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 113))\n"}
+,{"stream_name":"stdout","time":43.825056968,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/prometheus_fastapi_instrumentator-7.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 114))\n"}
+,{"stream_name":"stdout","time":43.825059138,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/propcache-0.4.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 115))\n"}
+,{"stream_name":"stdout","time":43.825060238,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/protobuf-6.33.6-cp39-abi3-manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 116))\n"}
+,{"stream_name":"stdout","time":43.825061208,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 117))\n"}
+,{"stream_name":"stdout","time":43.825062108,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/py_cpuinfo-9.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 118))\n"}
+,{"stream_name":"stdout","time":43.825062968,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 119))\n"}
+,{"stream_name":"stdout","time":43.825063888,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pycountry-26.2.16-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 120))\n"}
+,{"stream_name":"stdout","time":43.825064918,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pycparser-3.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 121))\n"}
+,{"stream_name":"stdout","time":43.825065818,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_core-2.46.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 122))\n"}
+,{"stream_name":"stdout","time":43.825066678,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_extra_types-2.11.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 123))\n"}
+,{"stream_name":"stdout","time":43.837259543,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_settings-2.14.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 124))\n"}
+,{"stream_name":"stdout","time":43.847668909,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic-2.13.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 125))\n"}
+,{"stream_name":"stdout","time":43.864524262,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pygments-2.20.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 126))\n"}
+,{"stream_name":"stdout","time":43.889761972,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyjwt-2.12.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 127))\n"}
+,{"stream_name":"stdout","time":43.900461807,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_dotenv-1.2.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 128))\n"}
+,{"stream_name":"stdout","time":43.911423873,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_json_logger-4.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 129))\n"}
+,{"stream_name":"stdout","time":43.922337758,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_multipart-0.0.27-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 130))\n"}
+,{"stream_name":"stdout","time":43.931533035,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 131))\n"}
+,{"stream_name":"stdout","time":43.951219557,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyzmq-27.1.0-cp312-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 132))\n"}
+,{"stream_name":"stdout","time":43.980792035,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/quack_kernels-0.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 133))\n"}
+,{"stream_name":"stdout","time":43.995360059,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/referencing-0.37.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 134))\n"}
+,{"stream_name":"stdout","time":44.005558265,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/regex-2026.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 135))\n"}
+,{"stream_name":"stdout","time":44.031027384,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requests-2.33.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 136))\n"}
+,{"stream_name":"stdout","time":44.038048441,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic_settings-2.14.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 124))\n"}
+,{"stream_name":"stdout","time":44.038061051,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pydantic-2.13.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 125))\n"}
+,{"stream_name":"stdout","time":44.038062851,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pygments-2.20.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 126))\n"}
+,{"stream_name":"stdout","time":44.038070031,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyjwt-2.12.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 127))\n"}
+,{"stream_name":"stdout","time":44.038071081,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_dotenv-1.2.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 128))\n"}
+,{"stream_name":"stdout","time":44.038072091,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_json_logger-4.1.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 129))\n"}
+,{"stream_name":"stdout","time":44.038072991,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/python_multipart-0.0.27-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 130))\n"}
+,{"stream_name":"stdout","time":44.038073901,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 131))\n"}
+,{"stream_name":"stdout","time":44.038074861,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/pyzmq-27.1.0-cp312-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 132))\n"}
+,{"stream_name":"stdout","time":44.038076171,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/quack_kernels-0.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 133))\n"}
+,{"stream_name":"stdout","time":44.038077061,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/referencing-0.37.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 134))\n"}
+,{"stream_name":"stdout","time":44.038078041,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/regex-2026.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 135))\n"}
+,{"stream_name":"stdout","time":44.038079091,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requests-2.33.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 136))\n"}
+,{"stream_name":"stdout","time":44.04156724,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rich_toolkit-0.19.7-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 137))\n"}
+,{"stream_name":"stdout","time":44.052582306,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rich-15.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 138))\n"}
+,{"stream_name":"stdout","time":44.068112109,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rignore-0.7.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 139))\n"}
+,{"stream_name":"stdout","time":44.09128528,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rpds_py-0.30.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 140))\n"}
+,{"stream_name":"stdout","time":44.105649144,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 141))\n"}
+,{"stream_name":"stdout","time":44.127300425,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sentencepiece-0.2.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 142))\n"}
+,{"stream_name":"stdout","time":44.154844274,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sentry_sdk-2.58.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 143))\n"}
+,{"stream_name":"stdout","time":44.179430784,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/setproctitle-1.3.7-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 144))\n"}
+,{"stream_name":"stdout","time":44.190826389,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/setuptools-80.10.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 145))\n"}
+,{"stream_name":"stdout","time":44.218970168,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/shellingham-1.5.4-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 146))\n"}
+,{"stream_name":"stdout","time":44.229460234,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/six-1.17.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 147))\n"}
+,{"stream_name":"stdout","time":44.239882049,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sniffio-1.3.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 148))\n"}
+,{"stream_name":"stdout","time":44.242339558,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rich_toolkit-0.19.7-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 137))\n"}
+,{"stream_name":"stdout","time":44.242343548,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rich-15.0.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 138))\n"}
+,{"stream_name":"stdout","time":44.242344728,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rignore-0.7.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 139))\n"}
+,{"stream_name":"stdout","time":44.242345688,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/rpds_py-0.30.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 140))\n"}
+,{"stream_name":"stdout","time":44.242346658,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 141))\n"}
+,{"stream_name":"stdout","time":44.242350348,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sentencepiece-0.2.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 142))\n"}
+,{"stream_name":"stdout","time":44.242351328,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sentry_sdk-2.58.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 143))\n"}
+,{"stream_name":"stdout","time":44.242352178,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/setproctitle-1.3.7-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 144))\n"}
+,{"stream_name":"stdout","time":44.242353448,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/setuptools-80.10.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 145))\n"}
+,{"stream_name":"stdout","time":44.242354348,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/shellingham-1.5.4-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 146))\n"}
+,{"stream_name":"stdout","time":44.242355318,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/six-1.17.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 147))\n"}
+,{"stream_name":"stdout","time":44.242356718,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sniffio-1.3.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 148))\n"}
+,{"stream_name":"stdout","time":44.250828495,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sse_starlette-3.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 149))\n"}
+,{"stream_name":"stdout","time":44.263929229,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/starlette-0.52.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 150))\n"}
+,{"stream_name":"stdout","time":44.275272325,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/supervisor-4.3.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 151))\n"}
+,{"stream_name":"stdout","time":44.290595489,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sympy-1.14.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 152))\n"}
+,{"stream_name":"stdout","time":44.355725652,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tabulate-0.10.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 153))\n"}
+,{"stream_name":"stdout","time":44.367731027,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tiktoken-0.12.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 154))\n"}
+,{"stream_name":"stdout","time":44.391997097,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 155))\n"}
+,{"stream_name":"stdout","time":44.429045122,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torch_c_dlpack_ext-0.1.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 156))\n"}
+,{"stream_name":"stdout","time":44.451437223,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torch-2.10.0-3-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 157))\n"}
+,{"stream_name":"stdout","time":44.451604383,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sse_starlette-3.4.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 149))\n"}
+,{"stream_name":"stdout","time":44.451608933,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/starlette-0.52.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 150))\n"}
+,{"stream_name":"stdout","time":44.451610153,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/supervisor-4.3.0-py2.py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 151))\n"}
+,{"stream_name":"stdout","time":44.451611093,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/sympy-1.14.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 152))\n"}
+,{"stream_name":"stdout","time":44.451612013,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tabulate-0.10.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 153))\n"}
+,{"stream_name":"stdout","time":44.451612893,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tiktoken-0.12.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 154))\n"}
+,{"stream_name":"stdout","time":44.451613773,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 155))\n"}
+,{"stream_name":"stdout","time":44.451614703,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torch_c_dlpack_ext-0.1.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 156))\n"}
+,{"stream_name":"stdout","time":44.652264482,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torch-2.10.0-3-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 157))\n"}
+,{"stream_name":"stdout","time":51.858246773,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torchaudio-2.10.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 158))\n"}
+,{"stream_name":"stdout","time":51.886371921,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torchvision-0.25.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 159))\n"}
+,{"stream_name":"stdout","time":51.952956454,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tqdm-4.67.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 160))\n"}
+,{"stream_name":"stdout","time":51.965576909,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/transformers-4.57.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 161))\n"}
+,{"stream_name":"stdout","time":52.059552641,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torchaudio-2.10.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 158))\n"}
+,{"stream_name":"stdout","time":52.059572381,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/torchvision-0.25.0-cp312-cp312-manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 159))\n"}
+,{"stream_name":"stdout","time":52.059574141,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/tqdm-4.67.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 160))\n"}
+,{"stream_name":"stdout","time":52.059575141,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/transformers-4.57.6-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 161))\n"}
+,{"stream_name":"stdout","time":52.151948893,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/triton-3.6.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 162))\n"}
+,{"stream_name":"stdout","time":52.352848651,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/triton-3.6.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 162))\n"}
+,{"stream_name":"stdout","time":53.513978029,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typer-0.25.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 163))\n"}
+,{"stream_name":"stdout","time":53.525253075,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typing_extensions-4.15.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 164))\n"}
+,{"stream_name":"stdout","time":53.535685971,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typing_inspection-0.4.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 165))\n"}
+,{"stream_name":"stdout","time":53.545610027,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/urllib3-2.6.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 166))\n"}
+,{"stream_name":"stdout","time":53.557620302,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/uvicorn-0.46.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 167))\n"}
+,{"stream_name":"stdout","time":53.568627307,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 168))\n"}
+,{"stream_name":"stdout","time":53.615623238,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/vllm-0.19.0-cp38-abi3-manylinux_2_31_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 169))\n"}
+,{"stream_name":"stdout","time":53.714959788,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typer-0.25.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 163))\n"}
+,{"stream_name":"stdout","time":53.714974748,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typing_extensions-4.15.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 164))\n"}
+,{"stream_name":"stdout","time":53.714976228,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/typing_inspection-0.4.2-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 165))\n"}
+,{"stream_name":"stdout","time":53.714977408,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/urllib3-2.6.3-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 166))\n"}
+,{"stream_name":"stdout","time":53.714978278,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/uvicorn-0.46.0-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 167))\n"}
+,{"stream_name":"stdout","time":53.714979298,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 168))\n"}
+,{"stream_name":"stdout","time":53.714980328,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/vllm-0.19.0-cp38-abi3-manylinux_2_31_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 169))\n"}
+,{"stream_name":"stdout","time":56.965116137,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 170))\n"}
+,{"stream_name":"stdout","time":56.979552231,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 171))\n"}
+,{"stream_name":"stdout","time":56.991675356,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/xgrammar-0.1.34-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 172))\n"}
+,{"stream_name":"stdout","time":57.166242845,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 170))\n"}
+,{"stream_name":"stdout","time":57.166257525,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 171))\n"}
+,{"stream_name":"stdout","time":57.166258935,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/xgrammar-0.1.34-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 172))\n"}
+,{"stream_name":"stdout","time":57.367203313,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/yarl-1.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 173))\n"}
+,{"stream_name":"stdout","time":57.380078368,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/zipp-3.23.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 174))\n"}
+,{"stream_name":"stdout","time":57.568016802,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/yarl-1.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 173))\n"}
+,{"stream_name":"stdout","time":57.568023272,"data":"Processing /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/zipp-3.23.1-py3-none-any.whl (from -r /kaggle/input/datasets/driessmit1/arc3-vllm-h100-wheelhouse-v3/requirements.lock (line 174))\n"}
+,{"stream_name":"stdout","time":57.727391287,"data":"Installing collected packages: supervisor, py-cpuinfo, nvidia-ml-py, nvidia-cusparselt-cu12, mpmath, zipp, websockets, uvloop, urllib3, typing-extensions, triton, tqdm, tabulate, sympy, sniffio, six, shellingham, setuptools, setproctitle, sentencepiece, safetensors, rpds-py, rignore, regex, pyzmq, PyYAML, python-multipart, python-json-logger, python-dotenv, PyJWT, Pygments, pycparser, pycountry, pybase64, psutil, protobuf, propcache, prometheus-client, pillow, partial-json-parser, packaging, outlines-core, nvidia-nvtx-cu12, nvidia-nvshmem-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufile-cu12, nvidia-cudnn-frontend, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, numpy, ninja, networkx, multidict, msgspec, mdurl, MarkupSafe, loguru, llvmlite, llguidance, lark, jmespath, jiter, interegular, ijson, idna, httpx-sse, httptools, hf-xet, h11, fsspec, frozenlist, flashinfer-cubin, filelock, fastar, einops, docstring-parser, dnspython, distro, diskcache, dill, cuda-pathfinder, cloudpickle, click, charset-normalizer, certifi, cbor2, cachetools, blake3, attrs, astor, annotated-types, annotated-doc, aiohappyeyeballs, yarl, uvicorn, typing-inspection, sentry-sdk, requests, referencing, pydantic_core, opentelemetry-proto, opencv-python-headless, nvidia-cusparse-cu12, nvidia-cufft-cu12, nvidia-cudnn-cu12, numba, markdown-it-py, Jinja2, importlib-metadata, httpcore, grpcio, googleapis-common-protos, email-validator, depyf, cuda-bindings, cffi, apache-tvm-ffi, anyio, aiosignal, watchfiles, tiktoken, starlette, rich, pydantic, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, nvidia-cusolver-cu12, jsonschema-specifications, huggingface-hub, httpx, gguf, cuda-python, cryptography, aiohttp, typer, torch, tokenizers, sse-starlette, rich-toolkit, pydantic-settings, pydantic-extra-types, prometheus-fastapi-instrumentator, opentelemetry-semantic-conventions, openai-harmony, openai, nvidia-cutlass-dsl-libs-base, lm-format-enforcer, jsonschema, fastapi, anthropic, transformers, torchvision, torchaudio, torch-c-dlpack-ext, opentelemetry-sdk, nvidia-cutlass-dsl, model-hosting-container-standards, mcp, fastapi-cloud-cli, fastapi-cli, xgrammar, quack-kernels, opentelemetry-semantic-conventions-ai, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, mistral_common, flashinfer-python, compressed-tensors, opentelemetry-exporter-otlp, vllm\n"}
+,{"stream_name":"stdout","time":57.928360945,"data":"Installing collected packages: supervisor, py-cpuinfo, nvidia-ml-py, nvidia-cusparselt-cu12, mpmath, zipp, websockets, uvloop, urllib3, typing-extensions, triton, tqdm, tabulate, sympy, sniffio, six, shellingham, setuptools, setproctitle, sentencepiece, safetensors, rpds-py, rignore, regex, pyzmq, PyYAML, python-multipart, python-json-logger, python-dotenv, PyJWT, Pygments, pycparser, pycountry, pybase64, psutil, protobuf, propcache, prometheus-client, pillow, partial-json-parser, packaging, outlines-core, nvidia-nvtx-cu12, nvidia-nvshmem-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufile-cu12, nvidia-cudnn-frontend, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, numpy, ninja, networkx, multidict, msgspec, mdurl, MarkupSafe, loguru, llvmlite, llguidance, lark, jmespath, jiter, interegular, ijson, idna, httpx-sse, httptools, hf-xet, h11, fsspec, frozenlist, flashinfer-cubin, filelock, fastar, einops, docstring-parser, dnspython, distro, diskcache, dill, cuda-pathfinder, cloudpickle, click, charset-normalizer, certifi, cbor2, cachetools, blake3, attrs, astor, annotated-types, annotated-doc, aiohappyeyeballs, yarl, uvicorn, typing-inspection, sentry-sdk, requests, referencing, pydantic_core, opentelemetry-proto, opencv-python-headless, nvidia-cusparse-cu12, nvidia-cufft-cu12, nvidia-cudnn-cu12, numba, markdown-it-py, Jinja2, importlib-metadata, httpcore, grpcio, googleapis-common-protos, email-validator, depyf, cuda-bindings, cffi, apache-tvm-ffi, anyio, aiosignal, watchfiles, tiktoken, starlette, rich, pydantic, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, nvidia-cusolver-cu12, jsonschema-specifications, huggingface-hub, httpx, gguf, cuda-python, cryptography, aiohttp, typer, torch, tokenizers, sse-starlette, rich-toolkit, pydantic-settings, pydantic-extra-types, prometheus-fastapi-instrumentator, opentelemetry-semantic-conventions, openai-harmony, openai, nvidia-cutlass-dsl-libs-base, lm-format-enforcer, jsonschema, fastapi, anthropic, transformers, torchvision, torchaudio, torch-c-dlpack-ext, opentelemetry-sdk, nvidia-cutlass-dsl, model-hosting-container-standards, mcp, fastapi-cloud-cli, fastapi-cli, xgrammar, quack-kernels, opentelemetry-semantic-conventions-ai, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, mistral_common, flashinfer-python, compressed-tensors, opentelemetry-exporter-otlp, vllm\n"}
+,{"stream_name":"stdout","time":108.984564701,"data":"Successfully installed Jinja2-3.1.6 MarkupSafe-3.0.3 PyJWT-2.12.1 PyYAML-6.0.3 Pygments-2.20.0 aiohappyeyeballs-2.6.1 aiohttp-3.13.5 aiosignal-1.4.0 annotated-doc-0.0.4 annotated-types-0.7.0 anthropic-0.97.0 anyio-4.13.0 apache-tvm-ffi-0.1.10 astor-0.8.1 attrs-26.1.0 blake3-1.0.8 cachetools-7.0.6 cbor2-6.0.1 certifi-2026.4.22 cffi-2.0.0 charset-normalizer-3.4.7 click-8.3.3 cloudpickle-3.1.2 compressed-tensors-0.14.0.1 cryptography-47.0.0 cuda-bindings-12.9.4 cuda-pathfinder-1.5.4 cuda-python-12.9.4 depyf-0.20.0 dill-0.4.1 diskcache-5.6.3 distro-1.9.0 dnspython-2.8.0 docstring-parser-0.18.0 einops-0.8.2 email-validator-2.3.0 fastapi-0.136.1 fastapi-cli-0.0.24 fastapi-cloud-cli-0.17.1 fastar-0.11.0 filelock-3.29.0 flashinfer-cubin-0.6.6 flashinfer-python-0.6.6 frozenlist-1.8.0 fsspec-2026.4.0 gguf-0.18.0 googleapis-common-protos-1.74.0 grpcio-1.80.0 h11-0.16.0 hf-xet-1.4.3 httpcore-1.0.9 httptools-0.7.1 httpx-0.28.1 httpx-sse-0.4.3 huggingface-hub-0.36.2 idna-3.13 ijson-3.5.0 importlib-metadata-8.7.1 interegular-0.3.3 jiter-0.14.0 jmespath-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lark-1.2.2 llguidance-1.3.0 llvmlite-0.44.0 lm-format-enforcer-0.11.3 loguru-0.7.3 markdown-it-py-4.0.0 mcp-1.27.0 mdurl-0.1.2 mistral_common-1.11.1 model-hosting-container-standards-0.1.14 mpmath-1.3.0 msgspec-0.21.1 multidict-6.7.1 networkx-3.6.1 ninja-1.13.0 numba-0.61.2 numpy-2.2.6 nvidia-cublas-cu12-12.8.4.1 nvidia-cuda-cupti-cu12-12.8.90 nvidia-cuda-nvrtc-cu12-12.8.93 nvidia-cuda-runtime-cu12-12.8.90 nvidia-cudnn-cu12-9.10.2.21 nvidia-cudnn-frontend-1.18.0 nvidia-cufft-cu12-11.3.3.83 nvidia-cufile-cu12-1.13.1.3 nvidia-curand-cu12-10.3.9.90 nvidia-cusolver-cu12-11.7.3.90 nvidia-cusparse-cu12-12.5.8.93 nvidia-cusparselt-cu12-0.7.1 nvidia-cutlass-dsl-4.5.0.dev0 nvidia-cutlass-dsl-libs-base-4.5.0.dev0 nvidia-ml-py-13.595.45 nvidia-nccl-cu12-2.27.5 nvidia-nvjitlink-cu12-12.8.93 nvidia-nvshmem-cu12-3.4.5 nvidia-nvtx-cu12-12.8.90 openai-2.33.0 openai-harmony-0.0.8 opencv-python-headless-4.13.0.92 opentelemetry-api-1.41.1 opentelemetry-exporter-otlp-1.41.1 opentelemetry-exporter-otlp-proto-common-1.41.1 opentelemetry-exporter-otlp-proto-grpc-1.41.1 opentelemetry-exporter-otlp-proto-http-1.41.1 opentelemetry-proto-1.41.1 opentelemetry-sdk-1.41.1 opentelemetry-semantic-conventions-0.62b1 opentelemetry-semantic-conventions-ai-0.5.1 outlines-core-0.2.11 packaging-26.2 partial-json-parser-0.2.1.1.post7 pillow-12.2.0 prometheus-client-0.25.0 prometheus-fastapi-instrumentator-7.1.0 propcache-0.4.1 protobuf-6.33.6 psutil-7.2.2 py-cpuinfo-9.0.0 pybase64-1.4.3 pycountry-26.2.16 pycparser-3.0 pydantic-2.13.3 pydantic-extra-types-2.11.1 pydantic-settings-2.14.0 pydantic_core-2.46.3 python-dotenv-1.2.2 python-json-logger-4.1.0 python-multipart-0.0.27 pyzmq-27.1.0 quack-kernels-0.4.1 referencing-0.37.0 regex-2026.4.4 requests-2.33.1 rich-15.0.0 rich-toolkit-0.19.7 rignore-0.7.6 rpds-py-0.30.0 safetensors-0.7.0 sentencepiece-0.2.1 sentry-sdk-2.58.0 setproctitle-1.3.7 setuptools-80.10.2 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sse-starlette-3.4.1 starlette-0.52.1 supervisor-4.3.0 sympy-1.14.0 tabulate-0.10.0 tiktoken-0.12.0 tokenizers-0.22.2 torch-2.10.0 torch-c-dlpack-ext-0.1.5 torchaudio-2.10.0 torchvision-0.25.0 tqdm-4.67.3 transformers-4.57.6 triton-3.6.0 typer-0.25.1 typing-extensions-4.15.0 typing-inspection-0.4.2 urllib3-2.6.3 uvicorn-0.46.0 uvloop-0.22.1 vllm-0.19.0 watchfiles-1.1.1 websockets-16.0 xgrammar-0.1.34 yarl-1.23.0 zipp-3.23.1\n"}
+,{"stream_name":"stdout","time":109.188593044,"data":"Successfully installed Jinja2-3.1.6 MarkupSafe-3.0.3 PyJWT-2.12.1 PyYAML-6.0.3 Pygments-2.20.0 aiohappyeyeballs-2.6.1 aiohttp-3.13.5 aiosignal-1.4.0 annotated-doc-0.0.4 annotated-types-0.7.0 anthropic-0.97.0 anyio-4.13.0 apache-tvm-ffi-0.1.10 astor-0.8.1 attrs-26.1.0 blake3-1.0.8 cachetools-7.0.6 cbor2-6.0.1 certifi-2026.4.22 cffi-2.0.0 charset-normalizer-3.4.7 click-8.3.3 cloudpickle-3.1.2 compressed-tensors-0.14.0.1 cryptography-47.0.0 cuda-bindings-12.9.4 cuda-pathfinder-1.5.4 cuda-python-12.9.4 depyf-0.20.0 dill-0.4.1 diskcache-5.6.3 distro-1.9.0 dnspython-2.8.0 docstring-parser-0.18.0 einops-0.8.2 email-validator-2.3.0 fastapi-0.136.1 fastapi-cli-0.0.24 fastapi-cloud-cli-0.17.1 fastar-0.11.0 filelock-3.29.0 flashinfer-cubin-0.6.6 flashinfer-python-0.6.6 frozenlist-1.8.0 fsspec-2026.4.0 gguf-0.18.0 googleapis-common-protos-1.74.0 grpcio-1.80.0 h11-0.16.0 hf-xet-1.4.3 httpcore-1.0.9 httptools-0.7.1 httpx-0.28.1 httpx-sse-0.4.3 huggingface-hub-0.36.2 idna-3.13 ijson-3.5.0 importlib-metadata-8.7.1 interegular-0.3.3 jiter-0.14.0 jmespath-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lark-1.2.2 llguidance-1.3.0 llvmlite-0.44.0 lm-format-enforcer-0.11.3 loguru-0.7.3 markdown-it-py-4.0.0 mcp-1.27.0 mdurl-0.1.2 mistral_common-1.11.1 model-hosting-container-standards-0.1.14 mpmath-1.3.0 msgspec-0.21.1 multidict-6.7.1 networkx-3.6.1 ninja-1.13.0 numba-0.61.2 numpy-2.2.6 nvidia-cublas-cu12-12.8.4.1 nvidia-cuda-cupti-cu12-12.8.90 nvidia-cuda-nvrtc-cu12-12.8.93 nvidia-cuda-runtime-cu12-12.8.90 nvidia-cudnn-cu12-9.10.2.21 nvidia-cudnn-frontend-1.18.0 nvidia-cufft-cu12-11.3.3.83 nvidia-cufile-cu12-1.13.1.3 nvidia-curand-cu12-10.3.9.90 nvidia-cusolver-cu12-11.7.3.90 nvidia-cusparse-cu12-12.5.8.93 nvidia-cusparselt-cu12-0.7.1 nvidia-cutlass-dsl-4.5.0.dev0 nvidia-cutlass-dsl-libs-base-4.5.0.dev0 nvidia-ml-py-13.595.45 nvidia-nccl-cu12-2.27.5 nvidia-nvjitlink-cu12-12.8.93 nvidia-nvshmem-cu12-3.4.5 nvidia-nvtx-cu12-12.8.90 openai-2.33.0 openai-harmony-0.0.8 opencv-python-headless-4.13.0.92 opentelemetry-api-1.41.1 opentelemetry-exporter-otlp-1.41.1 opentelemetry-exporter-otlp-proto-common-1.41.1 opentelemetry-exporter-otlp-proto-grpc-1.41.1 opentelemetry-exporter-otlp-proto-http-1.41.1 opentelemetry-proto-1.41.1 opentelemetry-sdk-1.41.1 opentelemetry-semantic-conventions-0.62b1 opentelemetry-semantic-conventions-ai-0.5.1 outlines-core-0.2.11 packaging-26.2 partial-json-parser-0.2.1.1.post7 pillow-12.2.0 prometheus-client-0.25.0 prometheus-fastapi-instrumentator-7.1.0 propcache-0.4.1 protobuf-6.33.6 psutil-7.2.2 py-cpuinfo-9.0.0 pybase64-1.4.3 pycountry-26.2.16 pycparser-3.0 pydantic-2.13.3 pydantic-extra-types-2.11.1 pydantic-settings-2.14.0 pydantic_core-2.46.3 python-dotenv-1.2.2 python-json-logger-4.1.0 python-multipart-0.0.27 pyzmq-27.1.0 quack-kernels-0.4.1 referencing-0.37.0 regex-2026.4.4 requests-2.33.1 rich-15.0.0 rich-toolkit-0.19.7 rignore-0.7.6 rpds-py-0.30.0 safetensors-0.7.0 sentencepiece-0.2.1 sentry-sdk-2.58.0 setproctitle-1.3.7 setuptools-80.10.2 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sse-starlette-3.4.1 starlette-0.52.1 supervisor-4.3.0 sympy-1.14.0 tabulate-0.10.0 tiktoken-0.12.0 tokenizers-0.22.2 torch-2.10.0 torch-c-dlpack-ext-0.1.5 torchaudio-2.10.0 torchvision-0.25.0 tqdm-4.67.3 transformers-4.57.6 triton-3.6.0 typer-0.25.1 typing-extensions-4.15.0 typing-inspection-0.4.2 urllib3-2.6.3 uvicorn-0.46.0 uvloop-0.22.1 vllm-0.19.0 watchfiles-1.1.1 websockets-16.0 xgrammar-0.1.34 yarl-1.23.0 zipp-3.23.1\n"}
+,{"stream_name":"stdout","time":113.169859078,"data":"Starting vLLM OpenAI server: /usr/bin/python3 -m vllm.entrypoints.openai.api_server --model /kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot --served-model-name vrfai/Qwen3.6-27B-FP8 --host 127.0.0.1 --port 1234 --tensor-parallel-size 1 --enable-auto-tool-choice --tool-call-parser qwen3_coder --generation-config vllm --enable-prefix-caching --default-chat-template-kwargs {\"preserve_thinking\": true} --reasoning-parser qwen3 --max-model-len 65536\n"}
+,{"stream_name":"stdout","time":113.371383612,"data":"Starting vLLM OpenAI server: /usr/bin/python3 -m vllm.entrypoints.openai.api_server --model /kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot --served-model-name vrfai/Qwen3.6-27B-FP8 --host 127.0.0.1 --port 1234 --tensor-parallel-size 1 --enable-auto-tool-choice --tool-call-parser qwen3_coder --generation-config vllm --enable-prefix-caching --default-chat-template-kwargs {\"preserve_thinking\": true} --reasoning-parser qwen3 --max-model-len 65536\n"}
+,{"stream_name":"stdout","time":663.219433337,"data":"vLLM server ready: {'object': 'list', 'data': [{'id': 'vrfai/Qwen3.6-27B-FP8', 'object': 'model', 'created': 1793229435, 'owned_by': 'vllm', 'root': '/kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot', 'parent': None, 'max_model_len': 65536, 'permission': [{'id': 'modelperm-b24396bdc7ca58b3', 'object': 'model_permission', 'created': 1793229435, 'allow_create_engine': False, 'allow_sampling': True, 'allow_logprobs': True, 'allow_search_indices': False, 'allow_view': True, 'allow_fine_tuning': False, 'organization': '*', 'group': None, 'is_blocking': False}]}]}\n"}
+,{"stream_name":"stdout","time":663.423294685,"data":"vLLM server ready: {'object': 'list', 'data': [{'id': 'vrfai/Qwen3.6-27B-FP8', 'object': 'model', 'created': 1793229435, 'owned_by': 'vllm', 'root': '/kaggle/input/datasets/driessmit1/vrfai-qwen3-6-27b-fp8-hf-snapshot', 'parent': None, 'max_model_len': 65536, 'permission': [{'id': 'modelperm-b24396bdc7ca58b3', 'object': 'model_permission', 'created': 1793229435, 'allow_create_engine': False, 'allow_sampling': True, 'allow_logprobs': True, 'allow_search_indices': False, 'allow_view': True, 'allow_fine_tuning': False, 'organization': '*', 'group': None, 'is_blocking': False}]}]}\n"}
+,{"stream_name":"stdout","time":685.613925146,"data":"\n"}
+,{"stream_name":"stdout","time":685.613940226,"data":"========================================================================================\n"}
+,{"stream_name":"stdout","time":685.613942126,"data":"VLLM OPENAI SERVER QWEN SMOKE TEST REAL MODEL OUTPUT\n"}
+,{"stream_name":"stdout","time":685.613943406,"data":"Generated: 2 + 2 equals 4.\n"}
+,{"stream_name":"stdout","time":685.613944416,"data":"========================================================================================\n"}
+,{"stream_name":"stdout","time":685.613950706,"data":"\n"}
+,{"stream_name":"stdout","time":685.624807941,"data":"\n"}
+,{"stream_name":"stdout","time":685.624817341,"data":"========================================================================================\n"}
+,{"stream_name":"stdout","time":685.624819371,"data":"VLLM OPENAI SERVER QWEN SMOKE TEST REAL MODEL OUTPUT\n"}
+,{"stream_name":"stdout","time":685.624820711,"data":"Generated: 2 + 2 equals 4.\n"}
+,{"stream_name":"stdout","time":685.624821861,"data":"========================================================================================\n"}
+,{"stream_name":"stdout","time":685.624823141,"data":"\n"}
+,{"stream_name":"stdout","time":686.659858407,"data":"v13 smoke knobs: games=['cn04', 'dc22', 'g50t', 'ka59', 'ls20', 'm0r0', 's5i5', 'sc25', 'su15', 'tn36'] concurrency=10 max_runtime_s_per_game=2880\n"}
+,{"stream_name":"stdout","time":686.860881757,"data":"benchmark.label : duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":686.860889387,"data":"benchmark.solver: HarnessSolver(label='duck-harness', runtime_environment=None, job_dir=None, soft_end_time=None, minimal_diagnostics=False, model='local', analyzer_timeout=900.0, max_actions_per_game=None, max_runtime_s_per_game=7920.0, concurrency=28, save_request_logs=False, start_local_server=False, local_server_config='', local_server_api_key_file='', local_server_repo_dir='/Users/jeroencottaar/code/ARC3-Inference', local_server_port=None, local_server_tensor_parallel_size=None, local_server_count=1, cancel_drain_timeout_s=120.0)\n"}
+,{"stream_name":"stdout","time":686.860893427,"data":"benchmark.passes: 1\n"}
+,{"stream_name":"stdout","time":686.860894417,"data":"benchmark.games : 25\n"}
+,{"stream_name":"stdout","time":686.860895467,"data":"git status:\n"}
+,{"stream_name":"stdout","time":686.860896337,"data":"  ARC3-Inference                   aa69123     DIRTY  add-kaggle-share-flag     Add flag to use shareable notebook\n"}
+,{"stream_name":"stdout","time":686.860897167,"data":"  tufa-arc-agi-framework           fe9f7c4     clean  submission-share-mode-bugfix  Fix dataset mapping, spell Isaiah's name properly\n"}
+,{"stream_name":"stdout","time":686.860897977,"data":"  re-arc-3                         57e46d619d  pinned  master                    (non-editable)\n"}
+,{"stream_name":"stdout","time":686.909789397,"data":"v13 smoke filter -\u003e ['tn36-ef4dde99', 'm0r0-492f87ba', 'cn04-2fe56bfb', 'dc22-fdcac232', 'ka59-38d34dbb', 'sc25-635fd71a', 's5i5-18d95033', 'ls20-9607627b', 'su15-1944f8ab', 'g50t-5849a774']\n"}
+,{"stream_name":"stdout","time":686.910316737,"data":"petersharps quota guard: games=10, n_passes=1, soft_end=00:05 (smoke v13)\n"}
+,{"stream_name":"stdout","time":686.910319017,"data":"petersharps quota cap re-applied: soft_end=00:05\n"}
+,{"stream_name":"stdout","time":1288.808943773,"data":"benchmark: regenerated diagnostics in /kaggle/working in 1.17s\n"}
+,{"stream_name":"stdout","time":1288.808965693,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":1288.808967773,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":1288.808969073,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":1288.808969993,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":1288.808970913,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":1288.808971933,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":1288.808972853,"data":"ended:     in progress\n"}
+,{"stream_name":"stdout","time":1288.808973833,"data":"mean score:    0.00\n"}
+,{"stream_name":"stdout","time":1288.808974763,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":1288.808975653,"data":"total actions: 178\n"}
+,{"stream_name":"stdout","time":1288.808980233,"data":"total tokens:  102462\n"}
+,{"stream_name":"stdout","time":1288.808981203,"data":"generated tokens/sec: 170.29 (job wallclock)\n"}
+,{"stream_name":"stdout","time":1288.808982013,"data":"total wallclock: 5502.9s\n"}
+,{"stream_name":"stdout","time":1288.808982733,"data":"\n"}
+,{"stream_name":"stdout","time":1288.808983453,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":1288.808984173,"data":"  cn04-2fe56bfb: score=0.00, levels=0.0/6, actions=41, tokens=10667\n"}
+,{"stream_name":"stdout","time":1288.808984953,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=8, tokens=10169\n"}
+,{"stream_name":"stdout","time":1288.808985693,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=11, tokens=10335\n"}
+,{"stream_name":"stdout","time":1288.808986393,"data":"  ka59-38d34dbb: score=0.00, levels=0.0/7, actions=16, tokens=10865\n"}
+,{"stream_name":"stdout","time":1288.808987103,"data":"  ls20-9607627b: score=0.00, levels=0.0/7, actions=8, tokens=9425\n"}
+,{"stream_name":"stdout","time":1288.808987803,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=54, tokens=9739\n"}
+,{"stream_name":"stdout","time":1288.808988603,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=10, tokens=10917\n"}
+,{"stream_name":"stdout","time":1288.808989293,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=19, tokens=10768\n"}
+,{"stream_name":"stdout","time":1288.808989993,"data":"  su15-1944f8ab: score=0.00, levels=0.0/9, actions=4, tokens=8716\n"}
+,{"stream_name":"stdout","time":1288.808990733,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=7, tokens=10861\n"}
+,{"stream_name":"stdout","time":1288.808991533,"data":"\n"}
+,{"stream_name":"stdout","time":1890.039962511,"data":"benchmark: regenerated diagnostics in /kaggle/working in 1.13s\n"}
+,{"stream_name":"stdout","time":1890.039983201,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":1890.039985061,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":1890.039986341,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":1890.039987401,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":1890.039988441,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":1890.039989561,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":1890.039990561,"data":"ended:     in progress\n"}
+,{"stream_name":"stdout","time":1890.039991511,"data":"mean score:    0.22\n"}
+,{"stream_name":"stdout","time":1890.039992451,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":1890.039993441,"data":"total actions: 321\n"}
+,{"stream_name":"stdout","time":1890.039994451,"data":"total tokens:  192187\n"}
+,{"stream_name":"stdout","time":1890.039995431,"data":"generated tokens/sec: 159.77 (job wallclock)\n"}
+,{"stream_name":"stdout","time":1890.039996471,"data":"total wallclock: 11468.4s\n"}
+,{"stream_name":"stdout","time":1890.039997441,"data":"\n"}
+,{"stream_name":"stdout","time":1890.039998381,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":1890.039999381,"data":"  cn04-2fe56bfb: score=0.00, levels=0.0/6, actions=77, tokens=18900\n"}
+,{"stream_name":"stdout","time":1890.040000371,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=12, tokens=19259\n"}
+,{"stream_name":"stdout","time":1890.040001331,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=18, tokens=19172\n"}
+,{"stream_name":"stdout","time":1890.040002331,"data":"  ka59-38d34dbb: score=0.00, levels=0.0/7, actions=24, tokens=19735\n"}
+,{"stream_name":"stdout","time":1890.040003281,"data":"  ls20-9607627b: score=0.00, levels=0.0/7, actions=15, tokens=20027\n"}
+,{"stream_name":"stdout","time":1890.040009061,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=77, tokens=18781\n"}
+,{"stream_name":"stdout","time":1890.040010001,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=17, tokens=19260\n"}
+,{"stream_name":"stdout","time":1890.040010761,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=33, tokens=19367\n"}
+,{"stream_name":"stdout","time":1890.040011481,"data":"  su15-1944f8ab: score=2.22, levels=1.0/9, actions=25, tokens=17717\n"}
+,{"stream_name":"stdout","time":1890.040012241,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=23, tokens=19969\n"}
+,{"stream_name":"stdout","time":1890.040012971,"data":"\n"}
+,{"stream_name":"stdout","time":2491.26930693,"data":"benchmark: regenerated diagnostics in /kaggle/working in 1.19s\n"}
+,{"stream_name":"stdout","time":2491.26933138,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":2491.26933334,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":2491.26933466,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":2491.26933573,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":2491.26933675,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":2491.26933783,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":2491.26933882,"data":"ended:     in progress\n"}
+,{"stream_name":"stdout","time":2491.26933985,"data":"mean score:    0.61\n"}
+,{"stream_name":"stdout","time":2491.26934079,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":2491.26934172,"data":"total actions: 530\n"}
+,{"stream_name":"stdout","time":2491.26934832,"data":"total tokens:  271870\n"}
+,{"stream_name":"stdout","time":2491.26937105,"data":"generated tokens/sec: 150.69 (job wallclock)\n"}
+,{"stream_name":"stdout","time":2491.26937228,"data":"total wallclock: 17089.2s\n"}
+,{"stream_name":"stdout","time":2491.26937326,"data":"\n"}
+,{"stream_name":"stdout","time":2491.26937422,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":2491.2693752,"data":"  cn04-2fe56bfb: score=0.35, levels=1.0/6, actions=114, tokens=28125\n"}
+,{"stream_name":"stdout","time":2491.26937642,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=16, tokens=28104\n"}
+,{"stream_name":"stdout","time":2491.26937738,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=42, tokens=26225\n"}
+,{"stream_name":"stdout","time":2491.26937832,"data":"  ka59-38d34dbb: score=3.57, levels=1.0/7, actions=28, tokens=25833\n"}
+,{"stream_name":"stdout","time":2491.26937934,"data":"  ls20-9607627b: score=0.00, levels=0.0/7, actions=38, tokens=28444\n"}
+,{"stream_name":"stdout","time":2491.26938028,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=131, tokens=27819\n"}
+,{"stream_name":"stdout","time":2491.26938123,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=27, tokens=28231\n"}
+,{"stream_name":"stdout","time":2491.26938229,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=48, tokens=25377\n"}
+,{"stream_name":"stdout","time":2491.26938343,"data":"  su15-1944f8ab: score=2.22, levels=1.0/9, actions=31, tokens=25817\n"}
+,{"stream_name":"stdout","time":2491.26938484,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=55, tokens=27895\n"}
+,{"stream_name":"stdout","time":2491.26938629,"data":"\n"}
+,{"stream_name":"stdout","time":3092.552615544,"data":"benchmark: regenerated diagnostics in /kaggle/working in 1.18s\n"}
+,{"stream_name":"stdout","time":3092.552634964,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":3092.552636824,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":3092.552641734,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":3092.552642734,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":3092.552643424,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":3092.552644224,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":3092.552644934,"data":"ended:     in progress\n"}
+,{"stream_name":"stdout","time":3092.552645624,"data":"mean score:    0.73\n"}
+,{"stream_name":"stdout","time":3092.552646314,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":3092.552646974,"data":"total actions: 717\n"}
+,{"stream_name":"stdout","time":3092.552647654,"data":"total tokens:  367297\n"}
+,{"stream_name":"stdout","time":3092.552648414,"data":"generated tokens/sec: 152.69 (job wallclock)\n"}
+,{"stream_name":"stdout","time":3092.552649214,"data":"total wallclock: 23112.8s\n"}
+,{"stream_name":"stdout","time":3092.552649924,"data":"\n"}
+,{"stream_name":"stdout","time":3092.552650644,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":3092.552651394,"data":"  cn04-2fe56bfb: score=0.35, levels=1.0/6, actions=131, tokens=37420\n"}
+,{"stream_name":"stdout","time":3092.552652154,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=27, tokens=38141\n"}
+,{"stream_name":"stdout","time":3092.552652874,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=56, tokens=33333\n"}
+,{"stream_name":"stdout","time":3092.552653584,"data":"  ka59-38d34dbb: score=3.57, levels=1.0/7, actions=36, tokens=35592\n"}
+,{"stream_name":"stdout","time":3092.552654294,"data":"  ls20-9607627b: score=1.14, levels=1.0/7, actions=57, tokens=38392\n"}
+,{"stream_name":"stdout","time":3092.552655004,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=152, tokens=34675\n"}
+,{"stream_name":"stdout","time":3092.552655724,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=32, tokens=35621\n"}
+,{"stream_name":"stdout","time":3092.552656434,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=100, tokens=38115\n"}
+,{"stream_name":"stdout","time":3092.552657144,"data":"  su15-1944f8ab: score=2.22, levels=1.0/9, actions=36, tokens=38232\n"}
+,{"stream_name":"stdout","time":3092.552657874,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=90, tokens=37776\n"}
+,{"stream_name":"stdout","time":3092.552658604,"data":"\n"}
+,{"stream_name":"stderr","time":3566.937829899,"data":"analyzer request failed at action 57: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=2.755015)\n"}
+,{"stream_name":"stderr","time":3566.937851679,"data":"\n"}
+,{"stream_name":"stderr","time":3566.937853709,"data":"analyzer request failed at action 57: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=2.755015)\n"}
+,{"stream_name":"stderr","time":3566.941341587,"data":"analyzer request failed at action 41: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=16.228722)\n"}
+,{"stream_name":"stderr","time":3566.941351087,"data":"\n"}
+,{"stream_name":"stderr","time":3566.941353067,"data":"analyzer request failed at action 41: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=16.228722)\n"}
+,{"stream_name":"stderr","time":3566.949477393,"data":"analyzer request failed at action 77: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=11.907099)\n"}
+,{"stream_name":"stderr","time":3566.949481483,"data":"\n"}
+,{"stream_name":"stderr","time":3566.949482623,"data":"analyzer request failed at action 77: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=11.907099)\n"}
+,{"stream_name":"stderr","time":3566.980285107,"data":"analyzer request failed at action 116: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=33.584429)\n"}
+,{"stream_name":"stderr","time":3566.980294477,"data":"\n"}
+,{"stream_name":"stderr","time":3566.980295607,"data":"analyzer request failed at action 116: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=33.584429)\n"}
+,{"stream_name":"stderr","time":3566.991895891,"data":"analyzer request failed at action 113: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=84.907817)\n"}
+,{"stream_name":"stderr","time":3566.991899081,"data":"\n"}
+,{"stream_name":"stderr","time":3566.991899911,"data":"analyzer request failed at action 113: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=84.907817)\n"}
+,{"stream_name":"stderr","time":3567.000770357,"data":"analyzer request failed at action 53: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=71.314723)\n"}
+,{"stream_name":"stderr","time":3567.000773407,"data":"\n"}
+,{"stream_name":"stderr","time":3567.000774257,"data":"analyzer request failed at action 53: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=71.314723)\n"}
+,{"stream_name":"stderr","time":3567.001091067,"data":"analyzer request failed at action 37: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=104.659018)\n"}
+,{"stream_name":"stderr","time":3567.001093497,"data":"\n"}
+,{"stream_name":"stderr","time":3567.001094337,"data":"analyzer request failed at action 37: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=104.659018)\n"}
+,{"stream_name":"stderr","time":3567.022081986,"data":"analyzer request failed at action 203: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=47.998061)\n"}
+,{"stream_name":"stderr","time":3567.022085076,"data":"\n"}
+,{"stream_name":"stderr","time":3567.022085936,"data":"analyzer request failed at action 203: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=47.998061)\n"}
+,{"stream_name":"stdout","time":3567.15158365,"data":"[finished] g50t-5849a774 state=cancelled level=0/7 score=0.00 actions=76 tokens=45411 per-level=76/78,0/175,0/179,0/230,0/96,0/54,0/67 note=\"tokens=45411\"\n"}
+,{"stream_name":"stdout","time":3567.15158804,"data":"[finished] tn36-ef4dde99 state=cancelled level=0/7 score=0.00 actions=115 tokens=45170 per-level=115/32,0/72,0/26,0/40,0/30,0/55,0/62 note=\"tokens=45170\"\n"}
+,{"stream_name":"stdout","time":3567.15158919,"data":"[finished] sc25-635fd71a state=cancelled level=0/6 score=0.00 actions=112 tokens=44385 per-level=112/36,0/6,0/32,0/83,0/143,0/50 note=\"tokens=44385\"\n"}
+,{"stream_name":"stdout","time":3567.15159006,"data":"[finished] ka59-38d34dbb state=cancelled level=1/7 score=3.57 actions=52 tokens=44850 per-level=27/28,25/109,0/51,0/51,0/33,0/132,0/326 note=\"tokens=44850\"\n"}
+,{"stream_name":"stdout","time":3567.1515909,"data":"[finished] s5i5-18d95033 state=cancelled level=0/8 score=0.00 actions=36 tokens=42317 per-level=36/20,0/89,0/106,0/54,0/162,0/38,0/86,0/83 note=\"tokens=44125\"\n"}
+,{"stream_name":"stdout","time":3567.15159176,"data":"[finished] m0r0-492f87ba state=cancelled level=0/6 score=0.00 actions=202 tokens=44582 per-level=202/30,0/111,0/203,0/26,0/500,0/237 note=\"tokens=44582\"\n"}
+,{"stream_name":"stderr","time":3567.232281269,"data":"analyzer request failed at action 155: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=12.430851)\n"}
+,{"stream_name":"stderr","time":3567.232284479,"data":"\n"}
+,{"stream_name":"stderr","time":3567.232285319,"data":"analyzer request failed at action 155: HTTPConnectionPool(host='127.0.0.1', port=1234): Read timed out. (read timeout=12.430851)\n"}
+,{"stream_name":"stdout","time":3567.44698371,"data":"[finished] cn04-2fe56bfb state=cancelled level=1/6 score=0.35 actions=154 tokens=45247 per-level=107/29,47/54,0/85,0/300,0/208,0/113 note=\"tokens=45247\"\n"}
+,{"stream_name":"stdout","time":3568.135206721,"data":"[finished] su15-1944f8ab state=cancelled level=1/9 score=2.22 actions=56 tokens=45769 per-level=20/22,36/42,0/26,0/115,0/36,0/31,0/8,0/40,0/41 note=\"tokens=45769\"\n"}
+,{"stream_name":"stdout","time":3568.135216591,"data":"[finished] dc22-fdcac232 state=cancelled level=0/6 score=0.00 actions=40 tokens=45775 per-level=40/59,0/102,0/67,0/98,0/324,0/578 note=\"tokens=45775\"\n"}
+,{"stream_name":"stdout","time":3573.825949533,"data":"[finished] ls20-9607627b state=cancelled level=1/7 score=1.14 actions=83 tokens=45276 per-level=39/22,44/123,0/73,0/84,0/96,0/192,0/186 note=\"tokens=45967\"\n"}
+,{"stream_name":"stdout","time":3576.01962368,"data":"benchmark: regenerated diagnostics in /kaggle/working in 2.17s\n"}
+,{"stream_name":"stdout","time":3576.01964197,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":3576.01964374,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":3576.01964493,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":3576.01964566,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":3576.01964635,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":3576.01964714,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":3576.01964786,"data":"ended:     2026-10-29 00:05:46\n"}
+,{"stream_name":"stdout","time":3576.01964873,"data":"duration:  48m 6s\n"}
+,{"stream_name":"stdout","time":3576.0196494,"data":"mean score:    0.73\n"}
+,{"stream_name":"stdout","time":3576.01965008,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":3576.01965074,"data":"total actions: 926\n"}
+,{"stream_name":"stdout","time":3576.01965141,"data":"total tokens:  448782\n"}
+,{"stream_name":"stdout","time":3576.01965214,"data":"generated tokens/sec: 155.46 (job wallclock)\n"}
+,{"stream_name":"stdout","time":3576.01965291,"data":"total wallclock: 28806.8s\n"}
+,{"stream_name":"stdout","time":3576.01965364,"data":"\n"}
+,{"stream_name":"stdout","time":3576.01965435,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":3576.01965533,"data":"  cn04-2fe56bfb: score=0.35, levels=1.0/6, actions=154, tokens=45247\n"}
+,{"stream_name":"stdout","time":3576.01965612,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=40, tokens=45775\n"}
+,{"stream_name":"stdout","time":3576.01965684,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=76, tokens=45411\n"}
+,{"stream_name":"stdout","time":3576.01965754,"data":"  ka59-38d34dbb: score=3.57, levels=1.0/7, actions=52, tokens=44850\n"}
+,{"stream_name":"stdout","time":3576.01965824,"data":"  ls20-9607627b: score=1.14, levels=1.0/7, actions=83, tokens=45276\n"}
+,{"stream_name":"stdout","time":3576.01965893,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=202, tokens=44582\n"}
+,{"stream_name":"stdout","time":3576.01965963,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=36, tokens=42317\n"}
+,{"stream_name":"stdout","time":3576.01966033,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=112, tokens=44385\n"}
+,{"stream_name":"stdout","time":3576.01966103,"data":"  su15-1944f8ab: score=2.22, levels=1.0/9, actions=56, tokens=45769\n"}
+,{"stream_name":"stdout","time":3576.01966172,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=115, tokens=45170\n"}
+,{"stream_name":"stdout","time":3576.01966243,"data":"\n"}
+,{"stream_name":"stdout","time":3576.01966309,"data":"diagnostics: /kaggle/working/diagnostics.html\n"}
+,{"stream_name":"stdout","time":3576.111550113,"data":"taaf.kaggle: teardown command: \"$PYTHON\" - \u003c\u003c'PYTEARDOWN'\n"}
+,{"stream_name":"stdout","time":3576.111561963,"data":"import os\n"}
+,{"stream_name":"stdout","time":3576.111563563,"data":"import shutil\n"}
+,{"stream_name":"stdout","time":3576.111564383,"data":"import signal\n"}
+,{"stream_name":"stdout","time":3576.111565073,"data":"import time\n"}
+,{"stream_name":"stdout","time":3576.111565773,"data":"from pathlib import Path\n"}
+,{"stream_name":"stdout","time":3576.111566503,"data":"\n"}
+,{"stream_name":"stdout","time":3576.111567253,"data":"WORKING_DIR = Path(os.environ['TAAF_KAGGLE_WORKING_DIR'])\n"}
+,{"stream_name":"stdout","time":3576.111568013,"data":"pid_path = WORKING_DIR / 'vllm-openai-server.pid'\n"}
+,{"stream_name":"stdout","time":3576.111568753,"data":"site_packages = WORKING_DIR / 'vllm-site-packages'\n"}
+,{"stream_name":"stdout","time":3576.111569483,"data":"if pid_path.exists():\n"}
+,{"stream_name":"stdout","time":3576.111570193,"data":"    try:\n"}
+,{"stream_name":"stdout","time":3576.111570923,"data":"        pid = int(pid_path.read_text(encoding='utf-8').strip())\n"}
+,{"stream_name":"stdout","time":3576.111571703,"data":"        print('Stopping vLLM server', flush=True)\n"}
+,{"stream_name":"stdout","time":3576.111572433,"data":"        os.kill(pid, signal.SIGTERM)\n"}
+,{"stream_name":"stdout","time":3576.111573133,"data":"        deadline = time.monotonic() + 30\n"}
+,{"stream_name":"stdout","time":3576.111573843,"data":"        while time.monotonic() \u003c deadline:\n"}
+,{"stream_name":"stdout","time":3576.111574713,"data":"            try:\n"}
+,{"stream_name":"stdout","time":3576.111575483,"data":"                os.kill(pid, 0)\n"}
+,{"stream_name":"stdout","time":3576.111576243,"data":"            except OSError:\n"}
+,{"stream_name":"stdout","time":3576.111576943,"data":"                break\n"}
+,{"stream_name":"stdout","time":3576.111577663,"data":"            time.sleep(1)\n"}
+,{"stream_name":"stdout","time":3576.111578393,"data":"        else:\n"}
+,{"stream_name":"stdout","time":3576.111579083,"data":"            os.kill(pid, signal.SIGKILL)\n"}
+,{"stream_name":"stdout","time":3576.111579823,"data":"    except Exception as exc:\n"}
+,{"stream_name":"stdout","time":3576.111580593,"data":"        print(f'Could not stop vLLM server cleanly: {exc!r}', flush=True)\n"}
+,{"stream_name":"stdout","time":3576.111581383,"data":"    pid_path.unlink(missing_ok=True)\n"}
+,{"stream_name":"stdout","time":3576.111582083,"data":"shutil.rmtree(site_packages, ignore_errors=True)\n"}
+,{"stream_name":"stdout","time":3576.111582823,"data":"print(f'Removed temporary vLLM install at {site_packages}', flush=True)\n"}
+,{"stream_name":"stdout","time":3576.111583583,"data":"\n"}
+,{"stream_name":"stdout","time":3576.111584243,"data":"PYTEARDOWN\n"}
+,{"stream_name":"stdout","time":3576.154227812,"data":"Stopping vLLM server\n"}
+,{"stream_name":"stdout","time":3576.312017702,"data":"Stopping vLLM server\n"}
+,{"stream_name":"stdout","time":3578.83778575,"data":"Removed temporary vLLM install at /kaggle/working/vllm-site-packages\n"}
+,{"stream_name":"stdout","time":3578.848217325,"data":"Removed temporary vLLM install at /kaggle/working/vllm-site-packages\n"}
+,{"stream_name":"stdout","time":3578.863207147,"data":"V13_SMOKE_BEGIN\n"}
+,{"stream_name":"stdout","time":3578.863210077,"data":"benchmark: duck-harness-kaggle\n"}
+,{"stream_name":"stdout","time":3578.863211047,"data":"solver:    duck-harness\n"}
+,{"stream_name":"stdout","time":3578.863211847,"data":"games:     10\n"}
+,{"stream_name":"stdout","time":3578.863212617,"data":"passes:    1\n"}
+,{"stream_name":"stdout","time":3578.863218707,"data":"runs:      10 (won: 0)\n"}
+,{"stream_name":"stdout","time":3578.863219587,"data":"started:   2026-10-28 23:17:39\n"}
+,{"stream_name":"stdout","time":3578.863220297,"data":"ended:     2026-10-29 00:05:46\n"}
+,{"stream_name":"stdout","time":3578.863220967,"data":"duration:  48m 6s\n"}
+,{"stream_name":"stdout","time":3578.863221737,"data":"mean score:    0.73\n"}
+,{"stream_name":"stdout","time":3578.863222417,"data":"median score:  0.00\n"}
+,{"stream_name":"stdout","time":3578.863223117,"data":"total actions: 926\n"}
+,{"stream_name":"stdout","time":3578.863223797,"data":"total tokens:  448782\n"}
+,{"stream_name":"stdout","time":3578.863224537,"data":"generated tokens/sec: 155.46 (job wallclock)\n"}
+,{"stream_name":"stdout","time":3578.863225347,"data":"total wallclock: 28806.8s\n"}
+,{"stream_name":"stdout","time":3578.863226067,"data":"\n"}
+,{"stream_name":"stdout","time":3578.863226777,"data":"per-game (mean across passes):\n"}
+,{"stream_name":"stdout","time":3578.863227507,"data":"  cn04-2fe56bfb: score=0.35, levels=1.0/6, actions=154, tokens=45247\n"}
+,{"stream_name":"stdout","time":3578.863228327,"data":"  dc22-fdcac232: score=0.00, levels=0.0/6, actions=40, tokens=45775\n"}
+,{"stream_name":"stdout","time":3578.863229047,"data":"  g50t-5849a774: score=0.00, levels=0.0/7, actions=76, tokens=45411\n"}
+,{"stream_name":"stdout","time":3578.863229747,"data":"  ka59-38d34dbb: score=3.57, levels=1.0/7, actions=52, tokens=44850\n"}
+,{"stream_name":"stdout","time":3578.863230457,"data":"  ls20-9607627b: score=1.14, levels=1.0/7, actions=83, tokens=45276\n"}
+,{"stream_name":"stdout","time":3578.863231347,"data":"  m0r0-492f87ba: score=0.00, levels=0.0/6, actions=202, tokens=44582\n"}
+,{"stream_name":"stdout","time":3578.863232067,"data":"  s5i5-18d95033: score=0.00, levels=0.0/8, actions=36, tokens=42317\n"}
+,{"stream_name":"stdout","time":3578.863232787,"data":"  sc25-635fd71a: score=0.00, levels=0.0/6, actions=112, tokens=44385\n"}
+,{"stream_name":"stdout","time":3578.863233487,"data":"  su15-1944f8ab: score=2.22, levels=1.0/9, actions=56, tokens=45769\n"}
+,{"stream_name":"stdout","time":3578.863234207,"data":"  tn36-ef4dde99: score=0.00, levels=0.0/7, actions=115, tokens=45170\n"}
+,{"stream_name":"stdout","time":3578.863234957,"data":"V13_SMOKE_END\n"}
+,{"stream_name":"stderr","time":3578.872505212,"data":"/usr/local/lib/python3.12/dist-packages/IPython/core/display.py:724: UserWarning: Consider using IPython.display.IFrame instead\n"}
+,{"stream_name":"stderr","time":3578.872511142,"data":"  warnings.warn(\"Consider using IPython.display.IFrame instead\")\n"}
+,{"stream_name":"stderr","time":3578.872512502,"data":"\n"}
+,{"stream_name":"stderr","time":3578.872513452,"data":"/usr/local/lib/python3.12/dist-packages/IPython/core/display.py:724: UserWarning: Consider using IPython.display.IFrame instead\n"}
+,{"stream_name":"stderr","time":3578.872514872,"data":"  warnings.warn(\"Consider using IPython.display.IFrame instead\")\n"}
+,{"stream_name":"stderr","time":3580.443688555,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":3580.443703085,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":3580.53198724,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":3580.53199567,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":3580.899593974,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":3581.048709258,"data":"[NbConvertApp] Writing 1269840 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":3582.243295582,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":3582.668249596,"data":"[NbConvertApp] Writing 1583379 bytes to __results__.html\n"}
+]
