@@ -1,7 +1,14 @@
 {
-  "id": "r109",
-  "op": "kernel-status",
+  "id": "r110",
+  "op": "kernel_output_pick",
   "args": {
-    "kernel": "petersharps/arc3-duck-v13-27b"
+    "kernel": "petersharps/arc3-duck-v13-27b",
+    "pick": [
+      "summary.txt",
+      "benchmark.json",
+      "*.log",
+      "submission.parquet"
+    ],
+    "max_mb": 25
   }
 }
