@@ -1,14 +1,12 @@
 {
-  "id": "r110",
-  "op": "kernel_output_pick",
+  "id": "r111",
+  "op": "auto-submit",
   "args": {
+    "confirm": true,
     "kernel": "petersharps/arc3-duck-v13-27b",
-    "pick": [
-      "summary.txt",
-      "benchmark.json",
-      "*.log",
-      "submission.parquet"
-    ],
-    "max_mb": 25
+    "version": "1",
+    "file": "submission.parquet",
+    "max_poll_minutes": 20,
+    "message": "slot B 29.10: Tufa Labs stock 27B-FP8 duck harness (MIT) rerun by petersharps; conc 28, no cap, 2.2h/game"
   }
 }
