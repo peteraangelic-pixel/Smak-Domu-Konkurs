@@ -113,3 +113,17 @@ Dla sesji czytających repo: KANDYDAT = arc-agi-3/duck-v11-c45 (slot A: PLAN_COM
 - Droga do 50+ (szczerze): (1) potwierdzic strukture 110-klonow (log reruna w przegladarce!), (2) playbook miedzy grami
   (replay sekwencji per hash-startu klatki), (3) otwieracze z zrodel (parser placements), (4) ew. 27B (v13-27b innej
   sesji w smoke), (5) deep/commit na c45. Bez (1)-(3) sufit linii ~30-40; z (2)+(3) realnie 45-55. Nic nie wysylane bez GO.
+
+## 12. WYNIKI 28-29.10 i REWIZJA OPCJI GO (Arena, 29.10 ~17:00 UTC)
+Tabela slotow: v3=26.25 (best) | c45=0.00 (glod 120) | v11 slotA=23.89 (fix conc dziala; regresja patchy rekonstrukcji:
+smoke 18.55 vs c45 26.78) | **slot B = stock 27B-FP8 (conc28, no cap) = 1.18** | **v14-27b-long smoke = 0.27** (2 poziomy/10 gier).
+- Wniosek 1: **linia 27B w konfiguracji v13/v14 MARTWA** (duzo wolniejsza: ~83k tok/1.5h vs 8B ~150k/0.8h; zero poziomow).
+  Model-size lever bez kopi konfiguracji Tufy M1 = spalenie slotu. Wstrzymac 27B do replikacji konfiguracji 1:1 (kosztowne, niski EV).
+- Wniosek 2: minimal-delta wygrala z wszelkimi rekonstrukcjami: c45 bajt + 1 fix (v12) = jedyny kandydat z pewna baza (26.78).
+- Wniosek 3: dwa nieudane eksperymenty z rzedu (0.00, 1.18) => dalsze sloty tylko dla variantow o dowiedzonym smoke>=26.
+OPCJE GO (rewizja):
+- GO#1 (aktualne, wzmocnione): v12 push+smoke -> submit slotu 30.10 (29.10 zajety przez slot B 1.18). Oczekiwany LB ~27-31.
+- GO#2 (aktualne): log reruna z przegladarki — teraz podwojnie: (a) struktura 110-klonow -> playbook, (b) diagnoza 1.18 (conc28 vs MAXREQ 27B?).
+- GO#3 (zmienione): nie "koordynacja 27B", tylko **WSTRZYMANIE 27B** + propozycja podzialu: druga sesja = output-pick/logi i ew. replikacja
+  konfiguracji M1; Arena = v12 + playbook (110 klonow) + otwieracze z zrodel + Rust precompute.
+Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
