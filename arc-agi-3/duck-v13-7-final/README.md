@@ -2,7 +2,7 @@
 
 **v13.6-final + patch 0010 dyn-level-budget (handoff sesji „strategia"; u nich 0009)
 — DORMANT**: na submisji zachowuje się DOKŁADNIE jak v13.6 (`ARC3_LEVEL_TOKEN_CAP="0"`),
-uzbrojenie później jedną wartością (**20000** — korekta §7, była 60000), kill `ARC3_DYN_CAP=0` → wierny statyczny 0004.
+uzbrojenie **WYCOFANE** (adjudykacja §9: konwersja do zera 76–101%, kolejka ≈0; 0010 zostaje dormant), kill `ARC3_DYN_CAP=0` → wierny statyczny 0004.
 Certyfikat: `OCENA-ARENA-V13-7-FINAL.md`.
 
 ## W skrócie
@@ -31,7 +31,12 @@ python3 tools/build_v137_final.py   # prev = ../duck-v13-6-final/arc3-duck-v13.i
 python3 tools/verify_v13.py --bundle <r033 bundle> --tests
 ```
 
-## Uzbrojenie (TYLKO wg GO, proponowany termin 1.11)
+## Uzbrojenie — WYCOFANE (adjudykacja §9 certyfikatu, 30.10 ~18:40)
 
-`ARC3_LEVEL_TOKEN_CAP: "0" -> "20000"` w komórce ARC3_VARIANT (korekta §7 certyfikatu: @60000 marnotrawcy bez historii nietknięci; @20000 cięci na 20k+reset, gry z historią bez zmiany). Wtedy moduł aktywny;
-kontrola A/B: `ARC3_DYN_CAP=0` przy uzbrojonym capa = exact statyczny 0004.
+NIE uzbrajać (kolejno 60000, potem 20000 — oba wycofane): konwersja uwolnionych
+tokenów do wyjścia na zero = **76–101%** (r085: 107% nawet przy łagodnej metryce),
+a kolejka solvera (Semaphore=10, wszystkie gry w kolejce — solver.py:898/917)
+prawdopodobnie daje ≈0 konwersji. Utracone poziomy trafiają w gry dowożące
+(dc22 3→1, g50t 3→0, ka59 5→1). 0010 zostaje dormant jako zapakowana opcja;
+sonda „v17 levers" przeliczy arming z danych własnego biegu. Ewentualna rewizja
+tylko po logach 30.10 (kontrowersja per-gra-cap vs globalny-deadline).

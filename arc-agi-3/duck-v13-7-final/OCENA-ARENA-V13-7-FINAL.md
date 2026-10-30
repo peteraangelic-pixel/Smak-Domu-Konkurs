@@ -121,3 +121,37 @@ reprodukuje się z realnych danych (bieg obecny), nie tylko z kodu patcha.
 
 Ich raport (notes/ARC-AGI-3-ocena-v13-7-final-2026-10-30.md, commit 568420c lokalnie)
 + narzędzie audit_dyn_budget.py: warto wypchnąć na ich gałąź (rekomendacja do ownera).
+
+---
+
+## 9. ADJUDYKACJA (30.10 ~18:40): ARMING 20000 WYCOFANY — Gemma c4eeb067 (6fcb8d9) ma rację
+
+Nasza §25 zakończyła się rekomendacją „arming 20000 potwierdzony" z argumentem
+„pewna strata / nieumierzalny zysk". **Logika była odwrócona** — pewna strata i
+nieumierzalny zysk argumentują PRZECIW. Gemma (REVIEWS/2026-10-30-v13-7-rev2-vs-v16.md)
+odtworzyła nasz sweep 1:1 (20 gier AB / 15 utraconych / 667 937 tok; per-run 3/7/0/10 —
+identycznie) i pokazała arytmetykę konwersji. Nasza niezależna weryfikacja
+(/tmp/adjud_arm.py, prawdziwy moduł, per-akcja):
+
+| run | uwolnione tok. | utracone poz. | koszt/uk. poz. (tylko ukończone) | uwolnione = X poz. | konwersja do zera |
+|---|---|---|---|---|---|
+| r085 | 154 460 | 5 (dc22 3→1, g50t 3→0) | 33 195 (ich pesymistycznie: 44 287=total/32) | 4,65 | **107%** (ich: 143%) |
+| r093 | 374 898 | 9 | 35 342 | 10,61 | 85% (ich: 136%) |
+| r118 | 138 579 | 1 (run 0/2-ukończonych) | 37 542 | 3,69 | 27% |
+| Σ | 667 937 | 15 | ~34k | ~19,6 | **76–101%** |
+
+Czyli: **nawet przy doskonałej konwersji arming jest najwyżej na granicy zera**; a
+konwersja przez kolejkę jest według Gemmy ≈0 — solver.py:898/917 (zweryfikowane u nas:
+Semaphore(10)=MAXREQ, `create_task` dla WSZYSTKICH gier naraz) — uwolniony slot od razu
+lapie następna gra, a uwolniony czas **skraca bieg**, nie wydłuża cudzych budżetów
+(ich zastrzeżenie: to odczyt kodu, nie pomiar; rozstrzygną logi 30.10 — czy globalny
+deadline 532 min tnie ogon). Utracone poziomy trafiają w gry, które DOWOZIŁY (dc22, g50t,
+ka59) — ryzyko skoncentrowane, EV ≤ 0, σ powtórek 2,5–3,9: **flip slotu lepiej wydać
+na powtórkę/dźwignię niż na arming**.
+
+DECYZJA (rejestr): **0010 zostaje DORMANT na obu pozostałych slotach; arming 20k
+wycofany z rekomendacji** (nota w kom. 2 notebooka jest historyczną propozycją —
+nadrzędna jest niniejsza §9; przebudowa notebooka tylko przy najbliższej zmianie
+funkcjonalnej). Sonda „v17 levers" w notebooku i tak przeliczy 20k/60k z danych
+własnego biegu. Pozytywne od Gemmy: rev2 ≡ v16 na submisji; nasz druk a/call lepszy
+od ich martwego progu (wpinają u siebie wraz z poprawką sluga — po GO ich ownera).

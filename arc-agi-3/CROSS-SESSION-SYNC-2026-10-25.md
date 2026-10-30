@@ -675,3 +675,30 @@ runy (0-ukończone), chroni drogie poziomy w dobrych (mediana×4). To porządkuj
 ### E. Status
 Slot 30.10 = **v13-7-final rev2** (CZEKA NA GO); flip 1.11 = uzbrojenie 20k (deklarowane
 przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decyzja po drukach 30.10).
+
+## 26. ADJUDYKACJA: GEMMA c4eeb067 OBALA ARMING 20k — PRZYJMUJEMY, WYCOFUJEMY REKOMENDACJĘ §25 (REJESTR DECYZJI) (30.10 ~18:45 UTC)
+
+- Gemma (6fcb8d9, REVIEWS/…v13-7-rev2-vs-v16.md): na submisji rev2 ≡ rev1 ≡ v16
+  (LEVEL_TOKEN_CAP=0 — zgadza się, rev2 zmieniła tylko dokumenty); rev2 LEPSZA od v16
+  w dwóch miejscach (nasz żywy druk a/call z bramką 6,0 vs ich martwy `<1.5`; własny slug
+  vs ich kolizja z arc3-duck-v13-4-unified). Ale plan „1.11: uzbroić 20k" — ODWRÓCONY.
+- **Nasza weryfikacja ich arytmetyki**: sweep odtworzyli 1:1 (20/15/667 937; 3/7/0/10) ✓.
+  Konwersja do wyjścia na zero liczą pesymistycznie (koszt poziomu = total_tokens/ukończone,
+  np. 44 287 na r085) → 143%/136%. NASZA łagodniejsza metryka (tylko tokeny ukończonych
+  poziomów, 33 195/35 342) daje **107% (r085) / 85% (r093) / 27% (r118); łącznie 76–101%**
+  → arming najwyżej break-even przy doskonałej konwersji. Mechanizm ≈0 konwersji:
+  solver.py:898 `Semaphore(10)` + :917 `create_task` WSZYSTKICH gier (zweryfikowane
+  w bundle) — uwolniony slot natychmiast zapełnia kolejna gra; uwolniony czas skraca
+  bieg. Otwarta kontrowersja (sama Gemma zastrzega): per-gra cap 48,4 min vs globalny
+  deadline 532 min tnący ogon — **rozstrzygną logi 30.10**.
+- **REJESTR DECYZJI: wycofujemy rekomendację §25 „arming 20000"** (nasz argument
+  „asymetrii" był odwrócony — pewna strata/nieumierzalny zysk mówi PRZECIW). 0010
+  zostaje dormant; OCENA §9 + README zaktualizowane; nota w kom. 2 = historyczna
+  (przebudowa nb przy najbliższej zmianie funkcjonalnej). Flip slotu 1.11: powtórka
+  najlepszego configu albo eksperyment D′ (osobna decyzja GO) — NIE arming.
+- Ryzyko skoncentrowane: ABANDONY @20k trafiają w gry dowożące (dc22 3→1, g50t 3→0,
+  ka59 5→1) — 15 utraconych poziomów to PEWNE −pkt; zysk nieumierzalny i ≤0 w oczekiwaniu.
+- Gemma oferuje: wpina nasz druk a/call (print-only) do swojego v16 + poprawia slug
+  (arc3-duck-v13-4-unified → własny) po GO ownera — rekomendujemy TAK.
+- Stan gałęzi: c4eeb067 = 6fcb8d9 (HEAD==origin, ich oświadczenie — nie weryfikowaliśmy
+  pusha osobno, klony świeże).
