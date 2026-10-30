@@ -13,7 +13,7 @@ OUT.mkdir(exist_ok=True)
 # evidence for any private agent. Missing roster identities remain explicit.
 USERS = '''threerabbits dlorah driessmit1 pressman1 stefano1283 infinitecreativity
 jeroencottaar xiaoz259 ngyzly mitubant keithtyser dzjiann markbarney sonphamorg
-scizical gklambauer fses91 dwellement0baser lukasaichberger yktori michaeltgao
+scizical gklambauer fses91 dwellement0baser lukasaichberger yktori michaeltgao grigoriyzatravkin
 cpmpml darraghdog eladsarafian galkaplun sorokin yeyinzhu titericz
 isakatsuyoshi konbu17 pompom555 refv00 tanakaai24 tk256ailab ttyn4519 yuto0712'''.split()
 
