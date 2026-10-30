@@ -229,3 +229,80 @@ Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
   i zmierzymy ms/token (zagadka 3,6x). 31.10: to samo 2x (draw). 1.11: kontrola PLAN_COMMIT=0 LUB commit-forcing
   (eskalacja 8-10) wg wyników. 2.11: select best.
 - Nadal w mocy: bez GO usera nic nie idzie.
+
+## 17. V13.2 CERTYFIKOWANA + 2. RUNDKA AUDYTÓW + KOREKTA WIELKA: „3,6×” NIE ISTNIEJE (30.10 ~08:15 UTC)
+
+Szczegóły weryfikacji: `duck-v13-2/OCENA-ARENA-V13-2.md`. Nowe HEAD-y: Pokemon a450 `cbefdd4→6b10853`
+(v13.2), c87 `f3c5726→4c9a3e5` (audyt 4 gałęzi); 7911 i Gemma c4eeb067 bez zmian. **Domykamy też
+Gemmę 6d081d52→678da95 (pobraną w §16, nieczytaną) — przeczytana w całości.**
+
+### A. v13.2 (Pokemon 6b10853) — zweryfikowana, CERTYFIKOWANA
+- Diff vs v13.1 CHIRURGICZNY: notebook tylko kom. 2 (ESCALATE_ACTIONS 60→10, print v13.2) i kom. 11
+  (wbudowany patch 0006 z guardem); standalone winpath +3 linie; +1 test winpath (teraz 8); verify/build
+  sync wersji; metadata v13-2; NOWE src/base-v11.ipynb (input buildera, notebook submisyjny prebuilt);
+  **playbook.json bajtowo identyczny** (cmp 0 różnic).
+- Guard GAME_OVER: `_replay_once` na martwej klatce zwraca False PRZED dotknięciem broken/fails ->
+  sterowanie idzie do normalnej obsługi game-over; naprawia drobiazg Gemmy z §16 i jest zamknięty
+  testem jednostkowym.
+- ESCALATE 60→10: okablowanie potwierdzone samodzielnie (kom. 2 eksportuje ARC3_ESCALATE_ACTIONS;
+  spatchowany tool_agent.py:131 czyta env; dyrektywa co N akcji). Jedyny mechanizm WYMUSZANIA
+  commit(plan) — wchodzi do slotu 30.10 zamiast czekać na 1.11.
+- Nasze checki: 6/6 patchy czysty r033, drzewo się kompiluje, 12/12 plan-commit, **8/8 winpath**
+  (w tym nowy test), standalone==spatchowany bajt, playbook **14/14 na żywym silniku** (arcengine
+  0.9.3/arc_agi 0.9.9), serving kom. 21 nietknięta (parity z c45 przenosi się tranzytywnie).
+- Pułapka (potwierdzona po raz 2): krok winpath w verify_v13.py nadpisuje PYTHONPATH (gubi arcengine)
+  -> 1 fail+5 errors środowiskowe; ręcznie z pełnym PYTHONPATH 8/8. FAIL verify = środowisko, nie logika.
+
+### B. c87 4c9a3e5 „AUDYT-4-GALEZI-30-10.md” — przeczytany w całości
+- Potwierdza naszą retrakcję §15 i konwergencję 4 sesji (ich tabela zgodności = wspólny stan wiedzy).
+- Ich zastrzeżenie do naszej rewizji §16 (UCIŚLE zapisane): po retrakcji „darmowa opcja” WINPATH=1
+  zakłada prawdopodobieństwo rosteru, które właśnie wycofaliśmy; wartość oczek. ≈ 0, a cicha awaria
+  replayu (try/except bez logu, 7911) to **ryzyko DIAGNOSTYKI, nie wyniku**. Utrzymujemy WINPATH=1
+  (Gemma: brak dopasowań = 0 akcji kosztu; probe rozstrzygnie), ale z pełną świadomością tego argumentu.
+- Ich §5.2 — NAPIĘCIE w modelu 7911, które my też cytujemy w §16 bez flagi: **sufit 18,7 @ eff=90%
+  jest PONIŻEJ zmierzonego LB 26,25**; jedno z trzech (tempo 14,4 z r013 za wysokie / eff nie z tej
+  populacji / roster ≠ 110) musi być nie tak. Nierozstrzygnięte — nie budować na suficie 18,7 prognoz.
+- Ich reguła (3. przypadek tego samego błędu): komórka konfiguracyjna ma DWA bloki (smoke vs
+  TRUE_SUBMISSION) — czytanie pierwszego jako drugiego daje fałszywy model budżetu.
+- Ich plan slotów różni się naszym w 1 punkcie: 30.10 z PLAN_COMMIT=0 (kontrola), eskalacja 8-10 dopiero
+  31.10. v13.2 przenosi eskalację do 30.10 — zostawiamy DECYZJĘ userowi: (i) v13.2 as-shipped
+  (eskalacja od razu), albo (ii) v13.2 z PLAN_COMMIT=0 (kontrola c87).
+
+### C. Gemma 6d081d52→678da95 — DOMKNIĘTA (przeczytana w całości; stan z 25.10, 5 dni stary)
+- Audyt ICH pracy na c87 z 25.10 (nie opinia o v13.x). Kluczowe: formuła punktacji min(115,(baseline/akcje)²·100)
+  z wagami w_k=k+1 potwierdzona co do setnej (4. potwierdzenie capu 1.15); efektywność ruchów warta
+  ~1,75 pkt (nie główny cel); kalibracja kliknięć PO EFEKCIE = najbardziej transferowalna metoda;
+  n_passes=1 potwierdzone 25.10 (4. niezależne); kompakcja pamięci istnieje, ale ARC3_MEMORY_SECTIONS=off
+  i historia 150 tur; **wewnętrzne _get_valid_actions()/_score/_win_score z arc3_search.py ZAKAZANE
+  w submisji** (zgodność — używać publicznego API + kalibracji po skutku); kolizja numerów patchy 0004
+  (c87 vs a450) — nie składać jednego łańcucha; błąd auto-submit ops.py:459 (ścieżka vs nazwa pliku).
+- v13.2 używa numeru 0006 — kolizja uniknięta (potwierdzenie ich ostrzeżenia).
+
+### D. KOREKTA WIELKA (nasza, samodzielna weryfikacja w artefaktach): **zagadka „3,6× ms/token” NIE ISTNIEJE**
+- Gemma MEGA-CONFIG.md (6a6af4a, linia tabeli): „r110 | 8B, v13 cap 45k | 62,6 ms/tok” — **BŁĘDNA
+  ETYKIETA**. c87 przepisał tabelę i zbudował na niej główny wniosek audytu („3,6× luka silnika warta
+  więcej niż cały spór o v13”; priorytet #1: sparsować serve.log, by „odzyskać” 17,2 ms/tok).
+- PRAWDA (artefakty w naszym repo): **r110 = petersharps/arc3-duck-v13-27b** — Qwen3.6-**27B**-FP8 na
+  **vLLM** (vllm-openai-server.log: `SERVED_MODEL_NAME = 'vrfai/Qwen3.6-27B-FP8'`, wheelhouse
+  arc3-vllm-h100; SUMMARY.md potwierdza nazwę kernela). benchmark.json: 926 akcji / 448 782 tok /
+  28 806,8 s summed wallclock -> **64,2 ms/tok** (liczba Gemmy poprawna, etykieta nie).
+  r118 = arc3-duck-v14-27b-long (27B; 63,1 ms/tok Gemmy — spójne). r085 = arc3-duck-c45 (8B, SGLang):
+  nasz szacunek z serve.log (agregat ~663 tok/s ÷ 10 współbieżnych ≈ 15 ms/tok per-request) zgodny
+  z 17,2 Gemmy. Wniosek: 17 vs 63 ms/tok to RÓŻNICA MODELI (i silników: SGLang vs vLLM), nie zagadka
+  inżynieryjna. „Odzyskanie 82→228 akcji bez zmiany modelu” — nonsens: nasza linia v13.x JEST 8B.
+- Co zostaje PRAWDZIWE po korekcie: (1) 27B martwy (0,27-0,73 smoke, 63 ms/tok) — nie wznawiać;
+  (2) jedyny realny pomiar 8B to SMOKE (10 gier) — czy 17 ms/tok utrzyma się w rerunie 110 gier
+  (prefix-cache między falami różnych gier), NIEZNANE — **zmierzy metering/probe w runie 30.10**;
+  (3) sparsowanie serve.log r085 vs r093 (oba 8B SGLang smoke) to porównanie w obrębie smoke —
+  umiarkowana wartość, NIE 20-40 pkt jak liczył c87 (ich §3.3 traci podstawę).
+- Lekcja (do FAKTÓW, 4. przypadek): liczba z cudzego dokumentu bez odczytu wskazanego artefaktu to
+  hipoteza. c87 sam napisał „zawartości nie czytałem” — wystarczyło przeczytać SUMMARY.md.
+
+### E. PLAN (następstwa; NIC do Kaggle bez GO usera)
+- Slot 30.10 (CZEKA NA GO): **v13.2 AS-SHIPPED** — PLAN_COMMIT=1, ESCALATE=10, CAP=0, WINPATH=1,
+  DEAD_SKIP=1, conc=10, probe ON. Po runie: output-pick (roster_probe.jsonl + benchmark + winpath dir
+  + metering ms/token) -> rozstrzygnięcie rosteru + pomiar warunków rerunu (pkt D.2).
+- 31.10: ta sama konfiguracja ×2 (draw przy σ≈2,5-3,9). 1.11: wg wyników — kontrola PLAN_COMMIT=0
+  (opcja c87) albo commit-forcing dalej; 2.11: select best.
+- Otwarte (offline, 0 slotów): ewentualny parsing serve.log r085 vs r093 (zakres umiarkowany, pkt D.3);
+  rozstrzygnięcie napięcia c87 §5.2 (sufit 18,7 vs LB 26,25) po pomiarach z runu.
