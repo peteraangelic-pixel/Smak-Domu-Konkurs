@@ -1,3 +1,13 @@
+
+> ⚠️ **RETRAKCJA ARENY 30.10 ~07:45 (SYNC §15):** fragment o „rosterze 110 = klonach 25 gier POTWIERDZONYM W KODZIE"
+> był NADATRYBUCJĄ lokalnego symulatora (competition_arcade.py = „Local … simulator"; docstring: *„The real Kaggle
+> submission path talks to a gateway-backed Arcade with … no repeated game IDs within that scorecard"*). Prawdziwy
+> rerun = **110 gier UKRYTYCH, bez powtórzeń** (potwierdzają też: „110 hidden games" przez gateway:8001, source-introspection
+> 0.20 „Game sources don't exist in the rerun", held-out 0/113 vs 7/70). Konsekwencje: playbook EV ≈ 0…+2,9 pkt (nie 45-55),
+> replay między wpisami i dead-skip między wpisami = martwe na niepowtarzalnym rosterze. Żywe dźwignie v13.1:
+> PLAN_COMMIT=1 (celuje w zmierzony bottleneck-przepustowość; uwaga 7911: tylko OFEROWANE modelowi, eskalacja po 60 akcjach),
+> CAP=0 (zmierzone), fix conc=10. Rozstrzygnięcie sporu o roster = ZA DARMO: probe w outputcie dzisiejszego runa
+> (roster_probe.jsonl / game_id z logu; albo log reruna #57737623 z przeglądarki usera).
 # OCENA ARENA — v13-MEGA (Pokemon 3782f8c; weryfikacja niezależna 30.10 ~07:15 UTC)
 Wszystko poniżej robiłem SAM na czystych artefaktach (nie ufam deklaracjom — sprawdzam).
 

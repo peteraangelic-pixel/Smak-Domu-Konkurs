@@ -141,3 +141,43 @@ Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
   n_passes=1 — nasza korekta przyjeta); 6/6 patchy czysty r033; testy 12/12 + 7/7 (u verify padało na braku
   arcengine/PIL w srodowisku — reczny bieg zielony); standalone==spatchowany.
 - Slot 30.10: **v13.1** (duck-v13-1); fallback 31.10: v12. Wysylka PO GO.
+
+## 15. OPINIE POZOSTAŁYCH GAŁĘZI O V13/V13.1 + RETRAKCJA ARENY (30.10 ~07:45 UTC)
+Źródła: c87f7a48 (2561cfd, a5432da, 2d8645c), Gemma c4eeb067 (cded50d0, cytowana w 2d8645c), 7911f950 (3269393, 53eab27, 0050174).
+
+### RETRAKCJA (3. w projekcie, po v11-Smak i v9-dead): „roster = 110 klonów 25 gier POTWIERDZONY W KODZIE" — FAŁSZYWE
+- Weryfikacja osobiście w repo: `competition_arcade.py` L1-8: „**Local** competition-mode ARC-AGI Arcade simulator (R11.13).
+  The **real Kaggle submission path talks to a gateway-backed Arcade** with competition constraints: one scorecard,
+  **hidden baselines**, and **no repeated game IDs within that scorecard**."
+- Czyli `official_110()` = KSZTAŁT submisji na symulatorze LOKALNYM (przed-submisyjne repro failów), NIE roster punktowany.
+- Wnioski: (a) playbook EV ≈ 0 na ukrytym rosterze (Gemma: 72.61 TYLKO gdyby roster=publiczne-25; 7911: +2.3 na naszych 10 smoke;
+  c87/Gemma: ~+2.9) — „sufit 45-55" RETRAKTOWANY; (b) replay między wpisami / dead-skip między wpisami = martwe
+  (brak powtórzeń w scorecardzie); (c) lekcja c87, trzeci raz: czytać DOCSTRING, nie nazwę funkcji.
+- Zostaje formalna szczelina („no repeated IDs" ≠ wprost „gry mechanicznie różne"), ale 3 niezależne pomiary zewnętrzne
+  (source-introspection 0.20 „Game sources don't exist in the rerun"; held-out 0/113 vs 7/70; „110 hidden games" przez gateway:8001).
+  **ROZSTRZYGNIĘCIE ZA DARMO**: probe z outputu dzisiejszego runa (roster_probe.jsonl) albo log reruna #57737623 z przeglądarki.
+
+### Opinie — konwergencja 3-4 sesji (PRAWDA)
+- „Dwie z trzech dźwigni 0006 martwe w submisji": Gemma + c87 niezależnie ✅ (n_passes=1 + brak powtórzeń; dead-skip wymagał passa ≥4).
+- „23.89 = draw, nie regresja": 7911 (sd=2.47; -1.3 sd) + c87 (σ=3.93) ✅ → metoda: TA SAMA konfiguracja 2× z rzędu.
+- „Głębokość/pokrycie = ~96% brakujących punktów; efektywność 86-90%; sufit przy tym budżecie 18.7-31.9": Gemma+7911+c87 ✅.
+- „50+ = PRZEPUSTOWOŚĆ (~300 akcji/grę z ~213), nie mądrzejszy model (27B: 0.27 przy 47 s/akcję — za wolny)": 3 niezależne modele ✅.
+- „Cap per-poziom = 1.15, nie 1.0": c87 ✅ (metodologia arcprize + taaf/game.py min(115,…) + regresja 32/32 Gemmy); i tak prawie
+  zawsze wiąże cap UKOŃCZENIA — szybszość od człowieka płaci tylko w wąskiej klasie (+3.0 pkt).
+- „Playbook 14/14": 3 niezależne reprodukcje (Arena na silniku; Gemma 184/184 hashy + seedy 1/2/7/42; 7911 krzyżowo 2 ścieżki).
+
+### Korekty przyjęte
+- **7911: commit(plan) tylko OFEROWANY** (dopis w opisie narzędzia; eskalacja po 60 akcjach ≈ budżet poziomu) → bez wymuszenia
+  v13.1 gra jak v11+playbook (~28-30). Tanie naprawy: ESCALATE_ACTIONS 60→8-10; wymuszenie batcha na 1. turze poziomu;
+  odrzucanie 1-akcyjnych tur bez uzasadnienia (kandydat na 1.11).
+- **7911: cicha awaria replay** (try/except pass, init-mismatch → broken bez logu) → wymagać linii logu o replay.
+- **7911: playbook nie najkrótszy** (sp80 28 vs 4 akcje; vc33 1 piksel) → przy regeneracji brać najkrótsze ścieżki.
+- **c87: PLAN_COMMIT=1 = główna dźwignia** (jedyna celująca w bottleneck; odwrócenie ich własnej rekomendacji 0).
+
+### PLAN SLOTÓW (rewizja GO)
+- **30.10: v13.1 z ARC3_WINPATH=0 i ARC3_DEAD_SKIP=0** (martwe przy braku powtórzeń; czysta atrybucja); zostaje
+  PLAN_COMMIT=1 + CAP=0 + conc=10 + **probe ON** (output-pick roster_probe.jsonl rozstrzygnie roster po runie — sam zrobię).
+- **31.10: TA SAMA konfiguracja ponownie** (pomiar drawa; σ≈2.5-3.9 wymaga 2 próbek; metoda Gemmy 39.84/38.12).
+- **1.11**: lepsza z dwóch; jeśli <26 → kontrola PLAN_COMMIT=0; ewent. z wymuszeniem commit (eskalacja 8-10).
+- **2.11 (finał)**: select best (Kaggle: 2 submisje do punktacji prywatnej — potwierdzić w rules).
+- 27B pozostaje wstrzymany (0.27/1.18).
