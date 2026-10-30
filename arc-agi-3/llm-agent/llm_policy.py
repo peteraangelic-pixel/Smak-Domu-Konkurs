@@ -71,6 +71,7 @@ class LLMConfig:
     reasoning_effort: str = ""
     multimodal: bool = False
     upscale: int = 4
+    api_style: str = "openai"
 
     @classmethod
     def from_env(cls) -> LLMConfig:
@@ -89,6 +90,7 @@ class LLMConfig:
             reasoning_effort=os.environ.get("LLM_REASONING_EFFORT", "").strip().lower(),
             multimodal=os.environ.get("LLM_MULTIMODAL", "0").lower() in ("1", "true", "yes"),
             upscale=int(os.environ.get("LLM_UPSCALE", "4")),
+            api_style=os.environ.get("LLM_API_STYLE", "openai"),
         )
 
 
@@ -100,6 +102,8 @@ class LLMClient:
         self.total_tokens = 0
         self.total_calls = 0
         self.total_time = 0.0
+        self.reasoning_tokens = 0
+        self.failed_calls = 0
 
     def chat(self, messages: list[dict], temperature: float | None = None) -> dict:
         """Call chat completions. Returns the message dict.
@@ -107,6 +111,10 @@ class LLMClient:
         `temperature` overrides the configured value for THIS call only
         (adaptive exploration: hotter when deeply stuck, cooler when on a roll).
         """
+        if self.config.api_style == "lmstudio_native":
+            return self._chat_lmstudio(messages, temperature)
+        if self.config.api_style != "openai":
+            raise ValueError(f"Unknown LLM_API_STYLE: {self.config.api_style}")
         url = f"{self.config.base_url.rstrip('/')}/chat/completions"
 
         payload: dict[str, Any] = {
@@ -159,6 +167,56 @@ class LLMClient:
         if choices:
             return choices[0].get("message", {"role": "assistant", "content": ""})
         return {"role": "assistant", "content": ""}
+
+    def _chat_lmstudio(self, messages: list[dict], temperature: float | None) -> dict:
+        """Opt-in native API for the LOCAL JSON policy, with verified reasoning.
+
+        Native chat accepts user input rather than an OpenAI role-message list.
+        Preserve the complete caller-managed transcript as role-labelled JSON.
+        This is a stateless text adapter, not a faithful tool-calling substitute
+        for the competition Duck agent. The default OpenAI route is unchanged.
+        """
+        from urllib.parse import urlsplit, urlunsplit
+        parsed = urlsplit(self.config.base_url)
+        url = urlunsplit((parsed.scheme, parsed.netloc, "/api/v1/chat", "", ""))
+        if any(not isinstance(m.get("content"), str) for m in messages):
+            raise ValueError("Native local JSON policy currently supports text messages only")
+        system = "\n\n".join(m["content"] for m in messages if m.get("role") == "system")
+        transcript = [m for m in messages if m.get("role") != "system"]
+        payload = {
+            "model": self.config.model_id,
+            "system_prompt": system + "\nThe input is a JSON conversation transcript. Continue as the assistant, responding to its last user message.",
+            "input": json.dumps(transcript, ensure_ascii=False),
+            "store": False,
+            "reasoning": "on" if self.config.enable_thinking else "off",
+            "max_output_tokens": self.config.max_output_tokens,
+            "temperature": self.config.temperature if temperature is None else temperature,
+            "top_p": self.config.top_p,
+            "top_k": self.config.top_k,
+            "context_length": self.config.context_window,
+        }
+        request = urllib.request.Request(url, data=json.dumps(payload).encode("utf8"), headers={
+            "Content-Type": "application/json", "Authorization": f"Bearer {self.config.api_key}"})
+        start = time.monotonic()
+        try:
+            with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
+                result = json.loads(response.read().decode("utf8"))
+            stats = result.get("stats", {})
+            content = "\n".join(item.get("content", "") for item in result.get("output", []) if item.get("type") == "message")
+            reasoning = int(stats.get("reasoning_output_tokens", 0))
+            self.total_calls += 1
+            self.total_tokens += int(stats.get("input_tokens", 0)) + int(stats.get("total_output_tokens", 0))
+            self.reasoning_tokens += reasoning
+            if not self.config.enable_thinking and (reasoning or any(item.get("type") == "reasoning" for item in result.get("output", []))):
+                raise RuntimeError("LM Studio returned reasoning although reasoning=off was requested")
+            if not content.strip():
+                raise RuntimeError("LM Studio returned no assistant message")
+            return {"role": "assistant", "content": content}
+        except Exception:
+            self.failed_calls += 1
+            raise
+        finally:
+            self.total_time += time.monotonic() - start
 
 
 # ---------------------------------------------------------------------------

@@ -20,17 +20,14 @@ def fit(x, y):
     return x.T @ np.linalg.solve(x @ x.T + np.eye(len(x)) * 2, y)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('run', type=Path)
-    parser.add_argument('--output', type=Path, required=True)
-    args = parser.parse_args()
-    manifest = json.loads((args.run / 'manifest.json').read_text())
-    report = json.loads((args.run / 'report.json').read_text())
+def recommend(run, seed=20261030, count=8):
+    run = Path(run)
+    manifest = json.loads((run / 'manifest.json').read_text())
+    report = json.loads((run / 'report.json').read_text())
     training = manifest['train']
     known = {row['id']: row['genome'] for generation in report['training_history'] for row in generation}
     known.update({row['id']: row['genome'] for row in report['training_finalists']})
-    trials = [json.loads(line) for line in (args.run / 'trials.jsonl').read_text().splitlines()]
+    trials = [json.loads(line) for line in (run / 'trials.jsonl').read_text().splitlines()]
     trials = [row for row in trials if row['game'] in training and not row['error']]
     x = np.stack([features(known[row['genome']], row['game'], training) for row in trials])
     y = np.array([row['weighted_completion'] for row in trials])
@@ -47,7 +44,7 @@ def main():
             matched = train & (game_names == game_names[index])
             reference = y[matched].mean() if matched.any() else y[train].mean()
             game_baseline_errors.append((reference - y[index]) ** 2)
-    rng = np.random.default_rng(20261030)
+    rng = np.random.default_rng(seed)
     weights = []
     for _ in range(24):
         sample = rng.integers(0, len(x), len(x))
@@ -66,7 +63,7 @@ def main():
                            'ucb': float(estimates.mean() + estimates.std())})
     # Prefer separation in gene space as well as predicted utility.
     chosen = []
-    while candidates and len(chosen) < 8:
+    while candidates and len(chosen) < count:
         def utility(row):
             distance = min((sum(row['genome'][key] != other['genome'][key] for key in GENES)
                             for other in chosen), default=len(GENES))
@@ -85,6 +82,19 @@ def main():
         'qualification': 'Predictions guide trial selection. Ensemble spread is not a calibrated confidence interval.',
         'recommendations': chosen,
     }
+    return output
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('run', type=Path)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--seed', type=int, default=20261030)
+    parser.add_argument('--count', type=int, default=8)
+    args = parser.parse_args()
+    if not 1 <= args.count <= 144:
+        parser.error('count must be 1..144')
+    output = recommend(args.run, args.seed, args.count)
     args.output.write_text(json.dumps(output, indent=2), encoding='utf8')
     print(json.dumps({key: value for key, value in output.items() if key != 'recommendations'}, indent=2))
 

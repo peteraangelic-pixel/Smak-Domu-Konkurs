@@ -1,0 +1,81 @@
+{
+  "scope": "Local JSON policy integration only; not a Duck v13.7/v18 quality comparison",
+  "games": [
+    {
+      "game": "ft09",
+      "mode": "real",
+      "ok": true,
+      "steps": 6,
+      "levels_completed": 0,
+      "level_actions": [],
+      "partial_level_actions": 6,
+      "bad_actions": 0,
+      "won": false,
+      "final_state": "GameState.NOT_FINISHED",
+      "total_tokens": 27707,
+      "llm_calls": 6,
+      "llm_seconds": 21.33,
+      "reasoning_tokens": 0,
+      "failed_llm_calls": 0,
+      "rhae_score_pct": 0.0,
+      "level_scores_pct": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "baseline_actions": [
+        43,
+        12,
+        23,
+        28,
+        65,
+        37
+      ],
+      "seconds": 22.1,
+      "knobs_id": "control"
+    },
+    {
+      "game": "ls20",
+      "mode": "real",
+      "ok": true,
+      "steps": 6,
+      "levels_completed": 0,
+      "level_actions": [],
+      "partial_level_actions": 6,
+      "bad_actions": 0,
+      "won": false,
+      "final_state": "GameState.NOT_FINISHED",
+      "total_tokens": 27062,
+      "llm_calls": 6,
+      "llm_seconds": 22.55,
+      "reasoning_tokens": 0,
+      "failed_llm_calls": 0,
+      "rhae_score_pct": 0.0,
+      "level_scores_pct": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "baseline_actions": [
+        22,
+        123,
+        73,
+        84,
+        96,
+        192,
+        186
+      ],
+      "seconds": 22.7,
+      "knobs_id": "control"
+    }
+  ],
+  "cpu_search_workers_in_separate_ablation": 16,
+  "llm_request_parallelism": 1
+}

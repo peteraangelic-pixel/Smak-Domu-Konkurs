@@ -191,7 +191,7 @@ def play_one(games_dir: str, gid: str, max_actions: int = 40,
         if "GAME_OVER" in state.upper():
             result["final_state"] = state
             break
-        frame = FrameInfo(grid=grid, step=result["steps"], level=0,
+        frame = FrameInfo(grid=grid, step=result["steps"], level=int(fd.levels_completed or 0),
                           state_name=state,
                           levels_completed=int(fd.levels_completed or 0),
                           available_actions=_engine_names(fd.available_actions))
@@ -219,11 +219,14 @@ def play_one(games_dir: str, gid: str, max_actions: int = 40,
         result["levels_completed"] = int(fd.levels_completed or 0)
         if png_last:
             last_png = _save_png(rendered, png_last)
-    result["final_state"] = result.get("final_state", str(fd.state))
+    result["final_state"] = str(fd.state)
+    result["won"] = "WIN" in result["final_state"].upper()
     result["partial_level_actions"] = level_action_count
     result["total_tokens"] = int(policy.total_tokens)
     result["llm_calls"] = int(policy.total_calls)
     result["llm_seconds"] = round(float(policy.client.total_time), 2)
+    result["reasoning_tokens"] = int(getattr(policy.client, "reasoning_tokens", 0))
+    result["failed_llm_calls"] = int(getattr(policy.client, "failed_calls", 0))
     metadata = Path(games_dir) / gid / gid / "metadata.json"
     try:
         baseline_actions = json.loads(metadata.read_text(encoding="utf-8"))["baseline_actions"]

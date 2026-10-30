@@ -2,6 +2,32 @@
 
 ## Zacznij tutaj
 
+### Aktualizacja po publikacji pierwszego pakietu
+
+Zrealizowano brakujące porównanie wyboru prób: 507 prób, 27 konfiguracji,
+16 procesów/Rust FFI, 214,39 s. Model pomocniczy i ewolucja remisują na
+najlepszej konfiguracji: 4 ukończenia treningowe, 2 walidacyjne. Brak poprawy
+względem poprzedniego najlepszego wariantu. Pełny protokół i granice:
+analysis/SELECTOR-ABLATION-20261030.md oraz selector-ablation-20261030/.
+
+Rozszerzono odczyt na 40 kont całego top10 i pobrano 12 publicznych notebooków.
+Nie ujawniają metody stojącej za ich obecnymi wysokimi wynikami.
+Zobacz analysis/TOP10-RESEARCH-20261030.md i top10-final-20261030/.
+
+Dodano opcjonalny natywny protokół LM Studio do lokalnej polityki JSON.
+Test rzeczywistych gier: 12 wywołań Qwen3.5-4B, 0 reasoning, 0 błędów API,
+0 niepoprawnych akcji, 0 ukończeń w krótkim smoke. Nie jest to Duck ani
+porównanie v13.7/v18. Przechodzi 112 testów polityki i 2 testy izolacji
+selekcji od wyników walidacyjnych. Pełne A/B Duck i ablację pamięci lalalia
+nadal należy traktować jako niezrealizowane, nie jako gotowe ulepszenia.
+
+57811453 ponownie sprawdzono przez Kaggle API: nadal PENDING.
+
+### Stan pierwszego pakietu i historia prac
+
+Poniższy opis zachowuje stan pierwszego pakietu; rozstrzygnięcia z aktualizacji
+powyżej zastępują jego wcześniejsze informacje o brakujących wdrożeniach.
+
 Pakiet obejmuje aktualny warsztat lokalny i eksperymentalny wariant v18 z tej
 rozmowy. Powstał na najnowszej pobranej gałęzi Smak, tip03ae156. Starsze
 notatki27–29.10 w analysis/history-20261027-29 są zapisem ówczesnego stanu.
@@ -79,15 +105,3 @@ parsowanie klików i lokalny evaluator z danymi kliknięć oraz scoringiem SDK.
 
 Potrzebne recenzje obejmują izolację klonowania, poprawność FFI, rzeczywistą
 ścieżkę plan() w sandboxie, kryteria selekcji ewolucyjnej i zgodność punktacji.
-
-## Weryfikacja pakietu przed commitem
-
-W kopii publikacyjnej108 testów llm-agent przeszło przy PYTHONUTF8=1.
-Bez tego ustawienia jeden istniejący test CLI na Windows nie mógł wypisać
-znaku strzałki w kodowaniu CP1250. Test sandboxa v18 przeszedł ponownie
-z notebooka znajdującego się w kopii publikacyjnej.
-
-36 testów Rust również przeszło. git diff --cached --check jest czysty.
-Hash plików w zapisanych manifestach pochodzi z oryginalnych przebiegów
-Windows. Git może normalizować zakończenia linii. Do nowego eksperymentu
-należy wygenerować nowy manifest, a nie pomijać kontroli zgodności.
