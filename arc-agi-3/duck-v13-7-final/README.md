@@ -2,7 +2,7 @@
 
 **v13.6-final + patch 0010 dyn-level-budget (handoff sesji „strategia"; u nich 0009)
 — DORMANT**: na submisji zachowuje się DOKŁADNIE jak v13.6 (`ARC3_LEVEL_TOKEN_CAP="0"`),
-uzbrojenie później jedną wartością (60000), kill `ARC3_DYN_CAP=0` → wierny statyczny 0004.
+uzbrojenie później jedną wartością (**20000** — korekta §7, była 60000), kill `ARC3_DYN_CAP=0` → wierny statyczny 0004.
 Certyfikat: `OCENA-ARENA-V13-7-FINAL.md`.
 
 ## W skrócie
@@ -33,5 +33,5 @@ python3 tools/verify_v13.py --bundle <r033 bundle> --tests
 
 ## Uzbrojenie (TYLKO wg GO, proponowany termin 1.11)
 
-`ARC3_LEVEL_TOKEN_CAP: "0" -> "60000"` w komórce ARC3_VARIANT. Wtedy moduł aktywny;
+`ARC3_LEVEL_TOKEN_CAP: "0" -> "20000"` w komórce ARC3_VARIANT (korekta §7 certyfikatu: @60000 marnotrawcy bez historii nietknięci; @20000 cięci na 20k+reset, gry z historią bez zmiany). Wtedy moduł aktywny;
 kontrola A/B: `ARC3_DYN_CAP=0` przy uzbrojonym capa = exact statyczny 0004.

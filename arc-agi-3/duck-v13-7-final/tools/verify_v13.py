@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -79,6 +80,10 @@ def main() -> int:
     ap.add_argument("--tests", action="store_true")
     args = ap.parse_args()
 
+    bench_env = os.environ.get("R085_BENCH", "")
+    check("R085_BENCH points at a real benchmark.json (skipped tests would weaken this certificate)",
+          bool(bench_env) and Path(bench_env).is_file(),
+          f'R085_BENCH={bench_env!r} (przy zlej sciezce test 8-nudge SKIPPuje sie cicho!)')
     nb = json.loads(NB.read_text())
     cells = cells_of(nb)
     check("notebook parses (41 cells)", len(cells) == 41, len(cells))
@@ -251,8 +256,9 @@ def main() -> int:
                                            "tests.test_plan_commit", "tests.test_escalate_relative"],
                                           cwd=work / "ARC3-Inference", capture_output=True,
                                           text=True, env=env)
-                    check("12 plan-commit + 6 escalate-relative tests pass",
-                          proc.returncode == 0, (proc.stderr or proc.stdout)[-300:])
+                    _out = (proc.stderr or proc.stdout)
+                    check("12 plan-commit + 6 escalate-relative tests pass (none skipped)",
+                          proc.returncode == 0 and "skipped" not in _out.lower(), _out[-300:])
                     # self-pace tests: fixtures == shipped patch text (Gemma's proof
                     # harness), run from the package dir where tests/fixtures live
                     proc = subprocess.run([sys.executable, str(PKG / "tests" / "test_self_pace.py")],

@@ -39,6 +39,16 @@ V137_NOTE = """# v13.7-final = v13.6-final + patch 0010 dyn-level-budget (handof
 # clamp(mediana(koszty ukończonych poziomów gry) x ARC3_DYN_CAP_MULT(4), 45k, 150k),
 # drabina RESET x1.5, ABANDON tylko po wyczerpaniu resetów i >=1.5x cap — nigdy
 # ostrzejszy od statycznego. Kill: ARC3_DYN_CAP=0 => wierny kontrolny 0004 (A/B).
+# UZBROJENIE (korekta po opinii Gemmy 6d081d52, odtworzonej przeze mnie 1:1 na 40
+# grach r085/r093/r110/r118): ARC3_LEVEL_TOKEN_CAP 0 -> **20000**, NIE 60000.
+# Kod: base = max(static, mediana*4) => dyn NIGDY nie tnie ciaśniej od armingu;
+# @60000 dyn aktywny w 16/40 gier (≥2 ukończone), 15 luźniej / 0 ciaśniej,
+# mediana capa 128612, a 15 gier palących 100% budżetu (0 ukończonych) — NIE
+# dotknięte. @20000: gry z historią mają TE SAME capa (mediana*4 ≥ 46k), a
+# marnotrawcy bez historii są cięci na 20k + darmowy RESET (~40k). Ryzyko do
+# POMIARU na 1.11: 14 ukończonych poziomów kosztowało >45k (max ~91k) — część
+# mogłaby nie ukończyć; metryka ochronna: completed/game przed/po; opcja
+# ARC3_LEVEL_MIN_DONE=1 jako OSOBNA następna zmienna.
 # Weryfikacja: 16/16 testów dyn na bajtach == wyjściu łańcucha r033 (cmp);
 # 10/10 patchy czysty r033; dormancja potwierdzona (verify_v16 + nasz łańcuch).
 """

@@ -83,3 +83,41 @@ Odtworzyliśmy wszystko samodzielnie:
   v13.2" — ich wewnętrzna etykieta, bajty nietknięte (zasada: cmp zamiast kosmetyki).
 - Patch 0009: Gemma duck-v16 (0ef2465). Baza: nasz łańcuch v11→v13.6. Wszystkie liczby
   cudze zweryfikowane samodzielnie (reguła stała). Nic do Kaggle bez GO.
+
+---
+
+## 7. KOREKTA po niezależnej opinii Gemmy (gałąź 6d081d52) — 30.10 ~16:30, zweryfikowana przeze mnie 1:1
+
+Gemma odtworzyła nasz build/verify (bajt w bajt, cell-diff identyczny) i wnieśli TRZY rzeczy.
+Wszystkie sprawdziłem samodzielnie:
+
+1. **Semantyka kodu (potwierdzona w patchu 0010)**: `base = max(static_cap, mediana×4)`
+   → dyn **nigdy nie tnie ciaśniej niż arming**; poniżej 2 ukończonych poziomów fallback =
+   static_cap; drabina mnoży **po** clampie (150k×1,5=225k możliwe — kosmetyka, nie bug).
+   Ich „dormancja różnicowa" 8000 decyzji × 5 konfigów → identyczne decyzje: spójne.
+2. **Liczby z 40 gier (r085/r093/r110/r118) — ODTWORZONE PRZEZE MNIE 1:1**:
+   ukończone poziomy >45k: **14** (oni: 14), >60k: **13** (oni: 13), max koszt 91 043
+   (oni: 88 114 — drobny rozjazd cięcia segmentów); marnotrawstwo na poziomy nieukończone:
+   median **64,5%**, max **100%** (identycznie); sim @60000: dyn aktywny **16/40**,
+   **15 luźniej / 0 ciaśniej**, mediana capa **128 612** — WSZYSTKO identycznie.
+3. **Rekomendacja armingu 20 000 zamiast 60 000 — PRZYJĘTA**. Uzasadnienie (kod+liczby):
+   @60000 gry z historią dostają ≥60k, a **15 gier palących 100% budżetu (0 ukończonych,
+   >40k tok) pozostaje nietkniętych** — „utnij marnotrawstwo" nie działa; @20000 gry z
+   historią mają TE SAME capa (mediana×4 ≥ 46k; mediana 128 612 bez zmiany), a
+   marnotrawcy bez historii są cięci na 20k + darmowy RESET (~40k). Nota w komórce 2
+   i README poprawione na 20 000 (rev2). **Ryzyko do pomiaru na 1.11**: te 14 poziomów
+   >45k może nie ukończyć się pod capem 20k+reset — metryka ochronna: completed/game
+   przed/po; opcja `ARC3_LEVEL_MIN_DONE=1` (nie porzucaj gier z ≥1 ukończonym) jako
+   OSOBNA kolejna zmienna, nie w tym samym biegu.
+
+## 8. SPROSTOWANIE własnej usterki certyfikatu
+
+Ścieżka R085_BENCH w moich wcześniejszych biegach verify (`…/r085/benchmark.json`)
+**nie istniała** (prawdziwa: `…/r085-kernel_output_pick/output-pick/benchmark.json`),
+więc test reprodukcji 8 nudge'ów (escalate) był **cicho SKIPPED** (skip nie zmienia
+returncode). verify rev2: check na realny R085_BENCH + zakaz skipa („none skipped");
+bieg z dobrą ścieżką: **ALL CHECKS PASSED, 0 skipów**. Wniosek o 8/0 nudge'ach
+reprodukuje się z realnych danych (bieg obecny), nie tylko z kodu patcha.
+
+Ich raport (notes/ARC-AGI-3-ocena-v13-7-final-2026-10-30.md, commit 568420c lokalnie)
++ narzędzie audit_dyn_budget.py: warto wypchnąć na ich gałąź (rekomendacja do ownera).

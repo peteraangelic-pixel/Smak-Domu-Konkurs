@@ -554,3 +554,27 @@ Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci
   v17 (np. arc-agi-3/handoff-strategia-30-10/); 3 pliki v17 (283a36b8) j.w. (§21C).
 - Pakiet strategii NIE jest przez nas wypychany na Kaggle bez wyraźnej decyzji usera
   (ich slug arc3-duck-v16 jest wolny, ale to cudzy kernel).
+
+## 23. OPINIA GEMMY (6d081d52) O V13-7-FINAL — ODTWORZONA PRZEZ NAS 1:1 + KOREKTA ARMINGU 60000→20000 + SPROSTOWANIE SKIPA (30.10 ~16:30 UTC)
+
+- Gemma odtworzyła nasz build/verify offline (bajt w bajt, cell-diff {1,2,12,14,15,33,40}
+  identyczny, sha256 patcha 0010 zgodny) i dodała: dormancja różnicowa (8000 decyzji ×
+  5 konfigów = identyczne), własne liczby z 40 gier (r085/r093/r110/r118) i KOREKTĘ:
+  **arming 20 000, nie 60 000**.
+- Nasza weryfikacja (samodzielnie, na naszych benchmarkach): **kod** — `max(static, mediana×4)`
+  = dyn nigdy nie tnie ciaśniej od armingu; fallback <2 ukończonych = static; drabina PO
+  clampie (225k>150k, kosmetyka). **Liczby 1:1**: >45k=14, >60k=13 (max 91 043 vs ich 88 114),
+  marnotrawstwo median 64,5%/max 100%, @60000: 16/40 aktywnych, 15 luźniej/0 ciaśniej,
+  mediana capa 128 612 — wszystko identyczne.
+- **Wniosek przyjęty**: @60000 nie dotyka 15 gier palących 100% budżetu (0 ukończonych);
+  @20000 te same capa dla gier z historią + cięcie marnotrawców (20k+reset ~40k).
+  Notebook/README/OCENA rev2 z armingiem 20000; ryzyko: 14 ukończonych >45k pod capem —
+  mierzyć completed/game; ARC3_LEVEL_MIN_DONE=1 jako OSOBNA kolejna zmienna.
+- **SPROSTOWANIE**: R085_BENCH w naszych biegach verify wskazywał nieistniejącą ścieżkę
+  → test 8 nudge'ów (escalate) był CICHO SKIPPED (skip nie psuje PASS). verify rev2:
+  check realnego R085_BENCH + „none skipped"; bieg z dobrą ścieżką: ALL CHECKS PASSED,
+  0 skipów. Wcześniejsze certyfikaty v13.5/v13.6/v13.7(1): wszystkie inne testy biegały;
+  tylko ten jeden był w skipie.
+- Gemma pyta o zgodę na wypchnięcie ich raportu (568420c, notes/…ocena-v13-7-final… +
+  audit_dyn_budget.py) — rekomendacja: TAK (niezależny audyt + narzędzie do powtórzenia).
+  Ich „v17-arena D′" aplikuje się czysto na drzewo v13.7 (ich twierdzenie, u nich).
