@@ -134,3 +134,10 @@ Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
 - ROSTER: potwierdzony w kodzie Tufy: 110 = round-robin klonow 25 gier (n_passes=1, ~4.4x/gra) — nie 20 passow.
 - REWIZJA GO: slot 30.10 = v13-MEGA (sufit 45-55; kill-switche), fallback 31.10 = v12 (c45+fix). PC sweep 600s przed submitem.
 - Pakiet skopiowany do naszego repo: arc-agi-3/duck-v13-mega/ + pc-sweep-pack/ (RUN-NA-PC.md dla 5950X).
+
+## 14. V13.1 CERTYFIKOWANA — ZASTĘPUJE v13 JAKO GO#1 (30.10 ~07:35 UTC) — szczegoly: duck-v13-1/OCENA-ARENA-V13-1.md
+- Pokemon cbefdd4: diff chirurgiczny (kom. 2+11 notebooka; playbook identyczny -> 14/14 na silniku dalej wazne);
+  base_key = wspolny magazyn winpath dla ~4.4 klonow/gra; dead-skip na licznikach magazynu (pass_index martwy przy
+  n_passes=1 — nasza korekta przyjeta); 6/6 patchy czysty r033; testy 12/12 + 7/7 (u verify padało na braku
+  arcengine/PIL w srodowisku — reczny bieg zielony); standalone==spatchowany.
+- Slot 30.10: **v13.1** (duck-v13-1); fallback 31.10: v12. Wysylka PO GO.
