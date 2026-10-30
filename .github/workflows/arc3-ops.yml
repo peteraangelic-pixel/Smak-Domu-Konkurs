@@ -33,6 +33,19 @@ jobs:
                   summary[name]={'returncode':r.returncode,'bytes':len(r.stdout)}
               except subprocess.TimeoutExpired:
                   summary[name]={'error':'timeout'}
+          refs = [
+              'threerabbits/submission-32b-fix4',
+              'romantamrazov/the-agi-boys-i-am-better',
+              'vickyfym/arc-agi-3-lalalia-final',
+              'tantan0327/arc3-franzen-dprime',
+              'heliosli/try-merging-it-you-might-get-lucky-and-win-gold',
+          ]
+          for ref in refs:
+              target = pathlib.Path('research/sources', ref.replace('/','__'))
+              target.mkdir(parents=True,exist_ok=True)
+              r=subprocess.run(['kaggle','kernels','pull',ref,'--metadata','--path',str(target)],capture_output=True,text=True,timeout=120)
+              summary[ref]={'returncode':r.returncode}
+              (target/'pull.log').write_text(r.stdout+'\n'+r.stderr)
           pathlib.Path('research/summary.json').write_text(json.dumps(summary,indent=2))
           print(json.dumps(summary,indent=2))
           PY
