@@ -181,3 +181,51 @@ Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
 - **1.11**: lepsza z dwóch; jeśli <26 → kontrola PLAN_COMMIT=0; ewent. z wymuszeniem commit (eskalacja 8-10).
 - **2.11 (finał)**: select best (Kaggle: 2 submisje do punktacji prywatnej — potwierdzić w rules).
 - 27B pozostaje wstrzymany (0.27/1.18).
+
+## 16. AUDYTY v13.1 — PEŁNA RUNDKA (30.10 ~07:45 UTC): Gemma 6a6af4a, c87 f3c5726, 7911 a84173c
+(Wszystko przeczytane u źródła; nasza własna kontrola: serving-parity v13.1==c45 potwierdzona — kom.21==kom.17,
+ MAXREQ=10/cuda-graph/chunked identycznie -> pakiet GO#1 bez cichej regresji silnika; zagadka 3,6x ms/token Gemmy
+ (r085 17,2 vs r110 62,6) = otwarte pytanie do metryk po runie.)
+
+### Gemma (review v13.1, winpath_sim na PRAWDZIWYM silniku)
+- **Cross-entry replay zweryfikowany END-TO-END**: poziom z wpisu 1 odtworzony we wpisie 2 za **0 tokenów**
+  (tu93 18/18, vc33 3/3, m0r0 15/15, cn04 13/13 akcji). **dead-skip zweryfikowany** (wpisy 1-3 nie, od 4. tak).
+- **Wartość = funkcja rosteru: +5…+15 pkt średniej JEŚLI roster cykliczny; 0 jeśli nie.** Rachunek najdokładniejszy
+  do tej pory: kopia zachowuje efektywność wpisu 1 i cały budżet tokenowy zostawia na kolejny poziom (ls20: 414/427
+  akcji na poziomy 1-3; przejście 3->4 poziomy = +16,4 pkt na tej grze).
+- Ujawniła NASZĄ wewnętrzną sprzeczność: nasz własny rejestr z 25.10 (OCENA-V9-LEPSZA-DROGA.md, wiersz o
+  „Replay/×4.4 = 0 … official_110 = lokalny symulator") — 5 dni przed moją błędną „certyfikacją rosteru".
+  Przyznaję wprost: moja sesja to poprawnie ustaliła 25.10 i sama sobie zaprzeczyła 30.10. Retrakcja §15 stoi.
+- MEGA-CONFIG (dźwignie configowe na bazie v12): **11 fal × ~49 min/gra** (cap 532 min nigdy nie wiąże);
+  **s/akcja liniowe w tok/akcję (r≈1,0)**; cele: 400+ akcji/grę @ ~370 tok/akcję, 600 @ ~230;
+  poddanie się skalowane wagą poziomu (C45_LEVEL_TOKEN_CAP=40000 + ABANDON_TOKENS=0 + STUCK_AUDIT=200000 +
+  ABANDON_MIN_LEVELS=4); drobiazg: maybe_replay wołany przed obsługą game-over (skutek ~zero).
+
+### c87 (f3c5726, 8. korekta)
+- FAKT 1: nasza samosprzeczność rosterowa potwierdzona ich cytatem z naszego własnego dokumentu z 25.10 (+Gemma).
+- FAKT 2: PLAN_COMMIT niewymuszony (7911) obala ich wczorajszą rekomendację PLAN_COMMIT=0 -> główna dźwignia
+  = wymuszony batching; T3 = ich droga do 50+ (dalej: port planera paper01).
+- Ich tabela oczekiwań: Gemma **26-31**; 7911 **28 albo 50** (zależnie od wymuszenia commit); wartości pamięci:
+  2,90 (Gemma, roster cykliczny / 25 gier) vs 0,66 (7911, każda gra raz) vs 0 — **wszystko wisi na jednym fakcie o rosterze**.
+- Krótsze ścieżki playbooka (sp80 28->4 akcji) = kosmetyka (~3 pkt, cap ukończenia wiąże), ale darmowa przy regeneracji.
+
+### 7911 (a84173c, model budżetu)
+- 532 min = sufit JEDNEJ gry (może zjeść niemal cały bieg); realny budżet dzieli priority gate:
+  **efektywny czas/grę = 32 400 s × 10 / 110 = 2 945 s ≈ 49 min** -> ~205 akcji/grę @ 14,4 s/akcję ->
+  **sufit @ eff=90% = 18,7 pkt** (zgadza się z rzeczywistością; efektywność mamy 86-90%).
+- **DOWÓD POŚREDNI ROSTERU ≈ 110**: smoke (10 gier × 48 min) = 27,21-29,02 ≈ prawdziwy LB 26,25. Gdyby roster
+  miał 25 gier (216 min/gra, ~900 akcji), wynik byłby znacznie wyższy. **Wniosek: smoke 10x48 min to dobry
+  estymator WARUNKÓW ewaluacji** (populacja inna, budżet ten sam) — uzasadnia naszą bramkę smoke jako
+  wykrywacz katastrof przy zachowaniu ostrożności w ekstrapolacji punktów.
+- Jedyna droga do większej liczby akcji: **więcej akcji/decyzję (commit) albo mniej s/akcję (tok/akcję ↓, silnik ↑)**.
+
+### REWIZJA PLANU (nadpisuje §15 w jednym punkcie — jawna zmiana)
+- Slot 30.10: **v13.1 AS-SHIPPED (PLAN_COMMIT=1, CAP=0, WINPATH=1, DEAD_SKIP=1, conc=10, probe ON)**.
+  POWÓD ODWRÓCENIA kill-switchy z §15: Gemma dowiodła, że replay/dead-skip działają i są BEZPIECZNE, gdy roster
+  się nie powtarza (brak dopasowań = brak akcji), a płacą +5…+15, gdy się powtarza. Z WINPATH=1: darmowa opcja.
+  Atrybucję załatwia probe + plan „2x ta sama konfiguracja" (31.10). c87 ma rację co do rozmycia — ale przy
+  4 slotach i jednym nierozstrzygniętym fakcie (roster) opcja > czystość.
+- Po runie: output-pick (roster_probe.jsonl + benchmark + winpath dir z poziomami) -> ROZSTRZYGNIEMY roster
+  i zmierzymy ms/token (zagadka 3,6x). 31.10: to samo 2x (draw). 1.11: kontrola PLAN_COMMIT=0 LUB commit-forcing
+  (eskalacja 8-10) wg wyników. 2.11: select best.
+- Nadal w mocy: bez GO usera nic nie idzie.
