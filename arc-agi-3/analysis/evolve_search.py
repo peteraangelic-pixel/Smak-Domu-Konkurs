@@ -111,6 +111,8 @@ def main():
     parser.add_argument('--sec-cap', type=float, default=5)
     parser.add_argument('--max-levels', type=int, default=1)
     parser.add_argument('--seed', type=int, default=20261030)
+    parser.add_argument('--selector', choices=['evolution', 'surrogate'], default='evolution',
+                        help='Refit the surrogate on observed training outcomes after each generation')
     parser.add_argument('--reuse', type=Path, help='Reuse completed matching trials from an earlier run')
     args = parser.parse_args()
     if not 4 <= args.population <= 144 or args.generations < 1 or not 1 <= args.screen_games <= 17:
@@ -134,7 +136,7 @@ def main():
     train, holdout = games[:17], games[17:]
     args.out.mkdir(parents=True)
     manifest = {
-        'seed': args.seed, 'workers': 16,
+        'seed': args.seed, 'workers': 16, 'selector': args.selector,
         'budget': {'node_cap': args.node_cap, 'sec_cap': args.sec_cap, 'max_levels': args.max_levels},
         'train': [Path(path).stem for path, _ in train],
         'holdout': [Path(path).stem for path, _ in holdout],
@@ -189,11 +191,40 @@ def main():
             return sorted([summary(g, subset, cache) for g in genomes], key=rank, reverse=True)
 
         history = []
+        selection_history = []
         for generation in range(args.generations):
             ranked = evaluate(population, train[:args.screen_games], f'generation {generation}')
             history.append(ranked)
             print('screen best', ranked[0], flush=True)
-            population = breed([r['genome'] for r in ranked[:2]], args.population, rng)
+            if generation + 1 < args.generations and args.selector == 'surrogate':
+                # The recommender only reads training rows from the flushed log.
+                # Save an explicitly incomplete training snapshot, never fabricated
+                # finalist/validation results. No future outcomes enter selection.
+                snapshot = {'stage': 'training_snapshot', 'training_history': history,
+                            'training_finalists': [], 'holdout': []}
+                (args.out / 'report.json').write_text(json.dumps(snapshot), encoding='utf8')
+                from propose_search import recommend
+                proposals = recommend(args.out, seed=args.seed + generation, count=args.population)
+                elites = {identity(CONTROL): dict(CONTROL)}
+                # Keep the same two parents as ordinary breed(), so differences
+                # in exploration are not caused by removing an elite slot.
+                elites.update({row['id']: row['genome'] for row in ranked[:2]})
+                for row in proposals['recommendations']:
+                    if len(elites) >= args.population:
+                        break
+                    elites[row['id']] = row['genome']
+                if len(elites) < args.population:
+                    for genome in breed([r['genome'] for r in ranked[:2]], args.population, rng):
+                        if len(elites) >= args.population:
+                            break
+                        elites[identity(genome)] = genome
+                population = list(elites.values())
+                selection_history.append({'after_generation': generation,
+                                          'data_rows': proposals['training_samples'],
+                                          'data_genomes': proposals['training_genomes'],
+                                          'next_ids': [identity(g) for g in population]})
+            else:
+                population = breed([r['genome'] for r in ranked[:2]], args.population, rng)
         finalists = {r['id']: r['genome'] for r in history[-1][:2]}
         finalists[identity(CONTROL)] = dict(CONTROL)
         ranking = evaluate(list(finalists.values()), train, 'full training confirmation')
@@ -206,6 +237,7 @@ def main():
         selected = {winner['id']: winner['genome'], identity(CONTROL): CONTROL}
         held = evaluate(list(selected.values()), holdout, 'single holdout evaluation')
     report = {'training_history': history, 'training_finalists': ranking,
+              'selector': args.selector, 'selection_history': selection_history,
               'selected': winner, 'strict_train_gain': train_gain,
               'holdout': held, 'trials': len(cache), 'seconds': time.monotonic() - start,
               'promotion': 'pending independent full-agent evaluation'}

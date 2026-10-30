@@ -1,0 +1,73 @@
+{
+  "seed": 20261031,
+  "workers": 16,
+  "selector": "evolution",
+  "budget": {
+    "node_cap": 2000,
+    "sec_cap": 8.0,
+    "max_levels": 1
+  },
+  "train": [
+    "ka59",
+    "tu93",
+    "bp35",
+    "s5i5",
+    "lp85",
+    "vc33",
+    "lf52",
+    "g50t",
+    "ar25",
+    "re86",
+    "m0r0",
+    "tn36",
+    "cn04",
+    "ls20",
+    "sk48",
+    "tr87",
+    "su15"
+  ],
+  "holdout": [
+    "cd82",
+    "dc22",
+    "sp80",
+    "r11l",
+    "ft09",
+    "sc25",
+    "sb26",
+    "wa30"
+  ],
+  "game_sha256": {
+    "ka59": "38d34dbbf83b9a220903d11d3e5f4cdb73230c7376576669d7d66cc157f22144",
+    "tu93": "0768757bb4b39e5a6f8142e32e0f6546a619cee02707f1f52f806b7007f07e57",
+    "bp35": "0a0ad94090fe6923613bee92dd48df46b2a07877bdf0be618e385a92184b7d0d",
+    "s5i5": "18d950333a006e984941ceaa16cdc4dc8dca8ca26cb82194198759089aac5965",
+    "lp85": "305b61c3d3a7463c9e723b53378c188529c0cc7d85029ba287f7f2b660fe8513",
+    "vc33": "5430563c386ca51ff4c9a84b032579245a0613cb98c477c6eaeaa1086c80a2d5",
+    "lf52": "271a04aa4aafd1b035194b346c5333ec024d2e570d349edd413499c98e9e00d8",
+    "g50t": "5849a7740de172289b99f39680e60d7657de203a11b7361e24181e2104eebed5",
+    "ar25": "0c556536ad902afddb600cdb2b766ac9fda243dcd07b7f3a0a0d6277339745bf",
+    "re86": "8af5384d7f9bfdd6867edeb30550c20ba12b7cc9d4126acb35e68440c3447f04",
+    "m0r0": "492f87bab9b8cb3a9414becb7e9cd5a35be2de4b176596dbdec12aa88ed8ab51",
+    "tn36": "ef4dde99174ca5d753809f6f193177d8e25762b5fa58c9919df8458d8b69ff23",
+    "cn04": "2fe56bfb27680358db7d1c8b80c43e8877d6cfc629945402dc7c8967b0152603",
+    "ls20": "9607627b3d85bdb21ff28b40fefaa6a873691175981c6351b7e5a6637416f9d5",
+    "sk48": "d8078629ec82e3f66d70423ad188969d36cecaecf0d96d8a4496210042573a80",
+    "tr87": "cd924810f136aab40570209ff54a0069dd2306608414d16012f92d4ce66e23fb",
+    "su15": "1944f8aba6f2f8860d991745ba768131f02d918bcd5465466e85fcb2726d115a",
+    "cd82": "fb555c5ddf0a3b742188646bb28d2f57cb98cf2d3263c594032b45ec8fce2a86",
+    "dc22": "fdcac2320f6d4cfeaaddfbed5c12e533962817b99f700a2936edd2c296f3d169",
+    "sp80": "589a99af30f07879d044c56c88a2e9882fe04e6f13e9f943f5195c81d3b85a1f",
+    "r11l": "495a7899b016e043ad59e4a05a8ea9bbe81b8d2763df6f9dbef7fde5e2d6d33f",
+    "ft09": "0d8bbf2573e8f9837c649a1ffda2e7bde3734d26c3cb0fc4bbfd772d7f87a6bf",
+    "sc25": "635fd71a8670ff1c9c93ed9d2ebaaf333aca4964266a0563d5337ff32eb4340e",
+    "sb26": "7fbdac44f407cf63a682b4dc313769227f3a8a9d423287d096e24d72d00d9784",
+    "wa30": "ee6fef476d4db0d64ebe5d37ea9036d41bace2e26974f9b0b2516af0948e202a"
+  },
+  "implementation_sha256": {
+    "sweep2.py": "b305b5be75182e302c417d0aef946b2fd82b84d621eab794174e46f9f421bf5c",
+    "native_kernels.py": "2ded6cd3065628814b2542c1835c4f09f9a8056d5b940f0aed1995bec12b4fdd",
+    "evolve_search.py": "4ce4d0df221d0c651065cad572b33df4d516dce98e8e90271230592b4f498ed3"
+  },
+  "objective": "weighted completion, then completed levels, then fewer nodes",
+  "qualification": "Exploratory public holdout. All public games were inspected earlier. No hidden-game claim."
+}
