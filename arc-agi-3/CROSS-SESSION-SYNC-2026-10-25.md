@@ -507,3 +507,50 @@ Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci
   wheel rozpakowany do /tmp/ae i wstrzyknięty w PYTHONPATH (jak 29.10); brak arcengine
   = 8 ERRORS winpath / 4 ERRORS escalate — wygląda jak „zepsuty pakiet", jest środowiskiem.
   W builderach: kolejność podmian ma znaczenie (rebrand psuje kotwicę alarmu — assertion łapie).
+
+## 22. HANDOFF SESJI „STRATEGIA" (999f9194, 14:40) — ZWERYFIKOWANY, PENDING-GATE ZAMKNIĘTY PRZEZ NAS + V13.7-FINAL — CERTYFIKOWANA (30.10 ~15:30 UTC)
+
+### A. Co przyszło (zip 1 019 138 B w korzeniu gałęzi; pełny snapshot .git ich gałęzi)
+- **arc-v16-package** = ich kernel `arc3-duck-v16` (40 kom., 749 222 B): **nasz v13.4 +
+  patch 0009-dyn-level-budget (DORMANT)** — adaptacyjny budżet poziomu: cap =
+  clamp(mediana koszów ukończonych poziomów gry ×4, 45k, 150k), drabina RESET ×1,5,
+  ABANDON po wyczerpaniu resetów; dotyczy WYŁĄCZNIE framework/arc3_level_budget.py
+  (moduł 0004) → **plik rozłączny od self-pace Gemmy** (tool_agent.py). Slug ich:
+  arc3-duck-v16 (unikalny). 16/16 testów; verify_v16 ALL LOCAL CHECKS PASSED;
+  **bramka łańcucha r033 = pending → ZAMKNIĘTA PRZEZ NAS**: 9/9 patchy czysty r033,
+  kompilacja, nasze 12+6+11 testów na ich drzewie, 11/11 winpath; rekonstrukcja
+  src == bajty spatchowanego drzewa (cmp) — testują dokładnie to, co wysyłają.
+- **refs/**: patch self-pace Gemmy (u nas już jako 0009 w v13.6).
+- **Porównanie v16-naj vs v13.5 vs Gemma-v16**: zgodne z naszą mapą; ich „v17-naj"
+  = v13.5 + self-pace + dyn dormant + bramka 6,0 → == nasze v13.7-final. Higiena
+  slugów: Gemma duck-v15/v16 celują w NASZE slugy (nadpisalby kernele v13-3/v13-4).
+- **Recenzja v17 (strategia) — KLUCZOWE**: „RHAE 3,80→40,06" mierzy wartość PLANOWANIA
+  (PlannerAgent BFS vs ReactiveAgent), NIE warstwy — warstwa nie jest użyta w eval-u
+  ani razu; „12 seedów" = kosmetyka (1 przebieg deterministyczny, stdev 0,00);
+  integracja: PlanCache kolizja z win-path 0006, BudgetLedger = drugi harmonogram
+  (reguła jednego pisarza), ConvergedGuard najbezpieczniejszy (ale bug niehashowalnych
+  akcji a450 przed wpięciem). Nasza decyzja §21C PODTRZYMANA I WZMOCNIONA.
+- War-room 27-10: historia kampanii (kontekst; bez nowych liczb do akcji).
+
+### B. V13.7-FINAL — CERTYFIKOWANA (ALL CHECKS PASSED, komit ten)
+- = v13.6 + patch **0010-dyn-level-budget** (bajt w bajt z handoffu) jako extra-08;
+  **DORMANT** (LEVEL_TOKEN_CAP=0 zostaje → submisja ≡ v13.6; uzbrojenie = 0→60000,
+  propozycja na 1.11; kill ARC3_DYN_CAP=0 → exact 0004 = gotowy kontrolny A/B).
+- 41 komórek, 758 240 B; cell-diff vs v13.6 = {1,2,12,14,15,33,40}; writer extra-08 ==
+  patches/0010; slug petersharps/arc3-duck-v13-7-final.
+- Weryfikacja: **10/10 patchy** czysty r033, drzewo kompiluje, 12+6+11 testów,
+  self-pace 22/14 1:1, **0010: rekonstrukcja==drzewo (cmp) + 16/16 na bajtach
+  wysyłkowych**, dormancja w wariancie, sondy stub, playbook bajt, serving nietknięty.
+
+### C. Plan slotów (do GO usera; wszystkie ścieżki gotowe)
+- **30.10: v13-7-final** (≡ v13.6 na submisji, + dźwignia na 1.11 w kieszeni).
+- 31.10: powtórka (σ 2,5–3,9) albo v13.6/v13.5-kontrola — wg druków a/call i pokrycia.
+- 1.11: flip wg sond: **uzbrojenie 0010 (60000)** — najtańsza dostępna dźwignia głębi;
+  ewentualnie SELF_PACE=0 / HISTORY 150→48 jako alternatywne flipy (1 zmiana/bieg!).
+- 2.11: select best. Nic nie wychodzi bez GO.
+
+### D. Księgowość repo
+- Handoff zip siedzi w korzeniu (999f9194) — po decyzji usera do przeniesienia obok
+  v17 (np. arc-agi-3/handoff-strategia-30-10/); 3 pliki v17 (283a36b8) j.w. (§21C).
+- Pakiet strategii NIE jest przez nas wypychany na Kaggle bez wyraźnej decyzji usera
+  (ich slug arc3-duck-v16 jest wolny, ale to cudzy kernel).
