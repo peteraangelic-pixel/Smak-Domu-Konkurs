@@ -445,3 +445,65 @@ Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci
 - 31.10: v13.5 x2 (draw) lub kontrola v14-exact (RELATIVE=0 + OPENER=0 w TYM SAMYM kernelu).
 - 1.11: flip najsabszego wg meteringu (RELATIVE=0 / HISTORY 150->48 poprawnie opisany / skrocenie
   dyrektywy — wymaga patcha prompts.py, nie teraz). 2.11: select best.
+
+## 21. FALA 08:22–09:18 (v16 GEMMY, AUDYTY a450, c87 WARSTWA 8, 7911 24:1) + V13.6-FINAL — CERTYFIKOWANA (30.10 ~13:15 UTC)
+
+### A. Co przyszło z gałęzi (wszystko przeczytane, kluczowe liczby zweryfikowane)
+- **Gemma 0ef2465 (08:38) = duck-v16**: nadzbiór naszego v13.4-unified (odtworzyła nasze
+  8 patchy samodzielnie, 8 nudge/0 przedwczesnych przez spatchowany kod — potwierdzenie
+  z zewnątrz) + **patch 0009 self-pace** + sonda pokrycia. Self-pace = próg z
+  `GameRun.actions_per_level` (nasz rekord, NIEUKRYWANY): r085 = **22/14** (vs 42/26
+  floor20+cap2, vs 8/0 relatywny tylko-przy-widocznym-baseline'ie). Rysy u nich:
+  metadata slug dalej `arc3-duck-v13-4-unified` (nadpisze kernel przy pushu!) i docstring
+  0009 (27/16) vs tabela/testy (22/14). Plus sweep niepokrytych gier: 0/3 trafień (uczciwie).
+- **a450 (839c169 08:43 → 52b709e 08:49 → 2e2337c 09:18)**: audyt naszego v13.4 = „nowy
+  kandydat nr 1" (1 rysa: test R085_BENCH bez `is_file()` → IsADirectoryError z czystego
+  klona — FIX w v13.6); v13.5 potwierdzona; **duck-v16 9/9 zweryfikowane z reprodukcją**;
+  stan: „duck-v16 najpełniejszy, potem v13.5". Recenzja paczki **v17-action-efficiency**
+  (nasz upload 283a36b8): liczby odtwarzalne 7/7 i 40,06 (zgodne z naszym repro), ale
+  **bug: ConvergedGuard.banned kluczuje po akcji — akcje myszowe (dict) niehashowalne →
+  TypeError w prawdziwym harnessie**; PlanCache ≈ winpath 0006; BudgetLedger nie mapuje się
+  na równoległy solver.
+- **c87 (c7dab76 08:30 → 28ed67f 08:55)**: przyjmuje naszą korektę „3,6×" (hipoteza KV
+  obalona własnym pomiarem 663 tok/s; spór o silnik ZAMKNIĘTY); **8. instancja klasy:
+  MARTWY INSTRUMENT** — alarm `actions_per_call < 1.5` w sonda rosteru v14/v15 (próg 3×
+  poniżej zmierzonej bazy 4,357; pochodził z ery 1,00 a/decyzję r013/15/18) — sonda mówiła
+  „wiemy", nie mówiąc czy hint zadziałał; „martwa dźwignia daje wynik neutralny, martwy
+  miernik daje fałszywe poczucie, że wiemy". NIEZALEŻNA REPLIKACJA rozkładu baseline'ów
+  (r093, n=69: mediana 72, średnia 104; zgodność z Gemmą przy progu 10: 96,3 vs 96,9%).
+- **7911 (cad326c 08:22) = V17-COMPARE** (analityka): **hint openerowy = 48–50 akcji,
+  cały spór o eskalację = 2 akcje/gry → stosunek 24:1**; trzy niezależne pomiary tej samej
+  liczby (4,61/4,357/3,91–5,43); **bramka własna a/call ≥ 6,0** (Gemmina ≥1,8 przechodzi
+  przy martwym hincie; 6,0 leży na granicy 253 akcji/gry = 50 pkt); arytmetyka: POŁOWICZNY
+  efekt hinta (5,62 a/gen → 700 tok/akcję → 266 akcji/gry) wystarcza do 50. Ich „v13.4 nie
+  istnieje" = przeszukiwanie sprzed naszego pushu (nieaktualne, i tak wyciągnęli właściwy
+  wniosek); ich „v17" ≈ nasze v13.5 + bramka 6,0.
+
+### B. V13.6-FINAL — CERTYFIKOWANA (ALL CHECKS PASSED, komit ten)
+- Skład (cell-diff vs v13.5 = {1,2,12,14,32,39}; 40 komórek, 743 616 B):
+  1) patch **0009 self-pace** przeniesiony BAJT W BAJT z Gemmy duck-v16 (`duck-extra-07`),
+  2) **fix martwego alarmu** → bezwarunkowy druk `v13.6 batch: a/call = … (baza r019 = 4.357;
+     cel ~5.7/300, ~7.6/400; bramka 7911 >= 6.0 …)`,
+  3) **fix testu** R085_BENCH (`is_file`),
+  4) slug `petersharps/arc3-duck-v13-6-final` (bez rysy Gemmy).
+- Weryfikacja: **9/9 patchy** czysty r033, drzewo kompiluje, **12+6+11 testów**,
+  **test_self_pace 22/14 (1:1 z kodu patcha, fixtures==shipped)**, sondy stub z nowym
+  drukiem, playbook bajt, serving nietknięty. Builder przyrostowy (reguła v13.5).
+- Prognoza: przedział v13.5 (26–31), self-pace = korekta 2–4 akcji/gry na grach z długimi
+  przegrywanymi poziomami; dźwignia nr 1 pozostaje hint (24:1). Slot 30.10 = v13.6-final;
+  31.10 = powtórka/kontrola wg druków a/call + pokrycia; CZEKA NA GO.
+
+### C. Paczka v17-action-efficiency (upload UI 283a36b8, obca sesja) — DECYZJA
+- Zweryfikowana przez NAS (7/7 testów, RHAE 3,80→40,06 repro 1:1, pliki==zip) i przez
+  a450 (to samo) — uczciwa, ortogonalna, ale **niedojrzała do submisji**: bug niehashowalnych
+  akcji w ConvergedGuard; PlanCache≈winpath; BudgetLedger bez mapowania na równoległy solver.
+  **NIE tworzymy v18; nie wpinamy dzisiaj.** Wartość: przegląd metodologiczny + pomysł
+  „ban po hashu stanu" do małego patcha win-path później (po 2.11).
+- 3 pliki obcej sesji w KORZENIU repo — docelowo do przeniesienia (np.
+  `arc-agi-3/duck-v17-action-efficiency/`) po decyzji usera; nie ruszamy bez GO.
+
+### D. Lekcja środowiskowa (nowa)
+- Sandbox odtworzony: wheels arcengine 0.9.3 wymagają Pythona ≥3.12 (system 3.11) →
+  wheel rozpakowany do /tmp/ae i wstrzyknięty w PYTHONPATH (jak 29.10); brak arcengine
+  = 8 ERRORS winpath / 4 ERRORS escalate — wygląda jak „zepsuty pakiet", jest środowiskiem.
+  W builderach: kolejność podmian ma znaczenie (rebrand psuje kotwicę alarmu — assertion łapie).
