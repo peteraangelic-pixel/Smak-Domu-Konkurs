@@ -127,3 +127,10 @@ OPCJE GO (rewizja):
 - GO#3 (zmienione): nie "koordynacja 27B", tylko **WSTRZYMANIE 27B** + propozycja podzialu: druga sesja = output-pick/logi i ew. replikacja
   konfiguracji M1; Arena = v12 + playbook (110 klonow) + otwieracze z zrodel + Rust precompute.
 Pozostale sloty: 30.10, 31.10, 1.11, 2.11 (4). GPU: reset sobota 00:00 UTC.
+
+## 13. V13-MEGA ZWERYFIKOWANA I PRZYJETA (30.10 ~07:20 UTC) — szczegoly: duck-v13-mega/OCENA-ARENA-V13.md
+- Pokemon 3782f8c: 6/6 patchy na czystym r033, testy 12/12+6/6 (po doinstalowaniu PIL/arcengine w piaskownicy),
+  standalone winpath == spatchowany, playbook 14/14 POTWIERDZONY przez Arene na PRAWDZIWYM silniku (replay_pb).
+- ROSTER: potwierdzony w kodzie Tufy: 110 = round-robin klonow 25 gier (n_passes=1, ~4.4x/gra) — nie 20 passow.
+- REWIZJA GO: slot 30.10 = v13-MEGA (sufit 45-55; kill-switche), fallback 31.10 = v12 (c45+fix). PC sweep 600s przed submitem.
+- Pakiet skopiowany do naszego repo: arc-agi-3/duck-v13-mega/ + pc-sweep-pack/ (RUN-NA-PC.md dla 5950X).
