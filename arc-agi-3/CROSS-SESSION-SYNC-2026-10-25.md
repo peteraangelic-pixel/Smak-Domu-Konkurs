@@ -578,3 +578,39 @@ Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci
 - Gemma pyta o zgodę na wypchnięcie ich raportu (568420c, notes/…ocena-v13-7-final… +
   audit_dyn_budget.py) — rekomendacja: TAK (niezależny audyt + narzędzie do powtórzenia).
   Ich „v17-arena D′" aplikuje się czysto na drzewo v13.7 (ich twierdzenie, u nich).
+
+## 24. GEMMA 6d081d52 WYPYCHA v17-arena-dyn (= NASZ v13.7 + ŻYWY D′) — ZWERYFIKOWANE U NAS + WERDYKT „CZYJA LEPSZA" (30.10 ~17:10 UTC)
+
+### A. Weryfikacja ich pakietu (wszystko odtworzone na naszym bundlu/danych)
+- `arc3_local_candidate/v17-arena-dyn/`: **45 komórek / 783 407 B** (jak deklarowali);
+  baza = nasz **v13.7 rev1** (758 240 B; rev2 różni się tylko notą 20000 i verify — zero
+  zachowania); build **bajt w bajt powtarzalny** (build_v17_dyn.py z jawnymi --prev/--patch);
+  **verify_v17_dyn --bundle r033 --tests → ALL CHECKS PASSED u nas**: 11/11 patchy czysty r033,
+  kompilacja, 12 plan-commit + 5 escalate (r085-repro w środku, przeszedł z naszym REALNYM
+  R085_BENCH) + 21 D′ + 16 dyn na bajtach wysyłkowych + self-pace 22/14 z drzewa + 11 winpath;
+  cmp obu rekonstrukcji z drzewem; **OFF ≡ legacy priority_value (24 kombinacje)**.
+- **Jedyna żywa różnica vs nasz rev2: patch 0011 D′ (ARC3_PRIORITY_DPRIME=1) — PODMIANA
+  HARMONOGRAMU SLOTÓW, ŻYWA NA SUBMISJI**. Formuła A×M×C+B×φ (głębia×tempo×cierpliwość +
+  bonus wzrostu zanikający na końcu); ścieżki legacy bajtowo nietknięte; kod defensywny.
+- **Dowód D′ wg nich samych: n=4 publiczne biegi, śr. ~29,0 vs ~25,77 (SD ~3,93) —
+  EFEKT MNIEJSZY NIŻ 1σ**; w patchu czarno na białym: „modest, noisy signal, not a proven
+  gain". Nigdy nie biegł na GPU/gatewayu (ich README: „nie uruchamiany w Kaggle").
+- Skaza pakietu (kosmetyka, ale pułapka): STARE narzędzia w środku — verify_v17.py/build_v17.py
+  z poprzedniej iteracji (oczekują 43 komórki i D′=0010) → **padają na ich własnym nb (8 FAIL)**;
+  build_v17_dyn.py ma przestarzałe domyślne ścieżki (wymaga jawnych argumentów).
+  Ich verify-summary (54 OK) był z LOKALNEJ kopii r085 (/tmp/bench) — my powtórzyliśmy
+  z prawdziwym benchmarkiem z repo: przechodzi.
+- Plusy ich builda: komórka „v17 levers" (po biegu liczy 20000 vs 60000 z danych TEGO biegu),
+  sonda/metering D′, README uczciwy, rekomendacja armingu 20000 (zgodna z naszym rev2).
+
+### B. Werdykt „czyja v13.7 lepsza" (do decyzji GO usera)
+- **Jako kandydat na slot 30.10: nasz rev2.** Powody: (1) nasz ≡ v13.6 na submisji
+  (certyfikowane, 3 niezależne audyty), ich = v13.6 + NIEPRZETESTOWANA integracyjnie zmiana
+  serwingu działająca na wszystkie 110 gier przez cały bieg; (2) reguła kampanii: slot tylko
+  smoke≥26 LUB zweryfikowana dźwignia — D′ nie jest ani jednym (n=4, <1σ; σ powtórek 2,5–3,9 →
+  bieg z D′ nieodróżnialny statystycznie od powtórki); (3) c4eeb067 (najsilniejsze pomiary)
+  niezależnie: wysyłać JEDEN kandydat = v13.7; główna dźwignia = a/call + pokrycie.
+- **Ich D′ = dobry EKSPERYMENT na później** (31.10/1.11): OFF→exact v13.7, jedno-zmiennościowy,
+  po naszym biegu 30.10 będzie baseline a/call/pokrycia do atrybucji delta. Decyzja GO usera.
+- Feedback do nich (do przekazania): usunąć/poprawić stare tooly w pakiecie (verify_v17.py,
+  build_v17.py, domyślne ścieżki) — ktoś inny dostanie 8 FAIL na dobrym notebooku.
