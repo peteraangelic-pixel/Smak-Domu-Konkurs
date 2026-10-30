@@ -396,3 +396,52 @@ PROPOZYCJA-0007.md, REVIEWS/2026-10-29-v13-2..., MEGA-CONFIG §4b, escalation_au
 - Metry rozstrzygające z biegu 30.10 (niezależne od σ punktów): actions_per_call (bramka >=1,8),
   duplicate_bases (roster), cap_over_fair (głodzenie), [arc3-winpath] (replay żyje?), liczba
   nudge'ów (log Eskalacji).
+
+## 20. FALA 08:00-08:12 (v15 u kolegow) + V13.5-CONSENSUS — SKLEJKA FINALNA (30.10 ~11:15 UTC)
+
+Szczegoly: `duck-v13-5-consensus/OCENA-ARENA-V13-5-CONSENSUS.md`. Nowe HEAD-y: 7911 a84173c ->
+c170f55 (7 komitow), a450 6b10853 -> 8d96c68 (duck-v15), c87 4c9a3e5 -> 980deff (9. korekta),
+Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci.
+
+### A. Korekty 7911 (przyjete)
+- **1541d08**: ich „1,00 akcji/decyzje" = artefakt metody; prawda **4,61 akcji/generacje, 853 tok/akcje**;
+  budzet = DEKODOWANIE (~186 tys. tok/gre @15,8 ms/tok -> ~218 akcji/gre); dzwignia = **mniej tok/akcje**
+  (do 50: ~479 = -44%). UWAGA: batching/hint to wlasnie mechanizm ciecia tok/akcje (zgodne z audytem
+  Gemmy v13.3: a/call 4,36->6,5 => tok/akcje -33% => akcje/gre +50%).
+- **724189b**: poprawiona regula punktacji **score = min(raw, cap) <= 100 x POKRYCIE** (30/30 na
+  zapisanych wynikach); do 50: pokrycie 29->50% = **+1,1 poziomu/gre = +22% budzetu**; 72 akcje/gre
+  idzie w nieukonczone proby; na ukonczonych 1,7x szybsi od czlowieka (wiezie cap ukonczenia).
+- **c170f55**: **baseline DOMKNIETY NEGATYWNIE** — w submisji silnik UKRYWA base_actions_per_level
+  (a450 sprawdzil na r033) -> prog wzgledny degeneruje do absolutnej 20 + cap 2. „Czy wypelnione
+  w rerunie = sonda, nie zalozenie".
+
+### B. Kolegi pakiety
+- **a450 duck-v15** (8d96c68): v14 Gemmy + ICH patch progu wzglednego (pc_escalate_at w plan_commit;
+  ToolAgent(baseline) z konstruktora); 7/7+12+8+7; sami potwierdzaja degradacje w submisji.
+- **Gemma duck-v15** (07bf05e): baza = **NASZE v13.3-arena** (audit: PRZECHODZI; „mechanizm prawdziwy,
+  ta sama dzwignia co commit(plan) ale tansza; batch zmienia tok/akcje nie liczbe akcji") + v14 items.
+- **c87 980deff**: 9. korekta (PLAN_COMMIT=1+ESCALATE spójne; ESCALATE jest env — domkniete) +
+  lekcja **„testy zielone przy martwej funkcji"**.
+
+### C. Sprostowanie opinii Gemmy o naszym pakiecie (z dowodem)
+- Jej zastrzezenie §2c („150->48 odwrócone, domyslna 30") NIEDOTYCZY naszego pakietu: setup_env
+  (kom. 15) pinuje ARC3_HISTORY_ASSISTANT_TURNS=150 WPROST — nasz opis trimu poprawny. Jej
+  MEGA-CONFIG nadal ma bledna etykiety r110 („8B cap 45k") — korekta §17D bez zmian.
+
+### D. V13.5-CONSENSUS — CERTYFIKOWANA (ALL CHECKS PASSED)
+- Zmiany vs v13.4 (cell-diff 1,2,12,31,38): konsensus w kom. 2 (degradacja: rerun = absolutna 20 +
+  cap 2 = **42 wstrzykniecia na r085 = 2,9% puli**; Gemma 20 vs 7911 30-60 — cap ogranicza oba;
+  escalate= logowane), **sonda rosteru + pokrycie wazone + widocznosc baseline'u** (werdykt
+  UKRYTY/ZYWY z rerunu), rebrandy. Patch chain bez zmian (0001-0008).
+- Weryfikacja: 8/8 patchy, 12+6+11 testow (w tym 8/0 nudzy na r085 przez spatchowany kod), sondy
+  (pokrycie 19,8% -> sufit ~20 pkt na stubach; baseline UKRYTY/widoczny), playbook bajt, serving OK.
+- **Lekcja praktyczna (nowa pulapka srodowiskowa)**: nieudany tar --strip-components=2 zostawil
+  /tmp/src/arc3_winpath.py (STARY modul bez _log), ktory przez sys.path.insert(parent.parent/src)
+  w testach ZACIENIAL modul z drzewa -> „zielone testy na martwym module" (lekcja c87 z zycia).
+  /tmp/src usuniete; po oczyszczeniu 11/11.
+
+### E. PLAN SLOTÓW (propozycja; NIC bez GO)
+- **30.10: v13.5-consensus** (nadzbior wszystkich: hint+log+progi+sondy+metryki 7911).
+- 31.10: v13.5 x2 (draw) lub kontrola v14-exact (RELATIVE=0 + OPENER=0 w TYM SAMYM kernelu).
+- 1.11: flip najsabszego wg meteringu (RELATIVE=0 / HISTORY 150->48 poprawnie opisany / skrocenie
+  dyrektywy — wymaga patcha prompts.py, nie teraz). 2.11: select best.
