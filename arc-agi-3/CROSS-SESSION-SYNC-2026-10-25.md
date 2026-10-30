@@ -306,3 +306,37 @@ Gemmę 6d081d52→678da95 (pobraną w §16, nieczytaną) — przeczytana w cało
   (opcja c87) albo commit-forcing dalej; 2.11: select best.
 - Otwarte (offline, 0 slotów): ewentualny parsing serve.log r085 vs r093 (zakres umiarkowany, pkt D.3);
   rozstrzygnięcie napięcia c87 §5.2 (sufit 18,7 vs LB 26,25) po pomiarach z runu.
+
+## 18. V13.3-ARENA — WŁASNY WARIANT ARENY: „WYMUSZENIE BATCHA" BEZ NOWEGO PATCHA PROMPTOWEGO (30.10 ~09:30 UTC)
+
+Szczegóły: `duck-v13-3-arena/OCENA-ARENA-V13-3-ARENA.md` + README pakietu. Powód: user zapytał o plan
+„czegoś lepszego od v13.2" i zlecił budowę. v13.3-arena = v13.2 + DOKŁADNIE 2 dźwignie z audytów,
+obie kill-switchowalne:
+
+1. **ARC3_OPENER_COMMIT_HINT=1 (env-only!)** — harness MA wbudowany, env-gated (domyślnie OFF)
+   nacisk batchujący na każdym świeżym openerze; upstreamowy pomiar w docstringu tool_agent.py:
+   opener batche 3,91-5,43 akcji vs resumption 6,73-6,91. To jest dokładnie „wymuszenie batcha na
+   1. turze" z listy napraw c87 — obejmuje pierwsze ~10 akcji poziomu, których eskalacja (v13.2,
+   co 10) nie dotyka. Cel: akcje/wywołanie 4,36 -> 6-9 (metr: metering, odporny na hałas σ punktów).
+   Kill-switch: "ARC3_OPENER_COMMIT_HINT": "0" w komórce wariantu.
+2. **Patch 0007 (duck-extra-05): log zdarzeń win-path** — [arc3-winpath] stdout: session begin/end,
+   playbook match, replay start/ok/abort+POWÓD (hash-mismatch@krok, action-unavailable, game-over,
+   init-mismatch->broken, exhausted), record, dead-skip. Realizuje żądanie audytów 7911+c87
+   („cicha awaria replayu = ryzyko diagnostyki"): z samego logu reruna będzie widać, czy replay
+   strzelał. Log-only, ZERO zmiany semantyki, nigdy na gorących ścieżkach. Kill: ARC3_WINPATH_LOG=0.
+
+Weryfikacja (wszystko samodzielnie): 7/7 patchy czysty r033 -> ALL CHECKS PASSED (verify pakietu:
+36 komórek, opener-hint/extra-05/wersja checki dodane, PYTHONPATH-bug naprawiony => winpath step
+teraz przechodzi wbudowanie), 12/12 plan-commit + **11/11 winpath** (3 nowe testy logowania) na
+spatchowanym drzewie, standalone==spatchowany bajt, playbook bajtowo v13.2 i **14/14 na silniku**,
+cell-diff vs v13.2: tylko kom. 1+2 + wstawiony writer; serving stara kom. 21 == nowa 22 (parity c45).
+
+PLAN SLOTÓW (bez zmiany GO#1): **30.10 = v13.2** (baseline eskalacji co 10), **31.10 = v13.3-arena**
+(pomiar mechanizmu: metering akcje/wywołanie + logi replay + score), 1.11 = lepszy mechanizm x2
+(draw), 2.11 = select best. Alternatywa agresywna (30.10 od razu v13.3) NIErekomendowana: jeden
+zmienny na slot; baseline pozwoli policzyć wkład hinta z meteringu.
+Przygotowana OPCJA na 1.11 (nie doklejana): ARC3_HISTORY_ASSISTANT_TURNS 150->48 (env-only, -30%
+tok/akcji => ~+40% akcji/grę przy tym samym silniku; NIEZMIERZONE, godzi w pamięć gry).
+Oczekiwanie na v13.3: jeśli hint przenosi się na naszą linię (+25-50% akcji/decyzję na openerach),
+kilka punktów w górę wg projekcji Gemmy; ryzyko: gorsze batche niż eksploracja — stąd osobny slot.
+NADAL: NIC do Kaggle bez wyraźnego GO usera.
