@@ -702,3 +702,22 @@ przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decy
   (arc3-duck-v13-4-unified → własny) po GO ownera — rekomendujemy TAK.
 - Stan gałęzi: c4eeb067 = 6fcb8d9 (HEAD==origin, ich oświadczenie — nie weryfikowaliśmy
   pusha osobno, klony świeże).
+
+## 27. GO WYKONANY: SLOT 30.10 = DUCK-V13-7-FINAL — PIPELINE KAGGLE ODPALONY (30.10 ~19:20 UTC)
+
+- User: **GO**. Przygotowane: `arc-agi-3/kaggle/duck-v13-7-final/` (notebook rev2
+  fd98bf5ce836 == origin, kernel-metadata slug `petersharps/arc3-duck-v13-7-final`,
+  GPU NvidiaRtxPro6000, comp arc-prize-2026-arc-agi-3, datasety dfranzen ×2, modele ×2).
+- Request **r119 = midnight-launch** (push z retry + wykrycie wersji + poll smoke
+  co 5 min, max 100 min) → auto-chain **r120 = auto-submit** (confirm=true, wersja
+  z pusha, file submission.parquet, guard limitu dziennego). Wzorzec: r095 (v11,
+  23.89) i r111 (27B slot B) — identyczny łańcuch. Precedens fallbacku: r035
+  (Kaggle rerunuje wersję niezależnie od save-runu).
+- Wiadomość submisji: konfiguracja v13.5-consensus + self-pace + dormant 0010,
+  ALL CHECKS PASSED 10/10 r033, atrybucje Tufa Labs (MIT) / Franzen / petersharps.
+- Po biegu sprawdzić: smoke `ARC3_SMOKE_OK` + **a/call (baza 4.357; bramka 7911 ≥6,0
+  = granica 50 pkt)** + pokrycie wazone (sufit wyniku) + baseline UKRYTY/ZYWY +
+  `[arc3-winpath]` + metering tok/akcję; kontrowersja z §26: per-gra cap 48,4 min
+  vs globalny deadline 532 min (czy ogon kolejki dotrwa).
+- Reguła zachowana: 1 zgłoszenie/dzień; jedyna zmiana względem certyfikatu — żadna
+  (notebook bajt w bajt z origin a1d99f17).
