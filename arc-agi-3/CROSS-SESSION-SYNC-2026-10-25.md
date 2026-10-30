@@ -340,3 +340,59 @@ tok/akcji => ~+40% akcji/grę przy tym samym silniku; NIEZMIERZONE, godzi w pami
 Oczekiwanie na v13.3: jeśli hint przenosi się na naszą linię (+25-50% akcji/decyzję na openerach),
 kilka punktów w górę wg projekcji Gemmy; ryzyko: gorsze batche niż eksploracja — stąd osobny slot.
 NADAL: NIC do Kaggle bez wyraźnego GO usera.
+
+## 19. V14 (GEMMA b38b82e) ZAUDYTOWANA + V13.4-UNIFIED — SKLEJKA BEST-OF-ALL-BRANCHES (30.10 ~10:30 UTC)
+
+Szczegóły: `duck-v13-4-unified/OCENA-ARENA-V13-4-UNIFIED.md`. Nowy HEAD Gemmy c4eeb067: 6a6af4a ->
+**b38b82e** (2 komity: recenzja v13.2 07:55, pakiet duck-v14 08:04). Przeczytane w całości: README v14,
+PROPOZYCJA-0007.md, REVIEWS/2026-10-29-v13-2..., MEGA-CONFIG §4b, escalation_audit.py, test_probes.py.
+
+### A. v14 (Gemma) — audit i werdykt
+- Baza bajt-w-bajt v13.2 (md5 2886fde0ecc3... potwierdzony na NASZYM pliku), playbook ten sam,
+  0 nowych patchy. Zmiany: ESCALATE 10->20, guard hooka sondy, sonda budżetu (przed), sonda rosteru (po).
+- **ESCALATE=10 ZMIERZONE jako zbyt zachłanne** (ich escalation_audit.py na r085, 32 ukończone poziomy):
+  @10 = 154 wstrzyknięć = 15,3% puli tokenów gry, "przestań próbować" PRZED ludzkim baseline'em na
+  **31/32 poziomów** (kosztowna posłuszność: każda zachęta prosi turę modelarską); @20 = 60/6,0%;
+  próg względny max(20, 1,2×baseline) = 8/0,8%/0 przedwczesnych. **NASZE NIEZALEŻNE PRZELICZENIE
+  (własny kod na r085 benchmark.json): identycznie 154/12/8 i 31/32, 7/32, 0/32.** Konsekwencja:
+  GO#1=v13.2 z @10 przestaje być "bezpiecznym baseline" — płaci za znalezione ryzyko.
+- **Guard hooka sondy = REALNE ryzyko USUNIĘTE przez v14, obecne w naszym łańcuchu** (v12->v13.x->
+  v13.3-arena): `_orig_play = _S._HarnessGameSession.play` POZA try w komórce ustawiającej
+  bm.solver.* -> AttributeError w innej rewizji bundla = martwy notebook PRZED startem (klasa
+  katastrofy c45-0.00). Komentarz w naszej komórce ("kazdy blok w try/except") był FAŁSZYWY.
+- Sondy (budżet: cap vs uczciwy udział, ostrzeżenie >1,3x; roster: duplicate_bases z bm.game_runs
+  + alarm actions_per_call<1,5) — wszystko try/except, 0 zmian zachowania. Fakty Gemmy: we wszystkich
+  3 zapisanych runach każda gra kończy DOKŁADNIE na capie (48/48/90 min) -> cap = przydział akcji.
+- PROPOZYCJA-0007 (próg względny): NIE wysłana przez brak r033 ("patch, który nie wchodzi, zabija
+  notebook"). Nasza odpowiedź: **mamy r033 — wysłaliśmy** (pkt B).
+- Ich MEGA-CONFIG NADAL ma błędną etykietę r110 ("8B, v13 cap 45k") — nasza korekta §17D (27B/vLLM)
+  pozostaje nasz wyłączny zweryfikowany fakt.
+- Prognoza v14: 26-31, "@20 raczej górna połowa". Ich §6 uczciwie: nie sprawdzili dostępności
+  check_model/plan przy WORLD_MODEL=0 (czytali, nie uruchamiali).
+
+### B. v13.4-unified (nasz pakiet, CERTYFIKOWANY: ALL CHECKS PASSED)
+- Skład: v13.2 (baza) + v13.3-arena (OPENER_COMMIT_HINT=1 + patch 0007 log) + v14 (ESCALATE=20,
+  guard hooka, obie sondy) + **patch 0008: ARC3_ESCALATE_RELATIVE=1** — eskalacja tylko powyżej
+  max(floor, RATE×base_actions_per_level[poziom]), cap 2/level; fallback na absolutne 20 gdy
+  baseline ukryty (GameRun.base_actions_per_level=None) lub brak referencji gry. Dowiązanie gry:
+  1 hunk w solver._make_analyzer (agent.game = game; notebook nie używa analyzer_factory — sprawdzone).
+  base_actions_per_level istnieje w runtime (taaf/game.py:295).
+- **Test kluczowy**: spatchowany tool_agent._escalate_threshold na PRAWDZIWYM benchmarku r085
+  odtwarza dokładnie 8 nudge'ów / 0 przedwczesnych (test pakiecie, R085_BENCH).
+- Weryfikacja: 39 komórek; 8/8 patchy czysty r033; 12 plan-commit + 6 escalate-relative +
+  11 winpath na spatchowanym drzewie; sondy na stubach (duplikaty/0-pkt/a-call-alarm/exception-proof/
+  guard hooka); playbook bajtowo v13.2 i 14/14 na silniku; serving kom. 21==22 parity; cell-diff
+  potwierdzony (1,2,12, +13 writer, 27 guard, +31 budżet, +38 roster; roster pisze do
+  roster_probe_runs.jsonl, żeby NIE nadpisać logu hooka c45 — drobna poprawka nad v14).
+- Matryca kill-switchy: RELATIVE=0 -> v14 exact; OPENER=0 -> v14; WINPATH_LOG=0; WINPATH/DEAD_SKIP/
+  PLAN_COMMIT/CAP jak dotychczas; ESCALATE_MAX_PER_LEVEL=0 bez capu.
+
+### C. PLAN SLOTÓW (propozycja do GO; nadal NIC bez wyraźnego GO)
+- **30.10: v13.4-unified** (zamiast v13.2 as-shipped — @10 zmierzone jako ryzyko; unified =
+  ten sam kierunek, ostrzejszy zmierzony spust, pełna obserwacja, wszystko kill-switchowalne).
+- 31.10: v13.4-unified ×2 (draw) LUB v14 (Gemma) jako kontrola absolutna @20 — wg preferencji usera.
+- 1.11: flip najsłabszego komponentu wg meteringu (RELATIVE=0 / OPENER=0; opcja HISTORY 150->48
+  gdy sonda budżetu pokaże głodzenie). 2.11: select best.
+- Metry rozstrzygające z biegu 30.10 (niezależne od σ punktów): actions_per_call (bramka >=1,8),
+  duplicate_bases (roster), cap_over_fair (głodzenie), [arc3-winpath] (replay żyje?), liczba
+  nudge'ów (log Eskalacji).
