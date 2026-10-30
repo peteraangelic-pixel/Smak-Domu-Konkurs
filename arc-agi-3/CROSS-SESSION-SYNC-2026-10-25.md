@@ -614,3 +614,64 @@ Gemma b38b82e -> 07bf05e (audyt NASZEGO v13.3 + duck-v15). Przeczytane w calosci
   po naszym biegu 30.10 będzie baseline a/call/pokrycia do atrybucji delta. Decyzja GO usera.
 - Feedback do nich (do przekazania): usunąć/poprawić stare tooly w pakiecie (verify_v17.py,
   build_v17.py, domyślne ścieżki) — ktoś inny dostanie 8 FAIL na dobrym notebooku.
+
+## 25. SWEEP ARMINGU 0010: 10k–20k (zlecenie usera) — NASZA REPLIKACJA CYFRĄ W CYFRĘ ZGADZA SIĘ Z a450 + KRYTYKA POOLINGU POTWIERDZONA + OCENA FIX-ÓW c87 (30.10 ~17:50 UTC)
+
+### A. Fala a450 13:42–14:14 (7 komitów, przeczytane)
+Zweryfikowali nasze v13.6 i v13.7 (ALL CHECKS PASSED odtwarzalne), przyjęli korektę
+Gemmy (arming 20000), zweryfikowali v17-arena-dyn 6d081d52 (11/11) i zrobili sweep
+capa 10k–20k na prawdziwym module (step() CO AKCJĘ, jak solver.py:711). Ich wniosek:
+**20k blisko kolana; agresywny wariant 15k**.
+
+### B. NASZ niezależny sweep (własny symulator, prawdziwy LevelBudget ze spatchowanego
+drzewa v13.7, 40 gier r085/r093/r110/r118, per-akcja) — **REPRODUKUJE TABELĘ a450
+DOKŁADNIE** (wszystkie liczby 1:1, w tym freed tokeny co do tokenu):
+
+| cap | RESET | AB gier | bez strat | ze stratą | utracone poz. | uwolnione tok | AB per run (85/93/110/118) |
+|---|---|---|---|---|---|---|---|
+| 10000 | 57 | 34 | 20 | 14 | 35 | 2 092 276 | 9/8/7/10 |
+| 11000 | 57 | 32 | 19 | 13 | 32 | 1 862 706 | 8/8/6/10 |
+| 12000 | 53 | 31 | 19 | 12 | 27 | 1 644 652 | 7/8/6/10 |
+| 13000 | 53 | 30 | 18 | 12 | 27 | 1 535 558 | 7/8/5/10 |
+| 14000 | 55 | 25 | 15 | 10 | 23 | 1 273 460 | 6/8/1/10 |
+| 15000 | 50 | 23 | 13 | 10 | 23 | 1 210 216 | 5/8/0/10 |
+| 16000 | 51 | 22 | 13 | 9 | 19 | 1 037 627 | 5/7/0/10 |
+| 17000 | 50 | 22 | 13 | 9 | 19 | 974 667 | 4/8/0/10 |
+| 18000 | 51 | 22 | 13 | 9 | 19 | 931 043 | 4/8/0/10 |
+| 19000 | 48 | 21 | 13 | 8 | 17 | 807 650 | 4/7/0/10 |
+| **20000** | **48** | **20** | **13** | **7** | **15** | **667 937** | **3/7/0/10** |
+| 30000 | 43 | 0 | – | – | 0 | 0 | 0/0/0/0 |
+| 45000/60000 | 32/28 | 0 | – | – | 0 | 0 | 0/0/0/0 |
+
+- **Kolano między 20k a 30k** (AB: 20→0). Poniżej 20k: każda obniżka o 5k kosztuje
+  ~8 pewnych poziomów (15→23) za ~0,54 mln uwolnionych tokenów; 10k to już 35 poziomów.
+- **r118 = 10/10 ABANDON przy KAŻDYM cap ≤20k** (run total-loss, 9/10 gier 0-ukończonych
+  — porzucenie nic nie kosztuje, nic też nie daje); **r110 = 0 od 15k** (pule ~45k/gra).
+- **Asymetria ryzyka**: utracone poziomy = PEWNA strata (track dokończył je bez resetów);
+  uwolnione tokeny = ZYSK NIEUMIERZALNY z tracku (zależny od konwersji przez ogon kolejki —
+  ogon JEST: 110 gier vs ~48 min/gra). Dlatego **rekomendacja: arming 20000 (rev2) — potwierdzona**;
+  15k dopiero PO zmierzeniu konwersji @20k. MIN_DONE=1 NEUTRALIZOWAŁBY cel patcha
+  (blokuje 13/20 „bezstratnych" ABANDONÓW, zostawia 7 kosztownych) — zostaje 0.
+
+### C. Krytyka poolingu (c87) — POTWIERDZONA naszymi danymi
+Marnotrawstwo per run: **r085 = 19,7% / r093 = 33,7% / r110 = 100% / r118 = 100%** (mediany).
+Pooled 64,5% to statystyka ZŁYCH runów; „14 drobkich ukończonych >45k" to statystyka DOBRYCH.
+0010 ma dwie motywacje żyjące w różnych reżimach — przy uzbrojeniu 20k tnie głównie złe
+runy (0-ukończone), chroni drogie poziomy w dobrych (mediana×4). To porządkuje interpretację.
+
+### D. Fixy c87 (z ich notatek; ocenione u nas)
+- **FIX 3 (a/call) JEST w v13.7** — ich detektor dał fałszywy alarm od `< 1.5`:
+  to nasz KOMENTARZ w kom. 2 o martwym alarmie (dokumentacja), nie kod.
+- **FIX 4 (gate „NO-GO < 29.02" w sondzie budżetu) i FIX 5 (depth_budget_used_pct)**:
+  print-only instrumenty; gate porównuje mean_score biegu do pojedynczego smoke-mean v3
+  (29.02→LB 26.25) — realnie odpala prawie zawsze → szum w raporcie GO/NO-GO (klasa
+  „warstwa 8"). NIE psują zachowania; poprawka = kolejny build (churn). Decyzja usera:
+  przyjąć w rev3 tylko razem z inną konieczną zmianą; nasze decyzje slotów i tak stoją
+  na a/call + pokrycie + completed/game, nie na tym gate.
+- **FIX 6 (docstring 0009 „27/16" vs 22/14)**: celowo NIE ruszamy — bajtowa proweniencja
+  patcha Gemmy (cmp), dokumentowane w OCENA §7.
+- c87 buduje „v13.7-rev2 + FIX 4/5/6" — gdy wypchną, zweryfikujemy jak zwykle.
+
+### E. Status
+Slot 30.10 = **v13-7-final rev2** (CZEKA NA GO); flip 1.11 = uzbrojenie 20k (deklarowane
+przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decyzja po drukach 30.10).
