@@ -63,10 +63,12 @@ class LLMConfig:
     max_output_tokens: int = 2048
     temperature: float = 0.6
     top_p: float = 0.95
+    presence_penalty: float = 0.0
     top_k: int = 20
     timeout: float = 120.0
     context_window: int = 32768
     enable_thinking: bool = True
+    reasoning_effort: str = ""
     multimodal: bool = False
     upscale: int = 4
 
@@ -79,10 +81,12 @@ class LLMConfig:
             max_output_tokens=int(os.environ.get("LLM_MAX_OUTPUT", "2048")),
             temperature=float(os.environ.get("LLM_TEMPERATURE", "0.6")),
             top_p=float(os.environ.get("LLM_TOP_P", "0.95")),
+            presence_penalty=float(os.environ.get("LLM_PRESENCE_PENALTY", "0")),
             top_k=int(os.environ.get("LLM_TOP_K", "20")),
             timeout=float(os.environ.get("LLM_TIMEOUT", "120")),
             context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "32768")),
             enable_thinking=os.environ.get("LLM_ENABLE_THINKING", "1").lower() in ("1", "true", "yes"),
+            reasoning_effort=os.environ.get("LLM_REASONING_EFFORT", "").strip().lower(),
             multimodal=os.environ.get("LLM_MULTIMODAL", "0").lower() in ("1", "true", "yes"),
             upscale=int(os.environ.get("LLM_UPSCALE", "4")),
         )
@@ -90,13 +94,13 @@ class LLMConfig:
 
 class LLMClient:
     """Minimal OpenAI-compatible chat completion client (no dependencies)."""
-    
+
     def __init__(self, config: LLMConfig):
         self.config = config
         self.total_tokens = 0
         self.total_calls = 0
         self.total_time = 0.0
-    
+
     def chat(self, messages: list[dict], temperature: float | None = None) -> dict:
         """Call chat completions. Returns the message dict.
 
@@ -104,7 +108,7 @@ class LLMClient:
         (adaptive exploration: hotter when deeply stuck, cooler when on a roll).
         """
         url = f"{self.config.base_url.rstrip('/')}/chat/completions"
-        
+
         payload: dict[str, Any] = {
             "model": self.config.model_id,
             "messages": messages,
@@ -113,10 +117,21 @@ class LLMClient:
             "top_p": self.config.top_p,
             "stream": False,
         }
-        
-        if self.config.enable_thinking:
-            payload["chat_template_kwargs"] = {"enable_thinking": True}
-        
+        if self.config.presence_penalty:
+            payload["presence_penalty"] = self.config.presence_penalty
+
+        # LM Studio's OpenAI-compatible endpoint rejects unknown payload keys;
+        # chat_template_kwargs is not in its supported parameter list. Qwen
+        # models already default to thinking mode in their local templates.
+        # Opt in only for servers that explicitly support this extension.
+        send_template_kwargs = os.environ.get("LLM_SEND_TEMPLATE_KWARGS", "0").lower() in (
+            "1", "true", "yes")
+        if send_template_kwargs:
+            payload["chat_template_kwargs"] = {
+                "enable_thinking": self.config.enable_thinking}
+        if self.config.reasoning_effort:
+            payload["reasoning_effort"] = self.config.reasoning_effort
+
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             url, data=data,
@@ -125,7 +140,7 @@ class LLMClient:
                 "Authorization": f"Bearer {self.config.api_key}",
             },
         )
-        
+
         t0 = time.time()
         try:
             with urllib.request.urlopen(req, timeout=self.config.timeout) as resp:
@@ -135,11 +150,11 @@ class LLMClient:
             return {"role": "assistant", "content": ""}
         finally:
             self.total_time += time.time() - t0
-        
+
         self.total_calls += 1
         usage = result.get("usage", {})
         self.total_tokens += usage.get("total_tokens", 0)
-        
+
         choices = result.get("choices", [])
         if choices:
             return choices[0].get("message", {"role": "assistant", "content": ""})
@@ -262,17 +277,17 @@ class FrameInfo:
     state_name: str
     levels_completed: int
     available_actions: list[str]
-    
+
     @property
     def ascii(self) -> str:
         return format_grid_ascii(self.grid)
-    
+
     @property
     def shape(self) -> tuple[int, int]:
         rows = len(self.grid)
         cols = max((len(r) for r in self.grid), default=0)
         return (rows, cols)
-    
+
     def segmentation_summary(self) -> str:
         try:
             seg = segment_grid(self.grid)
@@ -288,18 +303,18 @@ class FrameInfo:
 @dataclass
 class StateTracker:
     """Track state transitions to detect loops."""
-    
+
     state_signatures: list[str] = field(default_factory=list)
     action_history: list[str] = field(default_factory=list)
     state_action_counts: Counter = field(default_factory=Counter)
     game_over_count: int = 0
     total_actions: int = 0
     unique_states_seen: set = field(default_factory=set)
-    
+
     # Recent window for loop detection
     _recent_sigs: list[str] = field(default_factory=list)
     _recent_actions: list[str] = field(default_factory=list)
-    
+
     def record(self, state_sig: str, action: str, *,
                game_over: bool = False) -> None:
         self.state_signatures.append(state_sig)
@@ -307,45 +322,45 @@ class StateTracker:
         self.state_action_counts[(state_sig, action)] += 1
         self.total_actions += 1
         self.unique_states_seen.add(state_sig)
-        
+
         self._recent_sigs.append(state_sig)
         if len(self._recent_sigs) > 12:
             self._recent_sigs = self._recent_sigs[-12:]
-        
+
         self._recent_actions.append(action)
         if len(self._recent_actions) > 12:
             self._recent_actions = self._recent_actions[-12:]
-        
+
         if game_over:
             self.game_over_count += 1
-    
+
     def is_looped(self) -> bool:
         """Check if we're stuck repeating."""
         if len(self._recent_sigs) < 6:
             return False
-        
+
         # Oscillation: same state appearing at positions 0,2,4
         last6 = self._recent_sigs[-6:]
         if last6[0] == last6[2] == last6[4] and last6[1] == last6[3] == last6[5]:
             return True
-        
+
         # Same action repeated 6+ times
         if len(self._recent_actions) >= 6:
             last6a = self._recent_actions[-6:]
             if len(set(last6a)) == 1:
                 return True
-        
+
         # Same state repeated 4+ times
         if len(self._recent_sigs) >= 4:
             last4 = self._recent_sigs[-4:]
             if len(set(last4)) == 1:
                 return True
-        
+
         return False
-    
+
     def repeated_in_state(self, state_sig: str, action: str) -> int:
         return self.state_action_counts.get((state_sig, action), 0)
-    
+
     def reset(self) -> None:
         self.state_signatures.clear()
         self.action_history.clear()
@@ -403,26 +418,27 @@ def _extract_action_objects(content: str) -> list[dict]:
 
 class LLMPolicy:
     """LLM-based policy with direct action output (no tool sandbox)."""
-    
+
     def __init__(self, config: LLMConfig | None = None):
         self.config = config or LLMConfig.from_env()
         self.client = LLMClient(self.config)
         self.tracker = StateTracker()
-        
+
         # Conversation history for the current game
         self._messages: list[dict] = []
         self._initialized = False
-        
+
         # Action cache: actions planned by LLM to execute without re-calling
         self._action_queue: list[dict] = []
         self._last_level = 0
         self._actions_since_last_llm = 0
         self._max_actions_per_plan = int(KNOBS["QUEUE_MAX"])  # re-plan after this many queued actions
-        
+
         # Game notes (agent's own compact memory, from the "notes" field) and
         # per-level action accounting for the stuck audit.
         self._game_notes: list[str] = []
         self._actions_on_level = 0
+        self._audits_on_level = 0
         self._last_audit_at = 0
         # Level whose "probe opening" was already queued (scripted opening:
         # try each safe direction once before spending LLM tokens).
@@ -453,7 +469,7 @@ class LLMPolicy:
             self.value_gate = ValueGate.from_env()
         except Exception:
             self.value_gate = None
-    
+
     def reset_game(self) -> None:
         """Reset for a new game."""
         self._messages.clear()
@@ -482,14 +498,14 @@ class LLMPolicy:
         self._game_overs.clear()
         self._audits_on_level = 0
         self._goal_class = None
-    
+
     def choose_action(self, frame: FrameInfo) -> dict:
         """Choose an action for the current frame.
-        
+
         Returns dict: {name: str, x: int|None, y: int|None, reasoning: dict}
         """
         state_sig = self._state_signature(frame)
-        
+
         # v6.9 (counter-picking z ich v7.0): detect the goal class from the
         # first board; UNKNOWN keeps retrying on later frames (early boards
         # can be near-empty). Exception → give up silently ("" stops retries).
@@ -500,7 +516,7 @@ class LLMPolicy:
                     self._goal_class = detected
             except Exception:
                 self._goal_class = ""
-        
+
         # Attribute the previous action's effect (no-op detection). Exact grid
         # equality: in games whose HUD changes every step the detector stays
         # silent (safe — no false positives), elsewhere it is reliable.
@@ -508,7 +524,7 @@ class LLMPolicy:
             self._noop_recent.append((self._last_exec, frame.grid != self._last_grid))
             if len(self._noop_recent) > KNOBS["NOOP_WINDOW"]:
                 del self._noop_recent[0]
-        
+
         # Check for level change — re-plan immediately
         if frame.levels_completed != self._last_level:
             solved = frame.levels_completed > self._last_level
@@ -524,7 +540,7 @@ class LLMPolicy:
             if solved:
                 # levels_completed = liczba rozwiązanych; ostatnio rozwiązany = -1
                 self._pending_notes = max(0, frame.levels_completed - 1)
-        
+
         # Scripted probe opening (tape-opening idea from PTCG replay analysis):
         # at the start of each level, execute each safe direction action once,
         # before any LLM call. Movement is cheap and the resulting state changes
@@ -539,12 +555,12 @@ class LLMPolicy:
                     "role": "user",
                     "content": f"[LEVEL COMPLETED! Now on level {frame.levels_completed + 1}. Re-assess the new board.]"
                 })
-        
+
         # Check for loop
         if self.tracker.is_looped():
             self._action_queue.clear()
             return self._anti_loop_action(frame)
-        
+
         # Try to use cached action
         if self._action_queue and self._actions_since_last_llm < self._max_actions_per_plan:
             action = self._action_queue.pop(0)
@@ -553,14 +569,14 @@ class LLMPolicy:
             self.tracker.record(state_sig, action.get("name", RESET))
             self._mark_executed(frame, action.get("name", RESET))
             return action
-        
+
         # Need to call LLM
         self._action_queue.clear()
         self._actions_since_last_llm = 0
-        
+
         # Build user turn
         user_content = self._build_user_turn(frame)
-        
+
         if not self._messages:
             # v6.9: system prompt budowany raz na grę (stabilny prefiks dla
             # KV-cache w llama.cpp) + opcjonalna wykryta klasa celu.
@@ -575,12 +591,12 @@ class LLMPolicy:
                     "if the board disagrees (mark ✗ CLASS)."
                 )
             self._messages.append({"role": "system", "content": sys_text})
-        
+
         self._messages.append({"role": "user", "content": user_content})
-        
+
         # Trim context if too long
         self._trim_context()
-        
+
         # Adaptive temperature (idea from their v6.6, deterministic wiring):
         # deep stuck (audit #2+) -> hot 0.9 (broad exploration after reset);
         # fresh level -> 0.7 (encourage exploring the new board); else base.
@@ -589,23 +605,23 @@ class LLMPolicy:
             temperature = KNOBS["TEMP_STUCK"]
         elif self._actions_on_level < KNOBS["TEMP_FRESH_ACTIONS"]:
             temperature = KNOBS["TEMP_FRESH"]
-        
+
         # Call LLM
         response = self.client.chat(self._messages, temperature=temperature)
         content = response.get("content", "") or ""
-        
+
         # Structured per-level notes survive via _level_notes even after
         # old history is trimmed (v5.0 idea, adopted). v6.7: scan reasoning
         # fields too — some models put the notes paragraph there.
         self._absorb_level_notes(response)
-        
+
         # Add assistant response to history
         self._messages.append({"role": "assistant", "content": content})
-        
+
         # Parse action(s) from response
         actions = self._parse_response(content, frame)
         self._absorb_notes(actions)
-        
+
         if not actions:
             # Fallback: try different directions
             action = self._fallback_action(frame)
@@ -613,22 +629,22 @@ class LLMPolicy:
             self._actions_on_level += 1
             self._mark_executed(frame, action.get("name", RESET))
             return action
-        
+
         # First action is immediate, rest go to queue
         immediate = actions[0]
         self._action_queue = actions[1:]
         self._actions_since_last_llm = 1
         self._actions_on_level += 1
-        
+
         self.tracker.record(state_sig, immediate.get("name", RESET))
         self._mark_executed(frame, immediate.get("name", RESET))
         return immediate
-    
+
     def _mark_executed(self, frame: FrameInfo, name: str) -> None:
         """Remember the executed action and the board it acted on."""
         self._last_exec = name
         self._last_grid = frame.grid
-    
+
     @staticmethod
     def _probe_actions(frame: FrameInfo) -> list[dict]:
         """Safe scripted opening for a fresh level: each direction once.
@@ -642,12 +658,12 @@ class LLMPolicy:
             if engine in frame.available_actions and len(probes) < int(KNOBS["PROBE_MAX"]):
                 probes.append({"name": engine, "reasoning": {"probe": True}})
         return probes
-    
+
     _LEVEL_NOTES_RE = re.compile(
         r"LEVEL\s*(\d+)\s*NOTES?:\s*(.+?)(?=\n\s*\n|LEVEL\s*\d+\s*NOTES?:|\Z)",
         re.DOTALL | re.IGNORECASE,
     )
-    
+
     def _absorb_level_notes(self, response: Any) -> None:
         """Extract 'LEVEL X NOTES: ...' paragraphs from the model reply.
 
@@ -678,7 +694,7 @@ class LLMPolicy:
         # Keep only the most recent levels (KNOBS).
         for lvl in sorted(self._level_notes)[:-int(KNOBS["LEVEL_NOTES_KEEP"])]:
             del self._level_notes[lvl]
-    
+
     def note_game_over(self, frame: FrameInfo) -> None:
         """Record a death for failure recovery (called by the agent wrapper)."""
         self._game_overs.append(
@@ -687,7 +703,7 @@ class LLMPolicy:
         )
         if len(self._game_overs) > KNOBS["GAME_OVERS_KEEP"]:
             del self._game_overs[:len(self._game_overs) - KNOBS["GAME_OVERS_KEEP"]]
-    
+
     def _absorb_notes(self, actions: list[dict]) -> None:
         """Capture the "notes" field from parsed actions into game memory."""
         for action in actions:
@@ -698,7 +714,7 @@ class LLMPolicy:
                     self._game_notes.append(text)
                     if len(self._game_notes) > KNOBS["NOTES_MAX"]:
                         del self._game_notes[0]
-    
+
     def _stuck_audit(self, frame: FrameInfo | None = None) -> str | None:
         """Stuck audit on the same level: fires on actions (>=40, then every 15)
         OR on tokens spent this level (>=50k, then every 20k), or immediately
@@ -755,7 +771,7 @@ class LLMPolicy:
                     "(and ✗-mark the ones you falsified)."
                 )
         return base
-    
+
     def _deterministic_value(self, frame: FrameInfo) -> float:
         """v6.9: deterministic progress estimate in [0,1] — no ML. Inputs:
         state novelty, recent board-change rate, loop penalty, solved bonus."""
@@ -772,7 +788,7 @@ class LLMPolicy:
         if frame.levels_completed:
             value = min(1.0, value + 0.1 * frame.levels_completed)
         return max(0.0, min(1.0, value))
-    
+
     def _state_signature(self, frame: FrameInfo) -> str:
         """Compact state signature for loop detection."""
         # Downsample: take every 4th row, every 4th col
@@ -785,17 +801,17 @@ class LLMPolicy:
             sampled.append(tuple(row_sample))
         payload = f"{frame.level}:{frame.state_name}:{sampled}".encode()
         return hashlib.md5(payload).hexdigest()[:12]
-    
+
     def _build_user_turn(self, frame: FrameInfo) -> str:
         """Build user message with current game state."""
         parts = []
-        
+
         # Status line
         parts.append(f"=== Turn {self.tracker.total_actions + 1} | "
                     f"Level {frame.level} | Step {frame.step} | "
                     f"State: {frame.state_name} | "
                     f"Levels done: {frame.levels_completed} ===")
-        
+
         # One-time structured notes request after solving a level
         if self._pending_notes is not None:
             n = self._pending_notes
@@ -805,27 +821,27 @@ class LLMPolicy:
                 "stating the mechanics you verified, the win condition, and the action "
                 "pattern that solved it (max 4 short sentences). Then give the usual "
                 "JSON action(s) for the new level.")
-        
+
         # Available actions
         model_actions = []
         for a in frame.available_actions:
             model_name = ENGINE_TO_MODEL.get(a, a)
             model_actions.append(model_name)
         parts.append(f"Valid actions: {', '.join(model_actions)}")
-        
+
         # Stats
         if self.tracker.total_actions > 0:
             parts.append(f"Stats: {self.tracker.total_actions} actions taken, "
                         f"{len(self.tracker.unique_states_seen)} unique states seen, "
                         f"{self.tracker.game_over_count} deaths")
-        
+
         # v6.9: deterministyczna (bez ML) ocena postępu, knob-gated.
         if int(KNOBS.get("VALUE_GATE", 0)):
             v = self._deterministic_value(frame)
             parts.append(
                 f"\nDeterministic value estimate: {v:.2f} "
                 "(0 = unproductive, 1 = productive; below 0.4 → change approach)")
-        
+
         # Board (compact)
         rows, cols = frame.shape
         if rows <= 40 and cols <= 40:
@@ -835,40 +851,40 @@ class LLMPolicy:
             parts.append(ascii_board)
         else:
             parts.append(f"\nBoard is {rows}×{cols} (large — key objects below)")
-        
+
         # Segmentation
         seg = frame.segmentation_summary()
         parts.append(f"\nObjects detected:\n{seg}")
-        
+
         # Recent history (last 5 actions)
         if self.tracker.action_history:
             recent = self.tracker.action_history[-5:]
             parts.append(f"\nRecent actions: {' → '.join(ENGINE_TO_MODEL.get(a, a) for a in recent)}")
-        
+
         # Agent's own game notes (from earlier "notes" fields)
         if self._game_notes:
             parts.append("\nYour game notes:")
             for note in self._game_notes:
                 parts.append(f"- {note}")
-        
+
         # Structured notes from solved levels (survive context trimming)
         if self._level_notes:
             parts.append("\nLevel notes (from solved levels):")
             for lvl in sorted(self._level_notes)[-3:]:
                 parts.append(f"Level {lvl}: {self._level_notes[lvl]}")
-        
+
         # Failure recovery: what already killed us in this game
         if self._game_overs:
             parts.append("\nGAME OVER HISTORY (avoid repeating these):")
             for line in self._game_overs[-int(KNOBS["GAME_OVERS_SHOW"]):]:
                 parts.append(f"- {line}")
-        
+
         # Run-level lessons: injected on the first LLM turn of each game
         if self._run_lessons and not self.tracker.action_history:
             parts.append("\nLessons from earlier games in this run:")
             for lesson in self._run_lessons:
                 parts.append(f"- {lesson}")
-        
+
         # No-op feedback (only when there is something worth saying)
         noop_total = len(self._noop_recent)
         if noop_total >= KNOBS["NOOP_MIN_SAMPLES"]:
@@ -879,24 +895,24 @@ class LLMPolicy:
                     f"\nNo-op check: {len(noops)}/{noop_total} recent actions did NOT "
                     f"change the board ({detail}). Such actions likely cannot help in "
                     "this state — don't repeat them expecting a different result.")
-        
+
         # Actions on this level + periodic stuck audit
         parts.append(f"\nActions on this level: {self._actions_on_level}")
         audit = self._stuck_audit(frame)
         if audit:
             parts.append(f"\n{audit}")
-        
+
         # Anti-loop warning
         if self.tracker.is_looped():
             parts.append("\n⚠️ WARNING: You appear to be stuck in a loop! "
                         "Try a COMPLETELY different approach.")
-        
+
         return "\n".join(parts)
-    
+
     def _parse_response(self, content: str, frame: FrameInfo) -> list[dict]:
         """Parse action(s) from LLM response."""
         actions = []
-        
+
         # Look for JSON objects with an "action" key (also with nested objects,
         # e.g. {"action": "UP", "reasoning": {...}}; the old non-greedy regex
         # cut those at the first "}" and silently dropped the action).
@@ -904,24 +920,24 @@ class LLMPolicy:
             action = self._normalize_action(parsed, frame)
             if action:
                 actions.append(action)
-        
+
         # If no JSON found, try to parse from text
         if not actions:
             action = self._parse_text_action(content, frame)
             if action:
                 actions.append(action)
-        
+
         return actions
-    
+
     def _normalize_action(self, parsed: dict, frame: FrameInfo) -> dict | None:
         """Normalize a parsed action dict to our format."""
         action_name = str(parsed.get("action", "")).upper().strip()
         if not action_name:
             return None
-        
+
         # Map friendly names to engine names
         engine_name = MODEL_TO_ENGINE.get(action_name, action_name)
-        
+
         # Validate against available actions
         valid = set(frame.available_actions) | {RESET}
         if engine_name not in valid:
@@ -936,26 +952,31 @@ class LLMPolicy:
                     engine_name = MODEL_TO_ENGINE.get(action_name, "RESET")
                 else:
                     return None
-        
+
         result = {"name": engine_name, "reasoning": {}}
-        
+
         if engine_name == COMPLEX_ACTION:
             # MOUSE/CLICK needs coordinates
             row = parsed.get("row", parsed.get("y", 0))
             col = parsed.get("col", parsed.get("x", 0))
-            result["x"] = int(col)
-            result["y"] = int(row)
-        
+            try:
+                row, col = int(row), int(col)
+            except (TypeError, ValueError):
+                return None
+            rows, cols = frame.shape
+            result["x"] = max(0, min(max(cols - 1, 0), col))
+            result["y"] = max(0, min(max(rows - 1, 0), row))
+
         reasoning = parsed.get("reasoning", "")
         if reasoning:
             result["reasoning"]["llm"] = str(reasoning)[:200]
-        
+
         return result
-    
+
     def _parse_text_action(self, text: str, frame: FrameInfo) -> dict | None:
         """Try to parse action from free text."""
         text_upper = text.upper()
-        
+
         # Look for action patterns
         for pattern, engine_name in [
             (r'\bUP\b', 'ACTION1'), (r'\bDOWN\b', 'ACTION2'),
@@ -965,50 +986,53 @@ class LLMPolicy:
             if re.search(pattern, text_upper):
                 if engine_name in frame.available_actions or engine_name == RESET:
                     return {"name": engine_name, "reasoning": {"parsed_from_text": True}}
-        
+
         # Look for MOUSE/click patterns with coordinates
         mouse_match = re.search(r'MOUSE\s*\(\s*row\s*=\s*(\d+)\s*,\s*col\s*=\s*(\d+)\s*\)', text, re.I)
         if not mouse_match:
             mouse_match = re.search(r'CLICK\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)', text, re.I)
         if mouse_match and COMPLEX_ACTION in frame.available_actions:
+            row = int(mouse_match.group(1))
+            col = int(mouse_match.group(2))
+            rows, cols = frame.shape
             return {
                 "name": COMPLEX_ACTION,
-                "x": int(mouse_match.group(2)),
-                "y": int(mouse_match.group(1)),
+                "x": max(0, min(max(cols - 1, 0), col)),
+                "y": max(0, min(max(rows - 1, 0), row)),
                 "reasoning": {"parsed_from_text": True},
             }
-        
+
         return None
-    
+
     def _anti_loop_action(self, frame: FrameInfo) -> dict:
         """Generate an action to break out of a loop."""
         import random
-        
+
         available = [a for a in frame.available_actions if a != RESET]
-        
+
         # Strategy 1: Reset
         if self.tracker.game_over_count < 3:
             return {"name": RESET, "reasoning": {"anti_loop": "reset"}}
-        
+
         # Strategy 2: Try all different actions
         tried_recent = set(self.tracker._recent_actions[-6:])
         untried = [a for a in available if a not in tried_recent]
-        
+
         if untried:
             choice = random.choice(untried)
             return {"name": choice, "reasoning": {"anti_loop": "try_untried"}}
-        
+
         # Strategy 3: Random from available
         if available:
             choice = random.choice(available)
             return {"name": choice, "reasoning": {"anti_loop": "random"}}
-        
+
         return {"name": RESET, "reasoning": {"anti_loop": "no_actions"}}
-    
+
     def _fallback_action(self, frame: FrameInfo) -> dict:
         """Fallback when LLM fails to produce an action."""
         import random
-        
+
         available = [a for a in frame.available_actions if a != RESET]
         if available:
             # Prefer directional actions
@@ -1018,9 +1042,9 @@ class LLMPolicy:
             else:
                 choice = random.choice(available)
             return {"name": choice, "reasoning": {"fallback": True}}
-        
+
         return {"name": RESET, "reasoning": {"fallback": True}}
-    
+
     def _trim_context(self) -> None:
         """Keep conversation within context window."""
         max_turns = 20  # system + last N user/assistant pairs
@@ -1029,15 +1053,15 @@ class LLMPolicy:
             others = [m for m in self._messages if m["role"] != "system"]
             # Keep last N turns
             self._messages = system + others[-(max_turns - len(system)):]
-    
+
     def record_result(self, result: dict) -> None:
         """Record action result for context (optional)."""
         pass  # Results are incorporated via frame changes
-    
+
     @property
     def total_tokens(self) -> int:
         return self.client.total_tokens
-    
+
     @property
     def total_calls(self) -> int:
         return self.client.total_calls

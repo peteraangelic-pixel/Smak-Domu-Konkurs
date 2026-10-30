@@ -1,0 +1,30 @@
+{
+  "id": "threerabbits/submission-32b-fix4",
+  "id_no": 124720550,
+  "title": "submission_32b_fix4",
+  "code_file": "submission-32b-fix4.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": false,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "keywords": [
+    "gpu"
+  ],
+  "dataset_sources": [
+    "threerabbits/proof-pilot-code",
+    "threerabbits/proof-pilot-env"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [
+    "ai-mathematical-olympiad-proof-pilot"
+  ],
+  "model_sources": [
+    "threerabbits/dflash-32b-draft-v2test-phasel/Transformers/default/1",
+    "threerabbits/dflash-32b-draft-v2test-phasel-int4mlp/Transformers/default/1",
+    "threerabbits/opd-32b-v33-s200-gptq-w4a16/Transformers/default/1"
+  ],
+  "docker_image": "gcr.io/kaggle-private-byod/python@sha256:57e612b484cf3df5026ee4dcc3cb176974b22b2bc0937fb1e16132a8be4cb13c",
+  "machine_shape": "NvidiaRtxPro6000"
+}

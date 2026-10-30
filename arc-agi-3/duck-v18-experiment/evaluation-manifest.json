@@ -1,0 +1,130 @@
+{
+  "purpose": "Pinned public corpus for paired agent evaluation. Historical score regression is separate.",
+  "historical_scoring_fixture": {
+    "path": "kaggle/ops/results/r085-kernel_output_pick/output-pick/benchmark.json",
+    "sha256": "9f0192857f1d5f06f5a655a919e8456c7b2d55045dd5cfe40c2aa66e7610832b"
+  },
+  "definition_completed": "Engine levels_completed at termination. Credit only actions_per_level[:levels_completed].",
+  "primary_metric": "Mean official per-game score over the entire pinned roster.",
+  "secondary_metrics": [
+    "completed/game",
+    "weighted completion",
+    "actions per completed level",
+    "output tokens per completed level",
+    "wallclock",
+    "errors"
+  ],
+  "games": [
+    {
+      "path": "games\\environment_files\\ar25\\ar25\\ar25.py",
+      "sha256": "0c556536ad902afddb600cdb2b766ac9fda243dcd07b7f3a0a0d6277339745bf"
+    },
+    {
+      "path": "games\\environment_files\\bp35\\bp35\\bp35.py",
+      "sha256": "0a0ad94090fe6923613bee92dd48df46b2a07877bdf0be618e385a92184b7d0d"
+    },
+    {
+      "path": "games\\environment_files\\cd82\\cd82\\cd82.py",
+      "sha256": "fb555c5ddf0a3b742188646bb28d2f57cb98cf2d3263c594032b45ec8fce2a86"
+    },
+    {
+      "path": "games\\environment_files\\cn04\\cn04\\cn04.py",
+      "sha256": "2fe56bfb27680358db7d1c8b80c43e8877d6cfc629945402dc7c8967b0152603"
+    },
+    {
+      "path": "games\\environment_files\\dc22\\dc22\\dc22.py",
+      "sha256": "fdcac2320f6d4cfeaaddfbed5c12e533962817b99f700a2936edd2c296f3d169"
+    },
+    {
+      "path": "games\\environment_files\\ft09\\ft09\\ft09.py",
+      "sha256": "0d8bbf2573e8f9837c649a1ffda2e7bde3734d26c3cb0fc4bbfd772d7f87a6bf"
+    },
+    {
+      "path": "games\\environment_files\\g50t\\g50t\\g50t.py",
+      "sha256": "5849a7740de172289b99f39680e60d7657de203a11b7361e24181e2104eebed5"
+    },
+    {
+      "path": "games\\environment_files\\ka59\\ka59\\ka59.py",
+      "sha256": "38d34dbbf83b9a220903d11d3e5f4cdb73230c7376576669d7d66cc157f22144"
+    },
+    {
+      "path": "games\\environment_files\\lf52\\lf52\\lf52.py",
+      "sha256": "271a04aa4aafd1b035194b346c5333ec024d2e570d349edd413499c98e9e00d8"
+    },
+    {
+      "path": "games\\environment_files\\lp85\\lp85\\lp85.py",
+      "sha256": "305b61c3d3a7463c9e723b53378c188529c0cc7d85029ba287f7f2b660fe8513"
+    },
+    {
+      "path": "games\\environment_files\\ls20\\ls20\\ls20.py",
+      "sha256": "9607627b3d85bdb21ff28b40fefaa6a873691175981c6351b7e5a6637416f9d5"
+    },
+    {
+      "path": "games\\environment_files\\m0r0\\m0r0\\m0r0.py",
+      "sha256": "492f87bab9b8cb3a9414becb7e9cd5a35be2de4b176596dbdec12aa88ed8ab51"
+    },
+    {
+      "path": "games\\environment_files\\r11l\\r11l\\r11l.py",
+      "sha256": "495a7899b016e043ad59e4a05a8ea9bbe81b8d2763df6f9dbef7fde5e2d6d33f"
+    },
+    {
+      "path": "games\\environment_files\\re86\\re86\\re86.py",
+      "sha256": "8af5384d7f9bfdd6867edeb30550c20ba12b7cc9d4126acb35e68440c3447f04"
+    },
+    {
+      "path": "games\\environment_files\\s5i5\\s5i5\\s5i5.py",
+      "sha256": "18d950333a006e984941ceaa16cdc4dc8dca8ca26cb82194198759089aac5965"
+    },
+    {
+      "path": "games\\environment_files\\sb26\\sb26\\sb26.py",
+      "sha256": "7fbdac44f407cf63a682b4dc313769227f3a8a9d423287d096e24d72d00d9784"
+    },
+    {
+      "path": "games\\environment_files\\sc25\\sc25\\sc25.py",
+      "sha256": "635fd71a8670ff1c9c93ed9d2ebaaf333aca4964266a0563d5337ff32eb4340e"
+    },
+    {
+      "path": "games\\environment_files\\sk48\\sk48\\sk48.py",
+      "sha256": "d8078629ec82e3f66d70423ad188969d36cecaecf0d96d8a4496210042573a80"
+    },
+    {
+      "path": "games\\environment_files\\sp80\\sp80\\sp80.py",
+      "sha256": "589a99af30f07879d044c56c88a2e9882fe04e6f13e9f943f5195c81d3b85a1f"
+    },
+    {
+      "path": "games\\environment_files\\su15\\su15\\su15.py",
+      "sha256": "1944f8aba6f2f8860d991745ba768131f02d918bcd5465466e85fcb2726d115a"
+    },
+    {
+      "path": "games\\environment_files\\tn36\\tn36\\tn36.py",
+      "sha256": "ef4dde99174ca5d753809f6f193177d8e25762b5fa58c9919df8458d8b69ff23"
+    },
+    {
+      "path": "games\\environment_files\\tr87\\tr87\\tr87.py",
+      "sha256": "cd924810f136aab40570209ff54a0069dd2306608414d16012f92d4ce66e23fb"
+    },
+    {
+      "path": "games\\environment_files\\tu93\\tu93\\tu93.py",
+      "sha256": "0768757bb4b39e5a6f8142e32e0f6546a619cee02707f1f52f806b7007f07e57"
+    },
+    {
+      "path": "games\\environment_files\\vc33\\vc33\\vc33.py",
+      "sha256": "5430563c386ca51ff4c9a84b032579245a0613cb98c477c6eaeaa1086c80a2d5"
+    },
+    {
+      "path": "games\\environment_files\\wa30\\wa30\\wa30.py",
+      "sha256": "ee6fef476d4db0d64ebe5d37ea9036d41bace2e26974f9b0b2516af0948e202a"
+    }
+  ],
+  "arcengine_version": "0.9.3",
+  "full_agent_paired_evaluation": "pending",
+  "requirements": [
+    "same model and quantization",
+    "same game source hashes",
+    "same per-game and overall runtime limits",
+    "same serving concurrency",
+    "same seed per pair where supported",
+    "fresh engine sessions and fresh model conversation state per variant",
+    "repeat paired runs before interpreting small differences"
+  ]
+}

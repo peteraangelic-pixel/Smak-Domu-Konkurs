@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 description = "CPU-side kernels for ARC-AGI-3 (ARC Prize 2026): grid segmentation, RHAE scoring, replay analysis"
 
+[lib]
+crate-type = ["rlib", "cdylib"]
+
 [dependencies]
 rayon = "1"
 sha1 = "0.10"

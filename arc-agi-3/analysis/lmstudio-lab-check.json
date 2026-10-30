@@ -1,0 +1,19 @@
+{
+  "response": {
+    "model_instance_id": "arc-lab-fast",
+    "output": [
+      {
+        "type": "message",
+        "content": "{\n  \"hypotheses\": [\n    {\n      \"id\": 1,\n      \"name\": \"Quantized Pixel Mapping\",\n      \"description\": \"The game uses a fixed-resolution grid where mouse input is snapped to the nearest pixel; object position changes are delayed artifacts of this snapping process occurring at specific intervals.\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Hidden Coordinate Accumulation\",\n      \"description\": \"Each click accumulates an invisible offset vector that only resolves and updates visible object positions after a fixed number of clicks or time threshold has been reached.\"\n    }\n  ],\n  \"probe\": \"Click exactly 10 times in the exact same location without moving the mouse, then observe if object positions shift immediately on the 10th click or gradually over subsequent frames.\"\n}"
+      }
+    ],
+    "stats": {
+      "input_tokens": 63,
+      "total_output_tokens": 180,
+      "reasoning_output_tokens": 0,
+      "tokens_per_second": 35.20585888429683,
+      "time_to_first_token_seconds": 0.290471
+    }
+  },
+  "json_valid": true
+}

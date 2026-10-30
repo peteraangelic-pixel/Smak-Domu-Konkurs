@@ -1,0 +1,22 @@
+{
+  "parity_cases": 267,
+  "rayon_threads": 16,
+  "timings": {
+    "public_initial_frames": {
+      "frames": 25,
+      "python_ms": 134.987600002205,
+      "rust_ffi_serial_ms": 3.079400001297472,
+      "rust_ffi_rayon16_ms": 1.4546999991580378,
+      "serial_speedup": 43.835682258014366,
+      "rayon_speedup": 92.79411568043867
+    },
+    "random_frames": {
+      "frames": 64,
+      "python_ms": 379.6955999969214,
+      "rust_ffi_serial_ms": 21.377000000939006,
+      "rust_ffi_rayon16_ms": 6.478999999671942,
+      "serial_speedup": 17.761874911364686,
+      "rayon_speedup": 58.60404383641718
+    }
+  }
+}

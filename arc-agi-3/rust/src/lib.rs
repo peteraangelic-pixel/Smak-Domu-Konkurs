@@ -11,9 +11,10 @@
 //! * [`score`]   — RHAE, the competition metric
 //! * [`replay`]  — find wasted actions in recorded runs, sweep directories in parallel
 
+pub mod ffi;
 pub mod grid;
 pub mod replay;
 pub mod score;
 
 pub use grid::{segment_layer, Grid, Node, Segmentation};
-pub use score::{level_score, rhae, rhae_weighted};
+pub use score::{ceiling, game_score, level_score, rhae, rhae_weighted};

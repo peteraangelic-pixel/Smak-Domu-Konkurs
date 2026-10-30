@@ -1,0 +1,125 @@
+{
+  "training_samples": 111,
+  "training_genomes": 13,
+  "heldout_genome_mse": 0.5604932015769056,
+  "constant_baseline_mse": 2.0702863675245173,
+  "per_game_baseline_mse": 0.594582362659964,
+  "surrogate_beats_constant": true,
+  "surrogate_beats_per_game": true,
+  "selection_data": "17 training games only. Validation game outcomes excluded.",
+  "qualification": "Predictions guide trial selection. Ensemble spread is not a calibrated confidence interval.",
+  "recommendations": [
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 40,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 4
+      },
+      "id": "58602d5f5327",
+      "predicted_mean_coverage": 1.0537103536940824,
+      "ensemble_spread": 0.18302360518855385,
+      "ucb": 1.2367339588826363
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 8,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 4
+      },
+      "id": "35852093e575",
+      "predicted_mean_coverage": 1.0486845940294687,
+      "ensemble_spread": 0.18160846532914618,
+      "ucb": 1.2302930593586148
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 16,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 4
+      },
+      "id": "d005c956b9de",
+      "predicted_mean_coverage": 1.0449749393420416,
+      "ensemble_spread": 0.15930263808351186,
+      "ucb": 1.2042775774255534
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 8,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 8
+      },
+      "id": "e4f1637abbc8",
+      "predicted_mean_coverage": 0.9542819807250003,
+      "ensemble_spread": 0.1899630002627553,
+      "ucb": 1.1442449809877555
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 40,
+        "click_candidates": 28,
+        "min_moves": 3,
+        "calib_step": 4
+      },
+      "id": "05da64715e6b",
+      "predicted_mean_coverage": 0.97571931692005,
+      "ensemble_spread": 0.16015009135860103,
+      "ucb": 1.135869408278651
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 40,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 8
+      },
+      "id": "0aba6cc58d4c",
+      "predicted_mean_coverage": 0.959307740389614,
+      "ensemble_spread": 0.17355808777030265,
+      "ucb": 1.1328658281599167
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 8,
+        "click_candidates": 28,
+        "min_moves": 3,
+        "calib_step": 4
+      },
+      "id": "d5741a4edc3b",
+      "predicted_mean_coverage": 0.9706935572554363,
+      "ensemble_spread": 0.1564354374058318,
+      "ucb": 1.1271289946612681
+    },
+    {
+      "genome": {
+        "bfs_branch": 0,
+        "beam": 32,
+        "max_clicks": 16,
+        "click_candidates": 28,
+        "min_moves": 1,
+        "calib_step": 8
+      },
+      "id": "ad7bae66548c",
+      "predicted_mean_coverage": 0.9505723260375735,
+      "ensemble_spread": 0.17391600837787094,
+      "ucb": 1.1244883344154444
+    }
+  ]
+}

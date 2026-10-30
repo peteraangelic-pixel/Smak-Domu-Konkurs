@@ -67,6 +67,14 @@ class ParseResponseTest(unittest.TestCase):
     def test_niedozwolona_akcja_jest_pomijana(self) -> None:
         self.assertEqual(self.parse('{"action": "TELEPORT"}'), [])
 
+    def test_wspolrzedne_klikniecia_sa_ograniczone_do_planszy(self) -> None:
+        actions = self.parse('{"action": "MOUSE", "row": -10, "col": 20}')
+        self.assertEqual((actions[0]["x"], actions[0]["y"]), (1, 0))
+
+    def test_tekstowe_klikniecie_rowniez_obcina_wspolrzedne(self) -> None:
+        actions = self.parse("MOUSE(row=5, col=10)")
+        self.assertEqual((actions[0]["x"], actions[0]["y"]), (1, 1))
+
     def test_batch_z_promptu_konczy_w_kolejce(self) -> None:
         content = (
             'Reasoning...\n'

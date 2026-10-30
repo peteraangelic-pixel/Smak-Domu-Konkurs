@@ -153,6 +153,7 @@ def play_one(games_dir: str, gid: str, max_actions: int = 40,
     policy = LLMPolicy()  # klient z env (LLM_BASE_URL / LLM_MODEL_ID)
 
     from arcengine import ActionInput, GameAction
+    from arc_agi.scorecard import EnvironmentScoreCalculator
 
     src = Path(games_dir) / gid / gid / f"{gid}.py"
     if not src.exists():
@@ -167,16 +168,18 @@ def play_one(games_dir: str, gid: str, max_actions: int = 40,
                and v is not _arc_base())
     game = cls()
 
-    def send(name: str):
-        if name == "RESET":
+    def send(name: str, data: dict | None = None):
+        if name in ("RESET", RESET):
             return game.perform_action(ActionInput(id=GameAction.RESET))
         return game.perform_action(
-            ActionInput(id=GameAction[name], data={}))
+            ActionInput(id=GameAction[name], data=data or {}))
 
     fd = send(RESET)
     last_png = None
     result = {"game": gid, "mode": "real", "ok": True, "steps": 0,
-              "levels_completed": 0, "won": False, "final_state": "UNKNOWN"}
+              "levels_completed": 0, "level_actions": [], "partial_level_actions": 0,
+              "bad_actions": 0, "won": False, "final_state": "UNKNOWN"}
+    level_action_count = 0
     for _ in range(max_actions):
         rendered = game.camera.render(game.current_level.get_sprites())
         grid = tuple(tuple(int(c) for c in row) for row in rendered)
@@ -193,21 +196,50 @@ def play_one(games_dir: str, gid: str, max_actions: int = 40,
                           levels_completed=int(fd.levels_completed or 0),
                           available_actions=_engine_names(fd.available_actions))
         proposal = policy.choose_action(frame)
+        action_name = str(proposal.get("name", "RESET"))
+        action_data = {}
+        if action_name == "ACTION6":
+            rows, cols = frame.shape
+            x = int(proposal.get("x", cols // 2))
+            y = int(proposal.get("y", rows // 2))
+            action_data = {"x": max(0, min(max(cols - 1, 0), x)),
+                           "y": max(0, min(max(rows - 1, 0), y))}
         try:
-            if proposal.get("name") == "ACTION6":
-                fd = send("6")
-            elif proposal.get("name") == "RESET":
-                fd = send(RESET)
-            else:
-                fd = send(proposal["name"])
+            fd = send(action_name, action_data)
         except Exception as exc:  # nieprawidłowa akcja w tej grze — nie kończ
+            result["bad_actions"] += 1
             result[f"bad_action_{result['steps']}"] = str(exc)[:120]
-            fd = send(RESET)
+            fd = send("RESET")
         result["steps"] += 1
+        level_action_count += 1
+        completed = int(fd.levels_completed or 0)
+        while len(result["level_actions"]) < completed:
+            result["level_actions"].append(level_action_count)
+            level_action_count = 0
         result["levels_completed"] = int(fd.levels_completed or 0)
         if png_last:
             last_png = _save_png(rendered, png_last)
     result["final_state"] = result.get("final_state", str(fd.state))
+    result["partial_level_actions"] = level_action_count
+    result["total_tokens"] = int(policy.total_tokens)
+    result["llm_calls"] = int(policy.total_calls)
+    result["llm_seconds"] = round(float(policy.client.total_time), 2)
+    metadata = Path(games_dir) / gid / gid / "metadata.json"
+    try:
+        baseline_actions = json.loads(metadata.read_text(encoding="utf-8"))["baseline_actions"]
+        calculator = EnvironmentScoreCalculator(id=gid, state=fd.state)
+        for index, baseline in enumerate(baseline_actions):
+            completed_level = index < len(result["level_actions"])
+            actions = (result["level_actions"][index] if completed_level else
+                       result["partial_level_actions"] if index == len(result["level_actions"]) else 0)
+            calculator.add_level(level_index=index + 1, completed=completed_level,
+                                 actions_taken=actions, baseline_actions=int(baseline))
+        score = calculator.to_score()
+        result["rhae_score_pct"] = round(float(score.score), 4)
+        result["level_scores_pct"] = [round(float(x), 4) for x in score.level_scores]
+        result["baseline_actions"] = baseline_actions
+    except (OSError, KeyError, TypeError, ValueError):
+        result["rhae_score_pct"] = None
     if last_png:
         result["png"] = last_png
     return result
@@ -283,7 +315,16 @@ def evaluate(knobs_sets: list[dict], games: list[str], games_dir: str = "",
             jobs.append({"game": gid, "knobs_id": str(knobs_id),
                          "knobs_json": json.dumps(blob) if blob else ""})
     if workers is None:
-        workers = max(1, min(len(jobs), os.cpu_count() or 1))
+        if mode == "mock":
+            workers = max(1, min(len(jobs), os.cpu_count() or 1))
+        else:
+            # One local model server is shared by all workers. Default to one
+            # request stream on small-VRAM PCs; parallelism remains explicit.
+            try:
+                limit = max(1, int(os.environ.get("LLM_MAX_PARALLEL", "1")))
+            except ValueError:
+                limit = 1
+            workers = max(1, min(len(jobs), limit))
     if mode == "mock":
         ctx_workers = workers
         with Pool(processes=ctx_workers, initializer=_worker_init,
@@ -304,8 +345,11 @@ def summarize(results: list[dict]) -> str:
         levels = sum(r.get("levels_completed", 0) for r in ok_rows)
         wins = sum(1 for r in ok_rows if r.get("won"))
         tokens = sum(r.get("total_tokens", 0) for r in ok_rows)
+        scores = [float(r.get("rhae_score_pct") or 0.0) for r in rows]
+        mean_score = sum(scores) / len(rows) if rows else 0.0
         lines.append(f"{knobs_id or 'default':<16} ok={len(ok_rows)}/{len(rows)} "
-                     f"poziomy={levels} wygrane={wins} tokeny(mock)={tokens}")
+                     f"RHAE={mean_score:.2f}% poziomy={levels} "
+                     f"wygrane={wins} tokeny={tokens}")
     return "\n".join(lines)
 
 
@@ -321,6 +365,10 @@ def make_fitness(games_dir: str = "", games: list[str] | None = None,
         ok_rows = [r for r in results if r.get("ok")]
         if not ok_rows:
             return float("-inf")
+        if mode == "real":
+            # Failed games and games without an official score count as zero;
+            # optimize the same mean-per-game score used by the competition.
+            return sum(float(r.get("rhae_score_pct") or 0.0) for r in results) / max(1, len(results))
         levels = sum(r.get("levels_completed", 0) for r in ok_rows)
         wins = sum(1 for r in ok_rows if r.get("won"))
         errors = len(results) - len(ok_rows)

@@ -3,10 +3,10 @@
 //! ```text
 //! arc3 bench   [--size 64] [--frames 2000]   throughput of the segmentation kernel
 //! arc3 segment <grid.json>                   segment one grid, print JSON
-//! arc3 score   <levels.json>                 RHAE for [[human, agent], ...]
+//! arc3 score   <levels.json>                 official per-game RHAE score
 //! ```
 
-use arc3::{rhae, segment_layer, Grid};
+use arc3::{ceiling, game_score, segment_layer, Grid};
 use rayon::prelude::*;
 use std::env;
 use std::fs;
@@ -117,7 +117,10 @@ fn cmd_bench(args: &[String]) -> ExitCode {
     println!("throughput       : {:.1} frames/s", frames as f64 / secs);
     println!("per frame        : {:.3} ms", secs * 1e3 / frames as f64);
     println!("total components : {}", total_nodes);
-    println!("avg components   : {:.1}", total_nodes as f64 / frames as f64);
+    println!(
+        "avg components   : {:.1}",
+        total_nodes as f64 / frames as f64
+    );
     ExitCode::SUCCESS
 }
 
@@ -155,16 +158,52 @@ fn cmd_score(path: &str) -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    let raw: Vec<(u32, u32)> = match serde_json::from_str(&text) {
+    let value: serde_json::Value = match serde_json::from_str(&text) {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("expected [[human, agent], ...]: {}", e);
+            eprintln!("invalid JSON: {}", e);
             return ExitCode::FAILURE;
         }
     };
-    let total = rhae(&raw);
-    let ceiling = 1.15_f64.powi(2);
-    println!("levels           : {}", raw.len());
+    let (human_actions, agent_actions): (Vec<u32>, Vec<u32>) = if value.is_array() {
+        let raw: Vec<(u32, u32)> = match serde_json::from_value(value) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("expected [[human, agent], ...] or a score object: {}", e);
+                return ExitCode::FAILURE;
+            }
+        };
+        raw.into_iter().unzip()
+    } else {
+        let human = value.get("baseline_actions").cloned();
+        let agent = value.get("agent_actions").cloned();
+        let (Some(human), Some(agent)) = (human, agent) else {
+            eprintln!("expected object with baseline_actions and agent_actions arrays");
+            return ExitCode::FAILURE;
+        };
+        let human: Vec<u32> = match serde_json::from_value(human) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("invalid baseline_actions: {}", e);
+                return ExitCode::FAILURE;
+            }
+        };
+        let agent: Vec<u32> = match serde_json::from_value(agent) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("invalid agent_actions: {}", e);
+                return ExitCode::FAILURE;
+            }
+        };
+        (human, agent)
+    };
+    let total = game_score(&human_actions, &agent_actions);
+    let ceiling = ceiling();
+    println!("levels           : {}", human_actions.len());
+    println!(
+        "completed levels : {}",
+        agent_actions.len().min(human_actions.len())
+    );
     println!("RHAE             : {:.6}", total);
     println!("ceiling          : {:.6}", ceiling);
     println!("% of ceiling     : {:.2}%", 100.0 * total / ceiling);
