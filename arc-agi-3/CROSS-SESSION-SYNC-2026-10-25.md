@@ -721,3 +721,18 @@ przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decy
   vs globalny deadline 532 min (czy ogon kolejki dotrwa).
 - Reguła zachowana: 1 zgłoszenie/dzień; jedyna zmiana względem certyfikatu — żadna
   (notebook bajt w bajt z origin a1d99f17).
+
+### F. WYNIK GO (r121, smoke diagnoza) — wszystko zielone, a/call = 5.3 (30.10 ~17:00 UTC)
+- **Submission ref 57811453** (PENDING, rerun 110 gier/532 min wystartował; wynik ~9 h).
+- Smoke: **`ARC3_SMOKE_OK`** (t=3463 s), **mean 22.59** (25 poziomów/10 gier) vs v11 smoke
+  18.54 na tych samych grach = **+4.05**; m0r0 i sc25 po 71.43 (5/6 poziomów).
+- **`v13.7 batch: a/call = 5.3`** — pierwszy LIVE pomiar instrumentu: baza 4.357 → 5.3
+  (**+22%**; cel 5.7 = 300 akcji/gry, bramka 50 pkt = 6.0 — jesteśmy na 88% drogi).
+  Hint openerowy działa; dalsza droga do 50 = dociągnąć a/call do 6.0.
+- Playbook replay NA ŻYWO: m0r0 match levels=2, replay start/ok (n=15, n=23) — darmowe
+  poziomy 0-1. Win-path rejestruje (recordy na wszystkich grach). Roster smoke: bazy się
+  nie powtarzają (pamięć win-path 0 pkt — jak w OCENA-V9; win-path płaci tylko przy powtarzalności).
+- Budget probe: 25 gier × 1 pass, conc 10, uczciwy udział 212 min/gra, cap 48 min → 0.23x
+  (smoke nie ma problemu capów; cap_over_fair dotyczył rerunu 110 gier).
+- Limit dzienny wyczerpany (0 remaining). Slot 31.10 otwiera się 00:00 UTC: **powtórka**
+  (σ 2,5–3,9) albo **D′** (Gemma 6d081d52, n=4<1σ) — decyzja po wyniku 57811453.
