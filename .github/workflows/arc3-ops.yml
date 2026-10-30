@@ -1,64 +1,44 @@
-name: ARC3 ops
-
-# Jedno CLI do operacji Kaggle z TEGO repo (wzorowane na arc3-ops z Pokemon).
-# Sekret KAGGLE_API_TOKEN czytany wyłącznie w runie Actions (env kroku —
-# CLI kaggle>=2.0 czyta go bezposrednio; bez kaggle.json).
-#
-# Fire:  edytuj arc-agi-3/kaggle/ops/request.json ({"id","op","args"}) i pushuj,
-#        albo Run workflow w UI.
-# Read:  arc-agi-3/kaggle/ops/results/<id>-<op>/SUMMARY.md (commitowane z powrotem).
-
+name: ARC3 read-only leader research
 on:
   workflow_dispatch:
-  push:
-    branches: ["arena/5ed750ef-smak-domu-konkurs"]
-    paths:
-      - "arc-agi-3/kaggle/ops/request.json"
-      - ".github/workflows/arc3-ops.yml"
-
 permissions:
-  contents: write
-  actions: write
-
-concurrency:
-  group: arc3-ops
-  cancel-in-progress: false
-
+  contents: read
 jobs:
-  op:
+  research:
     runs-on: ubuntu-latest
-    timeout-minutes: 355
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Install Kaggle CLI
-        run: pip install --quiet --upgrade "kaggle>=2.0"
-
-      - name: Prepare auth (never echoes the token)
+          python-version: '3.12'
+      - run: pip install --quiet 'kaggle>=2.0'
+      - name: Read public Kaggle data
         env:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-        run: python3 arc-agi-3/kaggle/ops/write_creds.py
-
-      - name: Run op
-        env:
-          KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
-        run: python3 arc-agi-3/kaggle/ops/ops.py
-
-      - name: Commit results (always; ops/results only)
-        if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add arc-agi-3/kaggle/ops/results || true
-          if [ -n "$(git status --porcelain arc-agi-3/kaggle/ops/results)" ]; then
-            git commit -q -m "ops: results $(date -u +%Y%m%dT%H%M%SZ) [skip ci]"
-            for i in 1 2 3 4 5; do
-              git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
-              sleep 5
-            done
-          fi
+          mkdir -p research
+          python - <<'PY'
+          import json, pathlib, subprocess
+          commands = {
+              'leaderboard': ['competitions','leaderboard','-c','arc-prize-2026-arc-agi-3','--show'],
+              'public_top': ['kernels','list','--competition','arc-prize-2026-arc-agi-3','--sort-by','scoreDescending','--page-size','100','--csv'],
+              'leader_notebooks': ['kernels','list','--user','threerabbits','--page-size','100','--csv'],
+              'franzen_notebooks': ['kernels','list','--user','dfranzen','--page-size','100','--csv'],
+          }
+          summary={}
+          for name,args in commands.items():
+              try:
+                  r=subprocess.run(['kaggle',*args],capture_output=True,text=True,timeout=120)
+                  pathlib.Path('research',name+'.txt').write_text(r.stdout+'\n'+r.stderr)
+                  summary[name]={'returncode':r.returncode,'bytes':len(r.stdout)}
+              except subprocess.TimeoutExpired:
+                  summary[name]={'error':'timeout'}
+          pathlib.Path('research/summary.json').write_text(json.dumps(summary,indent=2))
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arc-leader-research
+          path: research/
+          retention-days: 7
