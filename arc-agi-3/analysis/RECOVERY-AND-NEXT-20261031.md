@@ -4,6 +4,8 @@
 
 Odczyt tylko do odczytu przez Actions 41185887950: nasze najlepsze zapisane zgłoszenie 57247568 = 26,25, kernel `petersharps/arc3-duck`, **wersja 3**. Wersja ta została pobrana z Kaggle jawnie przez `kernels pull petersharps/arc3-duck/3`. Nie podstawiono aktualnej wersji kernela. Manifest SHA256 znajduje się w `champion-recovery-20261031/recovery-manifest.json`.
 
+Uściślenie po pytaniu użytkownika:26,25 jest wynikiem historycznym. Nie potwierdziliśmy odtwarzalności dzisiejszego rerunu ani codziennego wzrostu trudności. W publicznej dyskusji738762 pytania o identyczne seedy/podział gier między rerunami pozostają nierozstrzygnięte w sprawdzonym widoku. Różnicy do13,28 nie wolno przypisywać wyłącznie zmianom kodu bez kontroli. Odzyskany notebook stanowi dokładną kontrolę kodu, a nie gwarancję obecnego wyniku. Źródło: https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3/discussion/738762
+
 Świeży odczyt rankingu: 75,56 / 70,02 / 58,59 / 56,02 / **51,51**. Nagrody końcowe obejmują miejsca 1–5: https://arcprize.org/competitions/2026/arc-agi-3. To zmienna sytuacja rankingowa, a nie gwarantowany próg końcowy. v13.7-final ma 13,28; rekomendacja GO pozostaje wycofana.
 
 ## Co ustalono o kodzie
