@@ -1,0 +1,36 @@
+{
+  "unique_tool_calls": 38,
+  "unique_observed_tool_results": 34,
+  "calls_without_observed_result": [
+    "9PbrDZV6UoW0lQhJVFbvJyQqcxbTzPA9",
+    "C2bQcCpgNggk3F8wOfteIyAsqgAtfPZU",
+    "cvMT0NzXg6uudFaMF7RYY8nEJII2cYdj",
+    "rl8djTZ200Jk9s8OBSQA2YIuMhC6qs0N"
+  ],
+  "tool_errors": 3,
+  "tool_error_kinds": {
+    "NameError": 1,
+    "KeyError": 1,
+    "IndexError": 1
+  },
+  "errors": [
+    {
+      "tool_call_id": "EVVCoCl2bOEcugaG344Dsbcy9mXuFOM4",
+      "error": "NameError: name 'lines' is not defined"
+    },
+    {
+      "tool_call_id": "bxnnC7Id3gxeBGYLb5IihzDGp7qC2S9l",
+      "error": "KeyError: 'steps'"
+    },
+    {
+      "tool_call_id": "KIVXZeQZvzy2JCtde9XbAMrCJQus1RrJ",
+      "error": "IndexError: list index out of range"
+    }
+  ],
+  "calls_containing_action_code": 3,
+  "unique_feedback_results": 10,
+  "qualification": "Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.",
+  "finished": true,
+  "engine_actions": 3,
+  "levels_completed": 0
+}
