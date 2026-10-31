@@ -32,6 +32,9 @@ def main():
     p.add_argument('--seed', type=int, default=731)
     p.add_argument('--model', default='arc-lab-27b')
     p.add_argument('--image-scale',type=int,default=4)
+    p.add_argument('--thinking',choices=['off','on'],default='off')
+    p.add_argument('--oracle-replay',action='store_true',help='Infrastructure test only, never LLM quality evidence')
+    p.add_argument('--inspection-feedback',action='store_true')
     args = p.parse_args()
     if args.out.exists() and any(args.out.iterdir()):
         raise FileExistsError(args.out)
@@ -62,7 +65,7 @@ def main():
     os.environ.update(ARC3_PLAN_COMMIT='1', ARC3_ESCALATE_ACTIONS='20', ARC3_LEVEL_TOKEN_CAP='0',
         LOCAL_ANALYZER_MODEL_ID=args.model, LOCAL_ANALYZER_PROVIDER='lmstudio',
         LOCAL_ANALYZER_BASE_URL='http://127.0.0.1:1234/v1', LOCAL_ANALYZER_CONTEXT_WINDOW='16384',
-        LOCAL_ANALYZER_MAX_OUTPUT=str(args.request_tokens), LOCAL_ANALYZER_ENABLE_THINKING='0',
+        LOCAL_ANALYZER_MAX_OUTPUT=str(args.request_tokens), LOCAL_ANALYZER_ENABLE_THINKING='1' if args.thinking=='on' else '0',
         LOCAL_ANALYZER_TEMPERATURE='0', LOCAL_ANALYZER_SEED=str(args.seed),
         ONLY_RESET_LEVELS='true', ARC3_MAX_ACTIVE_STREAMS='1',
         MULTIMODAL_UPSCALE=str(args.image_scale),
@@ -92,7 +95,7 @@ def main():
             payload.pop('chat_template_kwargs', None)
             payload.pop('top_k', None)
             payload.pop('priority', None)
-            payload['reasoning_effort'] = 'none'
+            payload['reasoning_effort'] = 'none' if args.thinking=='off' else 'high'
             payload['seed'] = args.seed
             # Respect exact total generated-token budget instead of overshooting
             # by one whole request at the end of a game.
@@ -134,6 +137,9 @@ def main():
     if args.variant == 'memory' and ta.ToolAgent.analyze.__name__ != '_slm_analyze':
         from lalalia_compat import install as install_memory
         install_memory()
+    if args.inspection_feedback:
+        from inspection_feedback import install as install_feedback
+        install_feedback(ta.ToolAgent)
 
     path = next((ROOT/'games/environment_files').rglob(args.game+'.py'))
     game_text = path.read_text(encoding='utf8')
@@ -171,6 +177,20 @@ def main():
         game_index=0, pass_index=0, state_path=args.out/'tool_runtime_state.json',
         transcript_path=args.out/'transcript.txt', analysis_html_relpath='analysis.html',
         stop_event=threading.Event(), viewer_data_path=args.out/'viewer.json')
+    if args.oracle_replay:
+        # Known public solution is TEST INPUT to the genuine tool/action path.
+        # Never package this branch into the competition agent.
+        rows=[json.loads(line) for line in (ROOT/'analysis/sweep-rust-ffi.jsonl').read_text().splitlines()]
+        seq=next(row for row in rows if row['game']==args.game)['levels'][0]['seq']
+        actions=[{'action':'MOUSE','row':x['y'],'col':x['x']} if x['a']==6 else
+                 {'action':{1:'UP',2:'DOWN',3:'LEFT',4:'RIGHT',5:'SPACE',7:'UNDO'}[x['a']]} for x in seq]
+        solver.max_actions_per_game=len(actions)
+        def scripted_completion(*unused,**kwargs):
+            return ta._ChatCompletionResult(message={'role':'assistant','content':'',
+              'tool_calls':[{'id':'oracle-tool-check','type':'function','function':{'name':'python',
+              'arguments':json.dumps({'code':'print(action('+repr(actions)+'))'})}}]},
+              finish_reason='tool_calls',usage={'prompt_tokens':0,'completion_tokens':0,'total_tokens':0})
+        analyzer._chat_completion=scripted_completion
     manifest = {'variant': args.variant, 'game': args.game, 'model': args.model, 'seed': args.seed,
         'budget': {'generated_tokens': args.token_budget, 'request_tokens': args.request_tokens, 'seconds': args.seconds},
         'environment': {k:v for k,v in os.environ.items() if k.startswith(('ARC3_', 'LOCAL_ANALYZER_', 'MULTIMODAL_')) and 'KEY' not in k},
@@ -207,6 +227,10 @@ def main():
               'memory_pinned_chars': len(getattr(analyzer,'_slm_block_text','')),
               'note': run.solver_note, 'error': error, 'seconds': time.monotonic()-start}
     result['image_scale']=args.image_scale
+    result['thinking']=args.thinking
+    result['oracle_replay']=args.oracle_replay
+    result['inspection_feedback']=args.inspection_feedback
+    result['inspection_feedback_count']=getattr(analyzer,'_inspection_feedback_count',0)
     result['valid_model_run']=bool(api_rows) and not result['api_errors']
     result['time_limit_binding']=result['seconds']>=args.seconds-1
     (args.out/'result.json').write_text(json.dumps(result, indent=2), encoding='utf8')

@@ -14,6 +14,8 @@ def compare(control, candidate, score_field='rhae_score_pct'):
             result[key] = row
         return result
     a, b = keyed(control), keyed(candidate)
+    if any(row.get('oracle_replay') for row in [*control,*candidate]):
+        raise ValueError('Oracle replay validates infrastructure, never agent quality')
     if set(a) != set(b) or not a:
         raise ValueError('Require the same nonempty game/seed corpus')
     paired = []
