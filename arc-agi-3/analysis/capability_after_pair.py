@@ -1,9 +1,9 @@
 """One conditional capability diagnostic after the active A/B releases LM Studio.
 
-Earlier thinking-ON requests ended with length while still in reasoning. If
-the entire current pair has zero completions, test whether a single longer
-response can produce useful reasoning and actions. Total token cap stays8192;
-this is a capability probe, not an A/B score claim or a parameter sweep.
+The greedy ls20 control repeated one identical inspection94 times, while the
+recovered notebook specifies temperature0.7. For a healthy all-zero pair, run
+ONE sampling ablation: same source/game/seed/model/thinking/budgets, temp0.7.
+This tests an observed local-loop failure, not a Kaggle score forecast.
 """
 import json
 import os
@@ -14,7 +14,7 @@ import time
 
 ROOT=Path(__file__).resolve().parents[1]
 PAIR=ROOT/'analysis/champion-probe-pair-20261031'
-OUT=ROOT/'analysis/capability-on-8192-20261031'
+OUT=ROOT/'analysis/capability-sampling-20261031'
 
 
 def main():
@@ -37,13 +37,13 @@ def main():
         command=[sys.executable,'-X','utf8',str(ROOT/'analysis/run_duck_loop.py'),
                  '--source',str(ROOT/'analysis/champion-recovery-20261031/materialized-clean/ARC3-Inference'),
                  '--notebook',str(ROOT/'analysis/champion-recovery-20261031/champion-v3/arc3-duck.ipynb'),
-                 '--game','ft09','--variant','control','--out',str(OUT),
-                 '--thinking','on','--token-budget','8192','--request-tokens','8192','--seconds','3600']
+                 '--game','ls20','--variant','control','--out',str(OUT),
+                 '--thinking','off','--temperature','0.7','--token-budget','8192','--request-tokens','4096','--seconds','3600']
         (PAIR/'capability-command.json').write_text(json.dumps(command,indent=2),encoding='utf8')
         with (PAIR/'capability-followup.log').open('w',encoding='utf8') as f:
             subprocess.run(command,stdout=f,stderr=subprocess.STDOUT,check=True,timeout=3720)
         row=json.loads((OUT/'result.json').read_text(encoding='utf8'))
-        row['interpretation']='Single capability diagnostic of reasoning truncation; not evidence that a submission candidate outperforms its control.'
+        row['interpretation']='Single sampling ablation of a greedy repeat loop; one seed is insufficient for candidate promotion or a Kaggle score forecast.'
         (OUT/'capability-summary.json').write_text(json.dumps(row,indent=2),encoding='utf8')
         print(json.dumps(row),flush=True)
     finally:

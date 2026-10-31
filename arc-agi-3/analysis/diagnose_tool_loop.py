@@ -23,11 +23,13 @@ def diagnose(request_rows, api_rows=()):
             for call in choice.get('message', {}).get('tool_calls', []):
                 calls[call['id']] = call
     errors, error_kinds, action_calls, feedback = [], Counter(), [], []
+    code_counts=Counter()
     for call_id, call in calls.items():
         if call.get('function', {}).get('name') != 'python':
             continue
         try:
             args=json.loads(call['function']['arguments'])
+            code_counts[args['code']]+=1
             tree=ast.parse(args['code'])
         except (ValueError, KeyError, SyntaxError, TypeError):
             continue
@@ -54,6 +56,8 @@ def diagnose(request_rows, api_rows=()):
             'calls_without_observed_result':sorted(set(calls)-set(results)),
             'tool_errors':len(errors),'tool_error_kinds':dict(error_kinds),'errors':errors,
             'calls_containing_action_code':len(action_calls),'unique_feedback_results':len(feedback),
+            'max_identical_code_calls':max(code_counts.values(),default=0),
+            'most_repeated_code':[{'calls':count,'code':code} for code,count in code_counts.most_common(3)],
             'qualification':'Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.'}
 
 

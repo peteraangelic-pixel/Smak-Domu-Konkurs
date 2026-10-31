@@ -34,6 +34,7 @@ def main():
     p.add_argument('--model', default='arc-lab-27b')
     p.add_argument('--image-scale',type=int,default=4)
     p.add_argument('--thinking',choices=['off','on'],default='off')
+    p.add_argument('--temperature',type=float,default=0.0)
     p.add_argument('--oracle-replay',action='store_true',help='Infrastructure test only, never LLM quality evidence')
     p.add_argument('--inspection-feedback',action='store_true')
     p.add_argument('--policy-env', type=json.loads, default={}, help='Explicit experimental environment delta as JSON')
@@ -92,7 +93,7 @@ def main():
         LOCAL_ANALYZER_MODEL_ID=args.model, LOCAL_ANALYZER_PROVIDER='lmstudio',
         LOCAL_ANALYZER_BASE_URL='http://127.0.0.1:1234/v1', LOCAL_ANALYZER_CONTEXT_WINDOW='16384',
         LOCAL_ANALYZER_MAX_OUTPUT=str(args.request_tokens), LOCAL_ANALYZER_ENABLE_THINKING='1' if args.thinking=='on' else '0',
-        LOCAL_ANALYZER_TEMPERATURE='0', LOCAL_ANALYZER_SEED=str(args.seed),
+        LOCAL_ANALYZER_TEMPERATURE=str(args.temperature), LOCAL_ANALYZER_SEED=str(args.seed),
         ONLY_RESET_LEVELS='true', ARC3_MAX_ACTIVE_STREAMS='1',
         MULTIMODAL_UPSCALE=str(args.image_scale),
         ARC3_WINPATH_DIR=str((args.out/'winpath').resolve()),
@@ -256,6 +257,7 @@ def main():
     result['notebook_sha256']=hashlib.sha256(args.notebook.read_bytes()).hexdigest()
     result['policy_env']=args.policy_env
     result['thinking']=args.thinking
+    result['temperature']=args.temperature
     result['oracle_replay']=args.oracle_replay
     result['inspection_feedback']=args.inspection_feedback
     result['inspection_feedback_count']=getattr(analyzer,'_inspection_feedback_count',0)

@@ -1,0 +1,34 @@
+{
+  "unique_tool_calls": 114,
+  "unique_observed_tool_results": 110,
+  "calls_without_observed_result": [
+    "T9nYOQvXblabRlFQOLWxp3T1QmS1EvHe",
+    "TuvNYyKPrlksc50ArDVxJTAmHYV3Ksap",
+    "edtajpEpKMRs7om7mTXwFPJimrX3lllo",
+    "xIsYhsvCM8NvPlSDCjWcM4cNueefWeFK"
+  ],
+  "tool_errors": 0,
+  "tool_error_kinds": {},
+  "errors": [],
+  "calls_containing_action_code": 0,
+  "unique_feedback_results": 0,
+  "max_identical_code_calls": 94,
+  "most_repeated_code": [
+    {
+      "calls": 94,
+      "code": "a = current_frame.ascii\nlines = a.split('\\n')\nfor r in range(24, 51):\n    print(r, lines[r][30:64])\n"
+    },
+    {
+      "calls": 4,
+      "code": "import json\nseg = current_frame.segmentation\nprint(\"level\", current_frame.level, \"step\", current_frame.step)\nnodes = seg['nodes']\nfor n in nodes:\n    print(n['id'], n['color'], 'px', n['pixels'], 'hash', n['hash'][:8], 'rot', n['rotation'], 'sym', n['rotational_symmetry'])\n"
+    },
+    {
+      "calls": 4,
+      "code": "seg = current_frame.segmentation\nnodes = seg['nodes']\nfor n in nodes:\n    b = n['boundary']\n    # compute bbox from boundary\n    rs=[p[0] for p in b]; cs=[p[1] for p in b]\n    print(n['id'], n['color'], 'px',n['pixels'], 'bbox rows',min(rs),max(rs),'cols',min(cs),max(cs))\n"
+    }
+  ],
+  "qualification": "Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.",
+  "finished": true,
+  "engine_actions": 0,
+  "levels_completed": 0
+}

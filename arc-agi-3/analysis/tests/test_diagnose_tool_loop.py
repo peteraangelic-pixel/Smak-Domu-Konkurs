@@ -22,3 +22,12 @@ def test_feedback_after_json_and_action_text_in_comment_are_not_engine_actions()
         {'role':'tool','tool_call_id':'call1','content':json.dumps({'tool':'python','stdout':'NameError: example'})+'\nEXPERIMENT FEEDBACK: probe'}]}])
     assert r['tool_errors']==r['calls_containing_action_code']==0
     assert r['unique_feedback_results']==1
+
+
+def test_api_only_final_call_and_replayed_history_do_not_inflate_repeat_count():
+    def call(i):return {'id':i,'function':{'name':'python','arguments':json.dumps({'code':'print(current_frame.ascii)'})}}
+    request={'messages':[{'role':'assistant','tool_calls':[call('a')]}]}
+    api={'response':{'choices':[{'message':{'tool_calls':[call('b')]}}]}}
+    r=diagnose([request,request],[api,api])
+    assert r['unique_tool_calls']==r['max_identical_code_calls']==2
+    assert len(r['calls_without_observed_result'])==2
