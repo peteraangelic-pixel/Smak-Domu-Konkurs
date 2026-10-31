@@ -1,0 +1,27 @@
+{
+  "trials_per_backend": 75,
+  "identical_traces": 75,
+  "workers": 16,
+  "summaries": {
+    "uniform": {
+      "levels": 0,
+      "actions": 3248
+    },
+    "causal": {
+      "levels": 1,
+      "actions": 2879
+    },
+    "template": {
+      "levels": 3,
+      "actions": 25
+    }
+  },
+  "template_coverage": [
+    [
+      "ft09",
+      3,
+      25
+    ]
+  ],
+  "qualification": "Public forward-only policy evaluation; no hidden score forecast or LLM quality comparison."
+}

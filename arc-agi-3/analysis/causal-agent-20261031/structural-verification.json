@@ -1,0 +1,11 @@
+{
+  "equivalent_frames": 64,
+  "equivalent_decisions": 32,
+  "benchmark_frames": 256,
+  "numpy_python_seconds": 0.29244330000074115,
+  "rust_serial_ffi_seconds": 0.015480299989576451,
+  "rust_rayon16_ffi_seconds": 0.008753800007980317,
+  "rayon_threads": 16,
+  "speedup_including_ffi": 33.407582962157925,
+  "qualification": "Rectangle feature kernel only; excludes planning,game engine and LLM. Includes ctypes buffers and Python result conversion."
+}

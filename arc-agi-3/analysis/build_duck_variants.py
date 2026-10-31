@@ -1,6 +1,6 @@
-"""Package isolated memory/router hypotheses on the pinned v13.7 notebook.
+"""Package isolated policy experiments on an explicitly pinned notebook.
 
-No Kaggle push/submit. Serving, budgets and baseline patches stay at v13.7.
+No Kaggle push/submit. Preserve the selected base's serving and budgets.
 """
 import difflib
 import json
@@ -12,7 +12,7 @@ from materialize_duck import ROOT, materialize
 from lalalia_compat import source as memory_source
 
 
-def build(name, notebook=None):
+def build(name, notebook=None,source_output=None):
     notebook = Path(notebook) if notebook else ROOT/'duck-v18-experiment/base-v13-7.ipynb'
     nb = json.loads(notebook.read_text(encoding='utf8'))
     with tempfile.TemporaryDirectory(prefix='duck-variant-') as temp:
@@ -39,6 +39,13 @@ def build(name, notebook=None):
             change('inference/utils/codex_inspection_feedback.py',Path(__file__).with_name('inspection_feedback.py').read_text(encoding='utf8'))
             change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+
                 '\n\nfrom inference.utils.codex_inspection_feedback import install as _install_codex_feedback\n_install_codex_feedback(ToolAgent)\n')
+        elif name=='template':
+            change('inference/utils/codex_template_transfer.py',Path(__file__).with_name('template_transfer.py').read_text(encoding='utf8'))
+            change('inference/utils/codex_template_hook.py',Path(__file__).with_name('template_hook.py').read_text(encoding='utf8'))
+            change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+
+                '\n\nfrom inference.utils.codex_template_transfer import TemplateTransfer as _TemplateTransfer\n'+
+                'from inference.utils.codex_template_hook import install as _install_template_controller\n'+
+                '_install_template_controller(__import__(__name__, fromlist=["ToolAgent"]),_TemplateTransfer)\n')
         else:
             raise ValueError(name)
         patch=''.join(patches)
@@ -53,6 +60,7 @@ def build(name, notebook=None):
         'Unscored candidate. Base: '+str(notebook.name)+'. One isolated mechanism; serving and budget unchanged.\n'+
         ('Memory adapted from lalalia9/vickyfym and rellik13/sirikilohit; compatibility fix preserves existing level notes.\n' if name=='memory' else
          'Feedback uses actual tool outcomes. No game IDs or internal engine access.\n' if name=='probe' else
+         'Symbolic color relations from visible demonstrations, prediction checks and LLM fallback. No game IDs or engine access.\n' if name=='template' else
          'Observation-only strategy router and repeated-inspection guard. No game IDs or internal engine access.\n')]
     out=ROOT/'duck-lab-candidates'/name
     out.mkdir(parents=True,exist_ok=True)
@@ -62,14 +70,15 @@ def build(name, notebook=None):
     metadata=json.loads(metadata_path.read_text(encoding='utf8'))
     metadata.update(id='petersharps/arc3-codex-'+name+'-lab',title='ARC3 Codex '+name+' lab',code_file='agent.ipynb')
     (out/'kernel-metadata.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')
-    materialize(out/'agent.ipynb',ROOT/'analysis/duck-loop-20261031'/('packaged-'+name))
+    materialize(out/'agent.ipynb',source_output or ROOT/'analysis/duck-loop-20261031'/('packaged-'+name))
     print(out,flush=True)
 
 
 if __name__=='__main__':
     import argparse
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--name',choices=('memory','router','probe'))
+    p.add_argument('--name',choices=('memory','router','probe','template'))
     p.add_argument('--base-notebook',type=Path)
+    p.add_argument('--source-output',type=Path)
     args=p.parse_args()
-    for name in ([args.name] if args.name else ('memory','router')):build(name,args.base_notebook)
+    for name in ([args.name] if args.name else ('memory','router')):build(name,args.base_notebook,args.source_output)

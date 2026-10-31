@@ -25,7 +25,7 @@ def main():
     p.add_argument('--source', type=Path, required=True)
     p.add_argument('--notebook', type=Path, default=ROOT/'duck-v18-experiment/base-v13-7.ipynb')
     p.add_argument('--game', required=True)
-    p.add_argument('--variant', choices=['control', 'v18', 'memory', 'router', 'probe'], required=True)
+    p.add_argument('--variant', choices=['control', 'v18', 'memory', 'router', 'probe','template'], required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--token-budget', type=int, default=1024)
     p.add_argument('--request-tokens', type=int, default=512)
@@ -37,11 +37,13 @@ def main():
     p.add_argument('--temperature',type=float,default=0.0)
     p.add_argument('--oracle-replay',action='store_true',help='Infrastructure test only, never LLM quality evidence')
     p.add_argument('--inspection-feedback',action='store_true')
+    p.add_argument('--controller-only',action='store_true')
     p.add_argument('--policy-env', type=json.loads, default={}, help='Explicit experimental environment delta as JSON')
     args = p.parse_args()
     if args.out.exists() and any(args.out.iterdir()):
         raise FileExistsError(args.out)
     args.out.mkdir(parents=True, exist_ok=True)
+    if args.controller_only:os.environ['ARC3_TEMPLATE_ONLY']='1'
     # Apply notebook environment using literal data only; no notebook execution.
     nb = json.loads(args.notebook.read_text(encoding='utf8'))
     def safe_value(node):
@@ -200,10 +202,12 @@ def main():
                            max_generated_tokens_per_game=args.token_budget, max_actions_per_game=100, concurrency=1)
     analyzer = ta.ToolAgent(model=args.model, base_url='http://127.0.0.1:1234/v1', provider='lmstudio',
                             timeout=args.seconds, save_request_logs=True)
+    stop_event=threading.Event()
+    if args.controller_only:analyzer._template_stop_callback=stop_event.set
     session = _HarnessGameSession(solver=solver, game=game, analyzer=analyzer,
         game_index=0, pass_index=0, state_path=args.out/'tool_runtime_state.json',
         transcript_path=args.out/'transcript.txt', analysis_html_relpath='analysis.html',
-        stop_event=threading.Event(), viewer_data_path=args.out/'viewer.json')
+        stop_event=stop_event, viewer_data_path=args.out/'viewer.json')
     if args.oracle_replay:
         # Known public solution is TEST INPUT to the genuine tool/action path.
         # Never package this branch into the competition agent.
@@ -231,11 +235,17 @@ def main():
         session.play()
     except Exception as exc:
         import traceback
-        error = traceback.format_exc()
-        print(error, flush=True)
+        if args.controller_only and type(exc).__name__=='ControllerAbstained':
+            print('Observation controller abstained; no LLM request made',flush=True)
+        else:
+            error = traceback.format_exc()
+            print(error, flush=True)
     if game.game_run.final_score is None:
         game.finish_game()
     run = game.game_run
+    if error is None and run.state=='crashed':
+        error=run.solver_note or 'Harness recorded a crashed game'
+    (args.out/'game-run.json').write_text(json.dumps(run.to_json_dict(),indent=2),encoding='utf8')
     # Official scoring only after the agent has finished; no baseline leakage.
     from arc_agi.scorecard import EnvironmentScoreCalculator
     calc = EnvironmentScoreCalculator(id=args.game, state=game.current_state.raw.state)
@@ -253,10 +263,15 @@ def main():
               'routes': getattr(analyzer,'_lab_routes',[]), 'memory_levels': len(getattr(analyzer,'_slm_levels',[])),
               'memory_pinned_chars': len(getattr(analyzer,'_slm_block_text','')),
               'note': run.solver_note, 'error': error, 'seconds': time.monotonic()-start}
+    result['harness_state']=run.state
     result['image_scale']=args.image_scale
     result['notebook_sha256']=hashlib.sha256(args.notebook.read_bytes()).hexdigest()
     result['policy_env']=args.policy_env
     result['thinking']=args.thinking
+    result['controller_only']=args.controller_only
+    result['controller_actions']=getattr(analyzer,'_template_actions',0)
+    result['controller_abstained']=getattr(analyzer,'_template_abstained',False)
+    result['valid_agent_run']=not bool(error) and (bool(api_rows) or bool(result['controller_actions']))
     result['temperature']=args.temperature
     result['oracle_replay']=args.oracle_replay
     result['inspection_feedback']=args.inspection_feedback

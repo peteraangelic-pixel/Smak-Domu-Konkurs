@@ -12,6 +12,7 @@
 //! * [`replay`]  — find wasted actions in recorded runs, sweep directories in parallel
 
 pub mod ffi;
+pub mod rectangles;
 pub mod grid;
 pub mod replay;
 pub mod score;
