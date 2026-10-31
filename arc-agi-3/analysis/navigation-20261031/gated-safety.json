@@ -1,0 +1,62 @@
+{
+  "workers": 16,
+  "backend": "Rust FFI",
+  "rows": [
+    {
+      "policy": "original",
+      "family": "copy",
+      "trials": 300,
+      "fired": 149,
+      "correct": 149
+    },
+    {
+      "policy": "original",
+      "family": "rotate",
+      "trials": 300,
+      "fired": 299,
+      "correct": 18
+    },
+    {
+      "policy": "original",
+      "family": "invert",
+      "trials": 300,
+      "fired": 300,
+      "correct": 0
+    },
+    {
+      "policy": "original",
+      "family": "random",
+      "trials": 300,
+      "fired": 297,
+      "correct": 23
+    },
+    {
+      "policy": "gated",
+      "family": "copy",
+      "trials": 300,
+      "fired": 149,
+      "correct": 149
+    },
+    {
+      "policy": "gated",
+      "family": "rotate",
+      "trials": 300,
+      "fired": 17,
+      "correct": 3
+    },
+    {
+      "policy": "gated",
+      "family": "invert",
+      "trials": 300,
+      "fired": 0,
+      "correct": 0
+    },
+    {
+      "policy": "gated",
+      "family": "random",
+      "trials": 300,
+      "fired": 8,
+      "correct": 1
+    }
+  ]
+}

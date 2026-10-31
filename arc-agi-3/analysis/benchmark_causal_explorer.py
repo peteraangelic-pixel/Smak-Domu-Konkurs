@@ -29,7 +29,19 @@ def run(job):
     from arcengine import ARCBaseGame
     cls=next(v for v in vars(mod).values() if isinstance(v,type) and v.__module__==mod.__name__ and issubclass(v,ARCBaseGame))
     engine=cls(); fd=engine.perform_action(ActionInput(id=GameAction.RESET))
-    if variant=='guarded':
+    if variant=='gated':
+        from template_gated_guarded import GuardedTemplateTransfer
+        if backend=='rust':
+            from native_rectangles import NativeRectangles
+            agent=GuardedTemplateTransfer(extract_rectangles=NativeRectangles())
+        else:agent=GuardedTemplateTransfer()
+    elif variant=='navigation':
+        from motion_navigator import MotionNavigator
+        if backend=='rust':
+            from native_rectangles import NativeRectangles
+            agent=MotionNavigator(extract_rectangles=NativeRectangles())
+        else:agent=MotionNavigator()
+    elif variant=='guarded':
         from template_guarded import GuardedTemplateTransfer
         if backend=='rust':
             from native_rectangles import NativeRectangles
@@ -52,8 +64,8 @@ def run(job):
         if str(fd.state).endswith(('WIN','GAME_OVER')):break
     return {'game':Path(path).stem,'variant':variant,'backend':backend,'levels_completed':int(fd.levels_completed),
             'actions':len(records),'seconds':time.perf_counter()-t,'state':str(fd.state),
-            'policy_sha256':hashlib.sha256(Path(__file__).with_name('template_guarded.py' if variant=='guarded' else 'template_transfer.py' if variant=='template' else 'causal_explorer.py').read_bytes()).hexdigest(),
-            'base_template_sha256':hashlib.sha256(Path(__file__).with_name('template_transfer.py').read_bytes()).hexdigest() if variant=='guarded' else None,
+            'policy_sha256':hashlib.sha256(Path(__file__).with_name('template_gated_guarded.py' if variant=='gated' else 'motion_navigator.py' if variant=='navigation' else 'template_guarded.py' if variant=='guarded' else 'template_transfer.py' if variant=='template' else 'causal_explorer.py').read_bytes()).hexdigest(),
+            'base_template_sha256':hashlib.sha256(Path(__file__).with_name('template_gated_transfer.py' if variant=='gated' else 'template_transfer.py').read_bytes()).hexdigest() if variant in ('guarded','gated') else None,
             'evaluator_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'trace':records,'template_hits':getattr(agent,'hits',0),'prediction_mismatches':getattr(agent,'mismatches',0),
             'qualification':'Forward-only observation policy,public games,no Kaggle score forecast.'}
@@ -64,7 +76,7 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--games',nargs='*')
     p.add_argument('--workers',type=int,default=16)
-    p.add_argument('--variants',nargs='+',choices=['uniform','causal','template','guarded'],default=['uniform','causal','template'])
+    p.add_argument('--variants',nargs='+',choices=['uniform','causal','template','guarded','gated','navigation'],default=['uniform','causal','template'])
     p.add_argument('--rect-backend',choices=['numpy','rust'],default='numpy')
     p.add_argument('--actions',type=int,default=256)
     p.add_argument('--out',type=Path,required=True)
