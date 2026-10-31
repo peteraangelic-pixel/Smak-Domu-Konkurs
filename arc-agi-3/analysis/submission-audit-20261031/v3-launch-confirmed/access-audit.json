@@ -1,0 +1,64 @@
+{
+  "operations": [
+    {
+      "label": "cli-version",
+      "args": [
+        "--version"
+      ],
+      "returncode": 0,
+      "output_file": "cli-version.txt"
+    },
+    {
+      "label": "submission-v137",
+      "args": [
+        "competitions",
+        "submission",
+        "57811453"
+      ],
+      "returncode": 0,
+      "output_file": "submission-v137.txt"
+    },
+    {
+      "label": "submission-v3",
+      "args": [
+        "competitions",
+        "submission",
+        "57247568"
+      ],
+      "returncode": 0,
+      "output_file": "submission-v3.txt"
+    },
+    {
+      "label": "episodes-v137",
+      "args": [
+        "competitions",
+        "episodes",
+        "57811453"
+      ],
+      "returncode": 0,
+      "output_file": "episodes-v137.txt"
+    },
+    {
+      "label": "download-v137",
+      "args": [
+        "competitions",
+        "submission-download",
+        "57811453",
+        "-p",
+        "arc-agi-3/analysis/submission-access-20261031/submitted-file"
+      ],
+      "returncode": 1,
+      "output_file": "download-v137.txt"
+    },
+    {
+      "label": "competition-help",
+      "args": [
+        "competitions",
+        "--help"
+      ],
+      "returncode": 0,
+      "output_file": "competition-help.txt"
+    }
+  ],
+  "download_inventory": []
+}
