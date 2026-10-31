@@ -18,6 +18,8 @@ Weryfikacja porównania: identyczny model lokalny Qwen3.8-27B Q4,seed731,thinkin
 
 Surowe dane: `result.json`,`manifest.json`,`api.jsonl`,`requests.jsonl`,`transcript.txt`,`game-run.json`. Podsumowania: `paired-comparison.json`,`diagnosis.json` w katalogu przebiegu. Kontrola: `analysis/champion-probe-pair-20261031/control-ft09`.
 
+Uwaga do instrumentu: `controller_abstained=false` w pełnym przebiegu oznacza brak jawnego zatrzymania ewaluatora controller-only. To pole nie liczy przekazań sterowania w trybie hybrydowym; potwierdzeniem fallbacku jest56 rzeczywistych odpowiedzi API w surowym logu.
+
 **Wniosek: potwierdzono lokalną przewagę całej hybrydy na jednej publicznej grze użytej w rozwoju modułu.** To nie ślepy test nowych mechanik,nie wynik ani prognoza Kaggle i nie potwierdzenie50+. Lokalne28,5714 z SDK dotyczy tylko ft09. Na25 publicznych grach moduł działał tylko w ft09; na24 pozostałych przekazuje sterowanie LLM. Nadal nie wykonano pełnego A/B na docelowym Flash-Next/SGLang.
 
 Nie zgłoszono ani nie opublikowano notebooka na Kaggle. Ten pojedynczy test jest zakończony; nie uruchamiamy automatycznie kolejnej macierzy. Monitor należy usunąć po zapisaniu i commicie wyników.

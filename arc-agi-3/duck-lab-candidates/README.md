@@ -1,6 +1,6 @@
 # Experiments only
 
-`template/` is a new observation-derived symbolic controller on recovered v3. The actual packaged notebook completed3 public ft09 levels in25 actions through Duck's Python sandbox without LLM calls or stored paths. It abstains on unsupported observations and delegates to the original LLM. This is not a Kaggle score or full hybrid A/B. On the25 public-game CPU corpus it acted only on ft09. Read analysis/SYMBOLIC-CONTROLLER-20261031.md before considering upload.
+`template/` is a new observation-derived symbolic controller on recovered v3. The actual packaged notebook completed3 public ft09 levels in25 actions through Duck's Python sandbox without LLM calls or stored paths. It abstains on unsupported observations and delegates to the original LLM. This is not a Kaggle score or a target Flash-Next A/B. On the25 public-game CPU corpus it acted only on ft09. Read analysis/SYMBOLIC-CONTROLLER-20261031.md before considering upload.
 
 Update: one full local hybrid paired run completed. Same local Qwen27B/8192token budget:control0 levels,template3 levels on ft09. Real LLM fallback56 API calls added0 actions/levels. Read analysis/HYBRID-RESULT-20261031.md. This is one public development game,not a target Flash-Next test or Kaggle score.
 
