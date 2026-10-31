@@ -16,7 +16,7 @@ jobs:
       - name: Read public sources and own submission status
         env:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-        run: python arc-agi-3/analysis/read_top10.py
+        run: python arc-agi-3/analysis/recover_champion.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
