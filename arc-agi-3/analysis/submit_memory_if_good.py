@@ -88,7 +88,7 @@ def main():
         decision['smoke_ok']=bool(re.search(r'^ARC3_SMOKE_OK\s*$',text,re.M))
         decision['memory_captured']=bool(re.search(r'^SLM_V3_CAPTURE levels=\d+ current=\d+\s*$',text,re.M))
         decision['memory_pinned']=bool(re.search(r'^SOLVED_LEVEL_MEMORY pinned: \d+ level\(s\), \d+ chars\s*$',text,re.M))
-        decision['memory_errors']=bool(re.search(r'^(SLM_V3_REFRESH_ERROR |SOLVED_LEVEL_MEMORY error \()',text,re.M))
+        decision['memory_errors']=bool(re.search(r'^(SLM_V3_REFRESH_ERROR |SLM_V3_RECOVERY_ERROR |SOLVED_LEVEL_MEMORY error \()',text,re.M))
         ok=ok and decision['smoke_ok'] and decision['memory_captured'] and decision['memory_pinned'] and not decision['memory_errors']
         if not ok:
             decision['reason']='quality_or_activation_gate_failed';save();return
