@@ -23,8 +23,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source', type=Path, required=True)
+    p.add_argument('--notebook', type=Path, default=ROOT/'duck-v18-experiment/base-v13-7.ipynb')
     p.add_argument('--game', required=True)
-    p.add_argument('--variant', choices=['control', 'v18', 'memory', 'router'], required=True)
+    p.add_argument('--variant', choices=['control', 'v18', 'memory', 'router', 'probe'], required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--token-budget', type=int, default=1024)
     p.add_argument('--request-tokens', type=int, default=512)
@@ -35,12 +36,13 @@ def main():
     p.add_argument('--thinking',choices=['off','on'],default='off')
     p.add_argument('--oracle-replay',action='store_true',help='Infrastructure test only, never LLM quality evidence')
     p.add_argument('--inspection-feedback',action='store_true')
+    p.add_argument('--policy-env', type=json.loads, default={}, help='Explicit experimental environment delta as JSON')
     args = p.parse_args()
     if args.out.exists() and any(args.out.iterdir()):
         raise FileExistsError(args.out)
     args.out.mkdir(parents=True, exist_ok=True)
     # Apply notebook environment using literal data only; no notebook execution.
-    nb = json.loads((ROOT/'duck-v18-experiment/base-v13-7.ipynb').read_text(encoding='utf8'))
+    nb = json.loads(args.notebook.read_text(encoding='utf8'))
     def safe_value(node):
         if isinstance(node,ast.Constant): return node.value
         if isinstance(node,ast.Name) and node.id in ('SERVER_BASE_URL','SERVED_MODEL_NAME'):
@@ -51,18 +53,42 @@ def main():
         raise ValueError(f'Unsupported setup expression: {ast.dump(node)}')
     # The variant dictionary is only a delta. Recover the notebook's complete
     # policy setup as well (guards, UNDO, animations, function retention, etc.).
-    setup_cell=''.join(nb['cells'][17]['source'])
+    setup_cells=[''.join(c['source']) for c in nb['cells'] if 'setup_env =' in ''.join(c['source'])]
+    if len(setup_cells)!=1:
+        raise ValueError(f'Expected one setup_env cell; found {len(setup_cells)}')
+    setup_cell=setup_cells[0]
     start=setup_cell.index('setup_env =')
     setup_assignment=setup_cell[start:setup_cell.index('\n}',start)+2]
     for node in ast.walk(ast.parse(setup_assignment)):
         if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='setup_env' for t in node.targets):
             assert isinstance(node.value,ast.Dict)
             os.environ.update({str(safe_value(k)):str(safe_value(v)) for k,v in zip(node.value.keys,node.value.values)})
-    for node in ast.walk(ast.parse(''.join(nb['cells'][1]['source']))):
-        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'ARC3_VARIANT' for t in node.targets):
-            variant = ast.literal_eval(node.value)
-            os.environ.update(variant['env'])
-    os.environ.update(ARC3_PLAN_COMMIT='1', ARC3_ESCALATE_ACTIONS='20', ARC3_LEVEL_TOKEN_CAP='0',
+    for cell in nb['cells']:
+        text=''.join(cell['source'])
+        if cell.get('cell_type')!='code' or text.startswith('%%') or 'ARC3_VARIANT =' not in text:
+            continue
+        for node in ast.walk(ast.parse(text)):
+            if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'ARC3_VARIANT' for t in node.targets):
+                variant = ast.literal_eval(node.value)
+                os.environ.update(variant['env'])
+    # Later notebook versions enable commit outside ARC3_VARIANT. Recover the
+    # literal switch without executing notebook cells or imposing it on v3.
+    for cell in nb['cells']:
+        text=''.join(cell['source'])
+        if cell.get('cell_type')!='code' or 'PLAN_COMMIT = ' not in text or text.startswith('%%'):
+            continue
+        constants={}
+        for node in ast.parse(text).body:
+            if isinstance(node,ast.Assign) and isinstance(node.value,ast.Constant):
+                for target in node.targets:
+                    if isinstance(target,ast.Name):constants[target.id]=node.value.value
+        if constants.get('PLAN_COMMIT')=='1':
+            os.environ['ARC3_PLAN_COMMIT']='1'
+            os.environ['ARC3_ESCALATE_ACTIONS']=str(constants.get('ESCALATE_ACTIONS',20))
+    if not isinstance(args.policy_env,dict) or not all(isinstance(k,str) and k.startswith('ARC3_') for k in args.policy_env):
+        raise ValueError('--policy-env requires ARC3_ environment keys')
+    os.environ.update({k:str(v) for k,v in args.policy_env.items()})
+    os.environ.update(
         LOCAL_ANALYZER_MODEL_ID=args.model, LOCAL_ANALYZER_PROVIDER='lmstudio',
         LOCAL_ANALYZER_BASE_URL='http://127.0.0.1:1234/v1', LOCAL_ANALYZER_CONTEXT_WINDOW='16384',
         LOCAL_ANALYZER_MAX_OUTPUT=str(args.request_tokens), LOCAL_ANALYZER_ENABLE_THINKING='1' if args.thinking=='on' else '0',
@@ -227,6 +253,8 @@ def main():
               'memory_pinned_chars': len(getattr(analyzer,'_slm_block_text','')),
               'note': run.solver_note, 'error': error, 'seconds': time.monotonic()-start}
     result['image_scale']=args.image_scale
+    result['notebook_sha256']=hashlib.sha256(args.notebook.read_bytes()).hexdigest()
+    result['policy_env']=args.policy_env
     result['thinking']=args.thinking
     result['oracle_replay']=args.oracle_replay
     result['inspection_feedback']=args.inspection_feedback

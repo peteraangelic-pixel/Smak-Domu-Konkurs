@@ -17,14 +17,18 @@ def materialize(notebook, output):
     shutil.copytree(ROOT / 'kaggle/ops/results/r033-recon-bundle/bundle/src/ARC3-Inference', source)
     nb = json.loads(notebook.read_text(encoding='utf8'))
     hashes = []
-    for i in range(6, 16):
+    for i, item in enumerate(nb['cells']):
+        if item.get('cell_type') != 'code':
+            continue
         cell = ''.join(nb['cells'][i]['source'])
-        patches = [cell.split('\n', 1)[1]] if i == 6 else [
+        if not any(marker in cell for marker in ('diff --git', '--- a/', '--- /dev/null')):
+            continue
+        if cell.startswith('%%') and not cell.startswith('%%writefile /kaggle/harness-changes.patch'):
+            continue
+        patches = [cell.split('\n', 1)[1]] if cell.startswith('%%writefile /kaggle/harness-changes.patch') else [
             n.value for n in ast.walk(ast.parse(cell))
             if isinstance(n, ast.Constant) and isinstance(n.value, str)
             and n.value.startswith(('diff --git', '--- a/', '--- /dev/null'))]
-        if not patches:
-            raise ValueError(f'No patches in cell {i}')
         for patch in patches:
             subprocess.run(['git', 'apply', '--include=ARC3-Inference/*', '--whitespace=nowarn', '-'],
                            input=(patch.rstrip('\n') + '\n').encode(), cwd=output, check=True)

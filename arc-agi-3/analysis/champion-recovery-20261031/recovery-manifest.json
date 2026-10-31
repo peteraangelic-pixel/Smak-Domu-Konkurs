@@ -1,0 +1,42 @@
+{
+  "submission_ref": 57247568,
+  "kernel": "petersharps/arc3-duck",
+  "kernel_version": 3,
+  "commands": [
+    {
+      "args": [
+        "kernels",
+        "pull",
+        "petersharps/arc3-duck/3",
+        "--metadata",
+        "--path",
+        "research/champion-v3"
+      ],
+      "returncode": 0
+    },
+    {
+      "args": [
+        "competitions",
+        "submissions",
+        "-c",
+        "arc-prize-2026-arc-agi-3",
+        "--csv"
+      ],
+      "returncode": 0
+    },
+    {
+      "args": [
+        "competitions",
+        "leaderboard",
+        "-c",
+        "arc-prize-2026-arc-agi-3",
+        "--show"
+      ],
+      "returncode": 0
+    }
+  ],
+  "files": {
+    "champion-v3/kernel-metadata.json": "f619289e95a4bf4c6a6b6bf20b565f99f3732d717d1ea6ea5d4b6feb66dbcab2",
+    "champion-v3/arc3-duck.ipynb": "8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc"
+  }
+}
