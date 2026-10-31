@@ -84,6 +84,7 @@ if mode=='memory-correction':
 
 if mode in ('v3-watch','memory-watch','memory-correction-watch'):
     slug='petersharps/arc3-codex-memory-v3-lab' if mode in ('memory-watch','memory-correction-watch') else 'petersharps/arc3-duck-codex-v3-control-1031'
+    if mode=='memory-correction-watch':slug='petersharps/arc3-codex-memory-v3-recovery'
     label='memory-correction' if mode=='memory-correction-watch' else 'memory-target' if mode=='memory-watch' else 'v3-target'
     version='2' if mode=='memory-correction-watch' else '1'
     deadline=time.monotonic()+6000

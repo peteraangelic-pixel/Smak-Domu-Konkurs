@@ -40,13 +40,14 @@ def gate(control,candidate):
 def main():
     OUT.mkdir(exist_ok=True,parents=True)
     config=json.loads((ROOT/'duck-lab-candidates/memory-v3/SUBMISSION-CANDIDATE.json').read_text(encoding='utf8'))
-    assert config['kernel']==SLUG
+    assert config['kernel'] in (SLUG,'petersharps/arc3-codex-memory-v3-recovery')
+    selected_slug=config['kernel']
     version=int(config['version']);assert version>=1
     source=(ROOT/config['source']).resolve()
     assert (ROOT/'duck-lab-candidates').resolve() in source.parents
     assert len(config['sha256'])==64
-    version_ref=SLUG+'/'+str(version)
-    decision={'notebook':SLUG,'version':version,'sha256':config['sha256'],'utc':datetime.now(timezone.utc).isoformat(),'submitted':False}
+    version_ref=selected_slug+'/'+str(version)
+    decision={'notebook':selected_slug,'version':version,'sha256':config['sha256'],'utc':datetime.now(timezone.utc).isoformat(),'submitted':False}
     def save(): (OUT/'decision.json').write_text(json.dumps(decision,indent=2),encoding='utf8')
     def command(label,args):
         p=subprocess.run(['kaggle',*args],capture_output=True,text=True,timeout=180)
@@ -98,12 +99,12 @@ def main():
         rows=list(csv.DictReader(io.StringIO(submissions)))
         if not rows or 'ref' not in rows[0]:raise RuntimeError('Unrecognized submission inventory; no submission')
         if any(('memory-v3' in str(r) and 'scheduled20261101' in str(r)) or
-               'arc3-codex-memory-v3-lab' in str(r) for r in rows):
+               'arc3-codex-memory-v3-lab' in str(r) or 'arc3-codex-memory-v3-recovery' in str(r) for r in rows):
             decision['reason']='already_submitted';save();return
         # Durable attempt marker is written BEFORE the irreversible API call.
         (OUT/'attempted.json').write_text(json.dumps({'tag':TAG,'utc':datetime.now(timezone.utc).isoformat()}),encoding='utf8')
         response=command('competition-submit',['competitions','submit','arc-prize-2026-arc-agi-3',
-                                              '-k',SLUG,'-v',str(version),'-f','submission.parquet','-m',TAG.replace(' v1 ',f' v{version} ')])
+                                              '-k',selected_slug,'-v',str(version),'-f','submission.parquet','-m',TAG.replace(' v1 ',f' v{version} ')])
         decision.update(submitted=True,reason='gates_passed_submission_accepted',response=response)
         save()
     except Exception as exc:

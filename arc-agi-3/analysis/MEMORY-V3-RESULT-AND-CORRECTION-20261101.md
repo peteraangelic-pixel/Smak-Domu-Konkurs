@@ -21,3 +21,5 @@ Kod:memory_v3_recovery.py. Paczka:duck-lab-candidates/memory-v3-recovery. Metada
 SUBMISSION-CANDIDATE.json nadal wskazuje wersję1; **nie jest zakwalifikowana**. Dopiero po zakończeniu i przejściu wszystkich bramek wersji2 wolno przepiąć konfigurację na jej numer,plik i hash. Nie zgłaszać z tego monitora;decyzja o02:10 pozostaje osobną automatyzacją.
 
 Surowe wyniki wersji1:analysis/memory-v3-target-20261031/result-download/ oraz result-summary.json. Test korekty:recovery-activation/result.json,recovery-isolation.json,recovery-hint-check.json w tym samym katalogu.
+
+Aktualizacja po API: przyjęto wersję2,ale Kaggle zmienił canonical slug na petersharps/arc3-codex-memory-v3-recovery zgodnie z tytułem. Nie wykonywać ponownego pusha. Kolektor i allowlista wykonawcy submisji zostały dopasowane do faktycznej nazwy;przed wyborem nadal wymagane sprawdzenie kodu wersji2.
