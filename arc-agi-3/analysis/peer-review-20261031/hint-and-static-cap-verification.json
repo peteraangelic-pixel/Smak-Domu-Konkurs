@@ -1,0 +1,29 @@
+{
+  "scope": "Source/policy verification, no engine games or LLM quality evaluation",
+  "v11_notebook_sha256": "7b7e8b3196cc8471a2950281323234d89f88aac7f6a8fac619cca56f921fdac0",
+  "source_sha256": {
+    "analysis\\peer-review-20261031\\v11-hint-source-check\\ARC3-Inference\\inference\\agent\\tool_agent.py": "afda546d8792a364034ce4075c479b98610a4ef5698b7ffd07f4ec7ed74109c6",
+    "analysis\\peer-review-20261031\\v11-hint-source-check\\ARC3-Inference\\inference\\framework\\arc3_level_budget.py": "132e8246d7d8853c30759bd5fa5c04b30d3f17e82cc89ece7340bd0f1fa8f2c8",
+    "analysis\\champion-recovery-20261031\\v137-rematerialized\\ARC3-Inference\\inference\\framework\\arc3_level_budget.py": "a8a6385263b3c59a2481feeeb6c25deed61adcb6af0842931bca01650046fe5b"
+  },
+  "hint_ast_fragment_output": {
+    "0": [],
+    "1": [
+      "When your evidence supports a choice, call `action(actions)` with the sequence it supports. Probe with a single action when you genuinely need to distinguish two possibilities; otherwise batch the route you have."
+    ]
+  },
+  "static_budget_sampled_comparisons": 10000,
+  "static_budget_decisions": {
+    "keep_going": 2653,
+    "reset_level": 717,
+    "abandon": 6630
+  },
+  "v13_probe_cell_zero_based": 33,
+  "v13_live_roster_swap_cell_zero_based": 34,
+  "caveats": [
+    "Hint activation is not evidence of more completed levels.",
+    "Sampled static policy agreement is not full solver equivalence.",
+    "45000 is a per-level token cap; it does not replace 532 minutes per game.",
+    "No expected Kaggle score or top-five ceiling is established by these checks."
+  ]
+}
