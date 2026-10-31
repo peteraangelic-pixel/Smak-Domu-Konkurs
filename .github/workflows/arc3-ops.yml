@@ -4,10 +4,13 @@ on:
     inputs:
       mode:
         type: choice
-        options: [audit, v3-smoke, v3-watch, memory-smoke, memory-watch]
+        options: [audit, v3-smoke, v3-watch, memory-smoke, memory-watch, memory-submit]
         default: audit
 permissions:
   contents: read
+concurrency:
+  group: arc-codex-conditional-submit-${{ inputs.mode }}
+  cancel-in-progress: false
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -23,13 +26,21 @@ jobs:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
         run: python arc-agi-3/kaggle/ops/write_creds.py
       - name: Read scored submission and test artifact access
+        if: inputs.mode != 'memory-submit'
         env:
           KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
           ARC_AUDIT_MODE: ${{ inputs.mode }}
         run: python arc-agi-3/analysis/audit_submission_access.py
+      - name: Authorized conditional memory submission
+        if: inputs.mode == 'memory-submit'
+        env:
+          KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
+        run: python arc-agi-3/analysis/submit_memory_if_good.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: arc-submission-access-57811453
-          path: arc-agi-3/analysis/submission-access-20261031
+          path: |
+            arc-agi-3/analysis/submission-access-20261031
+            arc-agi-3/analysis/memory-v3-scheduled-submit-20261101
           retention-days: 7
