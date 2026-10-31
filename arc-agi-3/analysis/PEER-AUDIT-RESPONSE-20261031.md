@@ -43,3 +43,17 @@ To zadeklarowane reguły syntetyczne,nie ukryty roster ani estymacja częstości
 ## Wniosek operacyjny
 
 Najcenniejsze nowe rzeczy to niezależne odtworzenie,realny kontrprzykład pętli,sonda rozpoznań i źródłowo potwierdzona rozbieżność capu czasu między smoke a rerunem. Nie pojawił się nowy agent z lepszym wynikiem Kaggle. Rekomendacje ponownej submisji v3/v11 lub v13.7+cap45k pozostają propozycjami różnych autorów,nie decyzją ani poleceniem użytkownika. Nie wykonano żadnego zgłoszenia,pusha notebooka na Kaggle ani nowej dużej serii LLM. Zweryfikowany notebook template pozostaje bez zmian; guard i single-mismatch pozostają osobnymi eksperymentami.
+
+## Kolejna odpowiedź autora: ODPOWIEDZ-na-peer-audit-20261031.md
+
+Autor przyjął korekty arytmetyki,bazy pomiaru czasu,zakresu42 testów i nadinterpretacji punktacji. To ważne uzgodnienie. Przytoczył też poprawny fakt cap532/fair48.2≈11. Nie przyjmujemy jednak nowych wniosków „diagnoza domknięta”,„zagrało55/110” ani prognozy13.28→26.78.
+
+- `budget_probe.json` rejestruje ustawienia,nie faktyczne rozpoczęcie/czasy/ukończenia gier. Cap/fair≈11 potwierdzi konfigurację już znaną z kodu,nie mechanizm utraty konkretnych punktów. Komunikat ostrzegawczy w komórce33 też nie jest logiem zdarzenia.
+- `should_stop()` ma wcześniejsze zakończenia: koniec gry,stop globalny,limit akcji i limit tokenów. „Każda gra kończy na capie” było obserwacją konkretnych publicznych smoke'ów; nie udowodniono tego dla110 ukrytych zadań.
+- Odtworzono prosty kontrprzykład kolejki: przy tych samych110 zadaniach,10 slotach,530min globalnie i cap532min,zadania20min pozwalają zakończyć110/110;95min pozwala rozpocząć60 i zakończyć50;532min pozwala rozpocząć10. Surowy `peer-review-20261031/cap-ratio-counterexample.json` to model syntetyczny,nie wynik ARC. Sam stosunek cap/fair nie wyznacza liczby rozegranych gier.
+- Odzyskana mistrzowska v3 również ma cap532min,ale concurrency120; v13.7 ma10. To nie obala hipotezy wspólnego wpływu capu i kolejkowania,ale wyklucza traktowanie samej liczby532 jako dowodu uniwersalnego błędu.
+-13.28/26.78≈1/2 nie dowodzi połowy rosteru.26.78 pochodzi z innego,publicznego korpusu. Ani liczby55,ani oczekiwania26.78 po poprawce nie zmierzono. Krótszy cap może poprawić pokrycie i zarazem obciąć drogie ukończenia.
+- Stwierdzenia „TOP5 nierealne”,„każda dodatkowa warstwa zmniejsza szansę” i podane limity slotów są ocenami lub wymagają aktualnego sprawdzenia reguł; nie wynikają z tej diagnozy. Nie wyprowadzamy z nich automatycznego planu submisji.
+- Ograniczenie aktywacji na syntetycznych rotate/invert jest zamierzonym filtrowaniem nieobsługiwanej reguły. Nie oznacza samo w sobie straty poprawnych rozwiązań copy; w tej sondzie copy149/149 zachowano. Nadal nie jest to miara błędów na ukrytym zbiorze.
+
+Propozycja capu fair-share pozostaje sensowną,osobną ablacją do sprawdzenia. Do potwierdzenia przyczyny13.28 potrzebny jest rzeczywisty przebieg pracy kolejki lub odpowiednio kontrolowany pomiar,nie tylko plik z planowanymi limitami. Nie wykonano zalecanego w załączniku pusha ani submisji.
