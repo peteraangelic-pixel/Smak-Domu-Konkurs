@@ -4,7 +4,7 @@ on:
     inputs:
       mode:
         type: choice
-        options: [audit, v3-smoke, v3-watch]
+        options: [audit, v3-smoke, v3-watch, memory-smoke, memory-watch]
         default: audit
 permissions:
   contents: read

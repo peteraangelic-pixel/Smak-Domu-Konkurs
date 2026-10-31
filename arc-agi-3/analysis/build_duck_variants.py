@@ -29,8 +29,11 @@ def build(name, notebook=None,source_output=None):
                 'a/ARC3-Inference/'+relative if path.exists() else '/dev/null',
                 'b/ARC3-Inference/'+relative))
         agent=source/'inference/agent/tool_agent.py'
-        if name=='memory':
-            change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+'\n\n'+memory_source()+'\n')
+        if name in ('memory','memory-v3'):
+            if name=='memory-v3':
+                from memory_v3 import source as selected_memory_source
+            else:selected_memory_source=memory_source
+            change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+'\n\n'+selected_memory_source()+'\n')
         elif name=='router':
             change('inference/utils/codex_observation_router.py',Path(__file__).with_name('observation_router.py').read_text(encoding='utf8'))
             change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+
@@ -58,7 +61,7 @@ def build(name, notebook=None,source_output=None):
         'ARC3_VARIANT["name"] = "codex-'+name+'-lab"\n']})
     nb['cells'][0]['source']=['# Codex '+name+' experiment\n'+
         'Unscored candidate. Base: '+str(notebook.name)+'. One isolated mechanism; serving and budget unchanged.\n'+
-        ('Memory adapted from lalalia9/vickyfym and rellik13/sirikilohit; compatibility fix preserves existing level notes.\n' if name=='memory' else
+        ('Memory adapted from lalalia9/vickyfym and rellik13/sirikilohit; compatibility fix preserves existing level notes.\n' if name in ('memory','memory-v3') else
          'Feedback uses actual tool outcomes. No game IDs or internal engine access.\n' if name=='probe' else
          'Symbolic color relations from visible demonstrations, prediction checks and LLM fallback. No game IDs or engine access.\n' if name=='template' else
          'Observation-only strategy router and repeated-inspection guard. No game IDs or internal engine access.\n')]
@@ -68,6 +71,7 @@ def build(name, notebook=None,source_output=None):
     metadata_path=notebook.parent/'kernel-metadata.json'
     if not metadata_path.exists():metadata_path=ROOT/'duck-v18-experiment/candidate/kernel-metadata.json'
     metadata=json.loads(metadata_path.read_text(encoding='utf8'))
+    metadata.pop('id_no',None)
     metadata.update(id='petersharps/arc3-codex-'+name+'-lab',title='ARC3 Codex '+name+' lab',code_file='agent.ipynb')
     (out/'kernel-metadata.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')
     materialize(out/'agent.ipynb',source_output or ROOT/'analysis/duck-loop-20261031'/('packaged-'+name))
@@ -77,7 +81,7 @@ def build(name, notebook=None,source_output=None):
 if __name__=='__main__':
     import argparse
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--name',choices=('memory','router','probe','template'))
+    p.add_argument('--name',choices=('memory','memory-v3','router','probe','template'))
     p.add_argument('--base-notebook',type=Path)
     p.add_argument('--source-output',type=Path)
     args=p.parse_args()

@@ -53,33 +53,37 @@ for p in (OUT/'submitted-file').glob('**/*'):
         inventory.append(entry)
 (OUT/'access-audit.json').write_text(json.dumps({'operations':records,'download_inventory':inventory},indent=2),encoding='utf8')
 
-if os.environ.get('ARC_AUDIT_MODE')=='v3-smoke':
+mode=os.environ.get('ARC_AUDIT_MODE')
+if mode in ('v3-smoke','memory-smoke'):
     # Explicitly authorized private save-run. No competition submit command.
-    slug='petersharps/arc3-duck-codex-v3-control-1031'
-    existing=run('v3-target-preflight',['kernels','list','--mine','--search',slug.split('/')[1],'--csv'])
-    status=(OUT/'v3-target-preflight.txt').read_text(encoding='utf8')
+    slug='petersharps/arc3-codex-memory-v3-lab' if mode=='memory-smoke' else 'petersharps/arc3-duck-codex-v3-control-1031'
+    label='memory-target' if mode=='memory-smoke' else 'v3-target'
+    package='arc-agi-3/duck-lab-candidates/memory-v3' if mode=='memory-smoke' else 'arc-agi-3/duck-lab-candidates/v3-target-control'
+    existing=run(label+'-preflight',['kernels','list','--mine','--search',slug.split('/')[1],'--csv'])
+    status=(OUT/(label+'-preflight.txt')).read_text(encoding='utf8')
     if existing.get('returncode')==0 and slug in status:
         print('Existing target kernel: preserve it, no duplicate push.',flush=True)
     elif existing.get('returncode')==0:
-        record=run('v3-target-push',['kernels','push','-p','arc-agi-3/duck-lab-candidates/v3-target-control'])
-        print('Authorized private v3 save-run push result:',record.get('returncode'),flush=True)
+        record=run(label+'-push',['kernels','push','-p',package])
+        print('Authorized private save-run push result:',record.get('returncode'),flush=True)
     else:
         print('Preflight inconclusive: no push.',flush=True)
 
-if os.environ.get('ARC_AUDIT_MODE')=='v3-watch':
-    slug='petersharps/arc3-duck-codex-v3-control-1031'
+if mode in ('v3-watch','memory-watch'):
+    slug='petersharps/arc3-codex-memory-v3-lab' if mode=='memory-watch' else 'petersharps/arc3-duck-codex-v3-control-1031'
+    label='memory-target' if mode=='memory-watch' else 'v3-target'
     deadline=time.monotonic()+6000
     events=[]
     while time.monotonic()<deadline:
-        record=run('v3-target-status',['kernels','status',slug])
-        status=(OUT/'v3-target-status.txt').read_text(encoding='utf8')
+        record=run(label+'-status',['kernels','status',slug])
+        status=(OUT/(label+'-status.txt')).read_text(encoding='utf8')
         match=re.search(r'KernelWorkerStatus\.(\w+)',status)
         state=match.group(1).upper() if match else 'UNRESOLVED'
         events.append({'utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'state':state,'returncode':record.get('returncode')})
-        (OUT/'v3-watch-events.json').write_text(json.dumps(events,indent=2),encoding='utf8')
-        print('v3 target status:',state,flush=True)
+        (OUT/(label+'-watch-events.json')).write_text(json.dumps(events,indent=2),encoding='utf8')
+        print(label+' status:',state,flush=True)
         if state in ('COMPLETE','ERROR','CANCELLED','CANCELED'):
-            run('v3-target-output',['kernels','output',slug+'/1','-p',str(OUT/'v3-output'),
+            run(label+'-output',['kernels','output',slug+'/1','-p',str(OUT/(label+'-output')),
                                   '--file-pattern',r'(benchmark\.json|.*\.log|.*metrics.*\.json|budget_probe\.json)$'])
             break
         if len(events)>=3 and all(e['state']=='UNRESOLVED' for e in events[-3:]):
