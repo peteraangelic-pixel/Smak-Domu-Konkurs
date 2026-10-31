@@ -1,0 +1,45 @@
+{
+  "metric": "rhae_score_pct",
+  "pairs": [
+    {
+      "game": "ft09",
+      "seed": 731,
+      "families": [
+        "all",
+        "mouse_only"
+      ],
+      "level_delta": 3,
+      "score_delta": 28.57142857142857,
+      "error": false
+    }
+  ],
+  "groups": {
+    "all": {
+      "trials": 1,
+      "games": 1,
+      "level_delta": 3,
+      "mean_score_delta": 28.57142857142857,
+      "regressed_games": []
+    },
+    "mouse_only": {
+      "trials": 1,
+      "games": 1,
+      "level_delta": 3,
+      "mean_score_delta": 28.57142857142857,
+      "regressed_games": []
+    }
+  },
+  "no_level_regressions": true,
+  "no_group_score_regressions": true,
+  "error_free": true,
+  "qualification": "One development public game/seed with local Qwen27B; not a hidden-game score forecast or target-model A/B.",
+  "baseline_levels": 0,
+  "hybrid_levels": 3,
+  "controller_actions": 25,
+  "llm_actions": 0,
+  "fallback_api_calls": 56,
+  "completed_levels_improved": true,
+  "shared_base_patch_hashes": true,
+  "temperature_verified": 0,
+  "notebook_verified": true
+}

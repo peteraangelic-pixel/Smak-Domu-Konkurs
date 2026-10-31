@@ -1,0 +1,41 @@
+{
+  "unique_tool_calls": 56,
+  "unique_observed_tool_results": 52,
+  "calls_without_observed_result": [
+    "O4mI4O20vyMyQj8RueHhDViHYg4PUAcn",
+    "UcPbavQnObUQdFdX5Qya68PpHW1O1p3y",
+    "esbRk8OTBNqP2GELZDASqF7tzeYGzMWq",
+    "mf0BbGTIhbYrrPADfwvDyXhISdSaZMYN"
+  ],
+  "tool_errors": 1,
+  "tool_error_kinds": {
+    "NameError": 1
+  },
+  "errors": [
+    {
+      "tool_call_id": "XfuGMXM7KAEUg9gyXai2pN8ablYdPemU",
+      "error": "NameError: name 'json' is not defined"
+    }
+  ],
+  "calls_containing_action_code": 0,
+  "unique_feedback_results": 0,
+  "max_identical_code_calls": 5,
+  "most_repeated_code": [
+    {
+      "calls": 5,
+      "code": "# Level 3: what did the red block look like? Check transition 10 before frame.\nt = transitions[10]\nseg = t.before_frame.segmentation['nodes']\nfor n in seg:\n    if n['color']=='R':\n        print(n['id'], 'px',n['pixels'], 'hash',n['hash'])\n# crop ascii around red block bbox [4,60,7,63]\na = t.before_frame.ascii.split('\\n')\nfor r in range(2,10):\n    print(r, a[r][58:64])\n"
+    },
+    {
+      "calls": 3,
+      "code": "seg = current_frame.segmentation\nnodes = seg['nodes']\nprint(\"level\", current_frame.level, \"step\", current_frame.step)\nfor n in nodes:\n    print(n['id'], n['color'], 'px', n['pixels'], 'hash', n['hash'][:8], 'rot', n['rotation'], 'bbox', [min(p[0] for p in n['boundary']), min(p[1] for p in n['boundary']), max(p[0] for p in n['boundary']), max(p[1] for p in n['boundary'])])"
+    },
+    {
+      "calls": 3,
+      "code": "# Look at history to understand what happened in previous levels and this level's start\nprint(\"num transitions:\", len(transitions))\nfor i,t in enumerate(transitions):\n    print(i, t.action, 'auto' if t.result.get('automatic') else '', 'level', t.after_frame.level)"
+    }
+  ],
+  "qualification": "Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.",
+  "finished": true,
+  "engine_actions": 25,
+  "levels_completed": 3
+}

@@ -1,5 +1,7 @@
 # Aktywny test nowego modułu symbolicznego
 
+ZAKOŃCZONE: czytaj HYBRID-RESULT-20261031.md. Hybryda3 poziomy/25 akcji kontra kontrola0 poziomów/2 akcje,przy zgodnych modelu i budżecie8192 tokeny. Fallback do LLM56 wywołań API był rzeczywisty,bez błędów API,lecz nie dodał akcji/ukończeń na poziomie4. Jedna NameError w kodzie narzędzia; brak crasha i limitu czasu. Nie uruchamiać ponownie. Po archiwizacji usunąć heartbeat. Dalsze instrukcje są historyczne.
+
 Czytaj SYMBOLIC-CONTROLLER-20261031.md. Nowy kod i notebook template nie zawierają ID gier,gotowych ścieżek ani dostępu do silnika. W dwóch rzeczywistych przebiegach controller-only przez Duck/sandbox ukończyły3 publiczne poziomy ft09 w4+7+14=25 akcjach,0 tokenów,oracle_replay=false.4,766s i4,813s. Drugi przebieg zachował25 prawdziwych rekordów w game-run.json. Dalej polityka abstynuje. Notebook w trybie normalnym przekazuje wtedy sterowanie oryginalnemu LLM.
 
 Teraz działa JEDEN `run_duck_loop.py` dla `analysis/causal-agent-20261031/hybrid-full-ft09`,na Qwen3.8-27B Q4,16k kontekstu,thinkingOFF,temp0,8192total/4096request/3600s,seed731,image4. Nie dublować ani nie zmieniać załadowanego modelu. Źródło `analysis/causal-agent-20261031/packaged-template-final/ARC3-Inference`,notebook `duck-lab-candidates/template/agent.ipynb`,SHA550eb185aa12efe9450e011c794ff12625adc18db287cf9f8248fa716208d5fa.

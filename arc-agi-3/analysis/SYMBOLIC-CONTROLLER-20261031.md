@@ -32,7 +32,7 @@ Na25 publicznych grach uruchomiono3 polityki,po256 legalnych akcji maksymalnie,b
 
 Nie wykonano pełnego A/B hybrydowego Duck z docelowym Flash-Next. Nie wiadomo, czy w ukrytych grach ten wzorzec występuje ani ile wniesie do punktacji. Nie rekomendujemy zgłoszenia wyłącznie na podstawie tego wyniku. Notebook jest gotowym artefaktem do przeglądu i dalszego testowania,nie został wysłany na Kaggle.
 
-Uruchomiono jeden pełny lokalny przebieg hybrydowy `causal-agent-20261031/hybrid-full-ft09`: normalny fallback do Qwena27B,bez controller-only,8192 tokeny/4096request/3600s,temp0,thinkingOFF,seed731,obraz4. Jest porównywalny z istniejącą kontrolą `champion-probe-pair-20261031/control-ft09` przy tych samych limitach. Jego wynik pozostaje w toku; nie przedstawiamy go jako zakończonego A/B. Nie uruchamiać drugiej kopii.
+Zakończono jeden pełny lokalny przebieg hybrydowy `causal-agent-20261031/hybrid-full-ft09`: normalny fallback do Qwena27B,bez controller-only,8192 tokeny/4096request/3600s,temp0,thinkingOFF,seed731,obraz4. Hybryda ukończyła3 poziomy,istniejąca kontrola przy tych samych limitach0. Fallback miał56 wywołań API,ale nie wykonał dalszych akcji i nie ukończył poziomu4. To wynik jednej znanej publicznej gry,nie ukrytego Kaggle. Szczegóły i błędy narzędzi: HYBRID-RESULT-20261031.md. Nie uruchamiać drugiej kopii.
 
 ## Rust,Rayon i sprawdzenie poprawności
 
