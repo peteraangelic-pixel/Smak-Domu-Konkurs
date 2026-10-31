@@ -139,3 +139,7 @@ $env:PYTHONPATH=(Resolve-Path .\arc-agi-3\llm-agent).Path
 ```
 
 Nie zapisywać plików pamięci Codex bez osobnego polecenia użytkownika.
+
+
+## Aktualizacja03:00
+Przeczytaj NIGHT-UPDATE-0300-20261031.md; pilot zakończony, rozszerzona macierz działa.
