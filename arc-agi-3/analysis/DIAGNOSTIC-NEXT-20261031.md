@@ -12,5 +12,7 @@ Do not launch duplicate processes. Pending results are only in analysis/champion
 
 Heartbeat10:15local: one matrix and one active ToolAgent game process (Windows Python launcher/interpreter pairs are not duplicates); control/ft09 has33 successful API calls,5732 completion tokens and0 API errors so far. No completed row yet. Follow-up changed to every30minutes until this diagnosis finishes, with routine waiting quiet. Do not restart the running trial.
 
+Heartbeat10:46local: control/ft09 completed:0 levels,2 actions,8192 tokens,47 API calls,2137.688s,0 API errors. `diagnose_tool_loop.py` deduplicates native call IDs rather than re-counting replayed chat history:46 unique calls,42 observed outputs,1 NameError,2 calls containing action code. Thus tool runtime errors are separate from API health; repeated inspection dominates this control. Probe/ft09 remains active; frozen interim diagnosis observed6 distinct feedback outputs and3 tool errors among21 observed outputs. Feedback now DOES activate, unlike the earlier ON probe, but no quality conclusion yet. Keep the pair unchanged. Two diagnostic deduplication/error-classification tests passed. Recompute interim counts after the trial ends; do not treat a partial row as a final result.
+
 ## PILNE: rzeczywisty wynik Kaggle
 Przeczytaj V13-7-SCORE-STATUS-20261031.md: v13.7-final ma13.28, v11 ma23.89, najlepsze26.25. GO wycofane. Nie promuj pochodnych tej bazy na podstawie lokalnych smoke.
