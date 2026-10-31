@@ -1,0 +1,35 @@
+OK   notebook parses (33 cells)
+OK   control parses (33 cells)
+OK   code cells compile (18)
+OK   only header + variant cells differ
+OK   same cell count as control
+OK   VARIANT.json env == notebook env
+OK   variant name matches profile
+OK   PLAN_COMMIT=0 (control path)
+OK   TRUE_CONCURRENCY=10
+OK   concurrency 120 gone
+OK   all five patches extracted
+OK   metadata id/title/code_file
+OK   sources identical to control
+OK   cap=0 -> inert (peek)
+OK   cap=0 -> inert (step)
+OK   control: RESET at 45k
+OK   control: no abandon at 89 999
+OK   control: ABANDON at 90k
+OK   abandon: KEEP at 59 999
+OK   abandon: ABANDON at 60k
+OK   abandon: ABANDON at 0 levels
+OK   progress: step(50k, 0) keeps
+OK   progress: level done keeps
+OK   progress: fresh budget after level
+OK   min_done=1 protects 0-level game
+OK   min_done=1: step observes level 1
+OK   min_done=1 abandons at 120k on level 2
+OK   cap90: KEEP at 88 114 (max observed)
+OK   cap90: RESET at 90k
+OK   cap90: KEEP at 179 999
+OK   cap90: ABANDON at 180k
+OK   profile hint carries cap/resets/min_done
+OK   hint: exact single-env delta and provenance name
+
+ALL CHECKS PASSED

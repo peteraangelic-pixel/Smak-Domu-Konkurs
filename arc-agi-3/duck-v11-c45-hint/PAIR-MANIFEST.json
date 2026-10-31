@@ -1,0 +1,32 @@
+{
+  "status": "PACKAGING_VALIDATED_QUALITY_UNMEASURED",
+  "arms": {
+    "control": {
+      "folder": "duck-v11-c45-control",
+      "kernel_id": "petersharps/arc3-duck-v11-c45-control",
+      "notebook": "arc3-duck-v11.ipynb",
+      "sha256": "7b7e8b3196cc8471a2950281323234d89f88aac7f6a8fac619cca56f921fdac0"
+    },
+    "hint": {
+      "folder": "duck-v11-c45-hint",
+      "kernel_id": "petersharps/arc3-duck-v11-c45-hint",
+      "notebook": "arc3-duck-v11-c45-hint.ipynb",
+      "sha256": "78089ea52cae60c488b5af1f402e6f26beb67ecd20c14539e77761f322ee7fc5"
+    }
+  },
+  "source_files_identical": 36,
+  "patches_identical": 5,
+  "policy_delta": {
+    "ARC3_OPENER_COMMIT_HINT": [
+      "unset/off",
+      "1"
+    ]
+  },
+  "target": "Kaggle Flash-Next W4A16 and drafter, same inputs as v11",
+  "evaluations_run": {
+    "target_model": false,
+    "kaggle_smoke": false,
+    "competition_submission": false
+  },
+  "promotion_gate": "Fresh paired target-model runs: completed levels and per-game regressions, not actions per call."
+}
