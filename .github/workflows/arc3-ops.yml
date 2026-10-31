@@ -4,14 +4,14 @@ on:
     inputs:
       mode:
         type: choice
-        options: [audit, v3-smoke]
+        options: [audit, v3-smoke, v3-watch]
         default: audit
 permissions:
   contents: read
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 110
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

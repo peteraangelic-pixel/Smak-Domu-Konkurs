@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import time
 
 OUT=Path('arc-agi-3/analysis/submission-access-20261031')
 OUT.mkdir(parents=True,exist_ok=True)
@@ -64,3 +65,23 @@ if os.environ.get('ARC_AUDIT_MODE')=='v3-smoke':
         print('Authorized private v3 save-run push result:',record.get('returncode'),flush=True)
     else:
         print('Preflight inconclusive: no push.',flush=True)
+
+if os.environ.get('ARC_AUDIT_MODE')=='v3-watch':
+    slug='petersharps/arc3-duck-codex-v3-control-1031'
+    deadline=time.monotonic()+6000
+    events=[]
+    while time.monotonic()<deadline:
+        record=run('v3-target-status',['kernels','status',slug])
+        status=(OUT/'v3-target-status.txt').read_text(encoding='utf8')
+        match=re.search(r'KernelWorkerStatus\.(\w+)',status)
+        state=match.group(1).upper() if match else 'UNRESOLVED'
+        events.append({'utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'state':state,'returncode':record.get('returncode')})
+        (OUT/'v3-watch-events.json').write_text(json.dumps(events,indent=2),encoding='utf8')
+        print('v3 target status:',state,flush=True)
+        if state in ('COMPLETE','ERROR','CANCELLED','CANCELED'):
+            run('v3-target-output',['kernels','output',slug+'/1','-p',str(OUT/'v3-output'),
+                                  '--file-pattern',r'(benchmark\.json|.*\.log|.*metrics.*\.json|budget_probe\.json)$'])
+            break
+        if len(events)>=3 and all(e['state']=='UNRESOLVED' for e in events[-3:]):
+            break
+        time.sleep(60)
