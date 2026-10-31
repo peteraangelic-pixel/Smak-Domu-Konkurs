@@ -2,7 +2,7 @@
 
 Użytkownik wyraźnie polecił: „wrzuc go na submisje jesli wynik bedzie okey,zrób to o2:10 w nocy”. Dotyczy memory-v3,nie innego kandydata. Jednorazowa zgoda na submisję po przejściu kryteriów. Nie wymaga ponownego pytania.
 
-Termin: **2026-11-01 02:10 Europe/Warsaw = 2026-11-01 01:10 UTC**. Skrypt odmawia przed tym momentem i innego dnia. Automatyzacja ma wykonać tylko jedno sprawdzenie,zgłosić dokładną wersję1 albo zapisać powód pominięcia. Bez zastępczych wersji i bez ponawiania niejednoznacznego wysłania.
+Termin: **2026-11-01 02:10 Europe/Warsaw = 2026-11-01 01:10 UTC**. Skrypt odmawia przed tym momentem i innego dnia. Automatyzacja ma wykonać tylko jedno sprawdzenie,zgłosić wybraną zweryfikowaną wersję pamięci albo zapisać powód pominięcia. Bez niesprawdzonych zamienników i bez ponawiania niejednoznacznego wysłania.
 
 Kandydat początkowy: petersharps/arc3-codex-memory-v3-lab/1. Lokalny notebook SHA2561e73906cf1c99d65b17b41e18ecc7633438158aae42bc6383cb8570e97ca5a61. Przed decyzją pobrać opublikowany kod wybranej wersji i porównać wszystkie komórki kodu.
 

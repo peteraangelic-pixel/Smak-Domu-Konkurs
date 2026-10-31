@@ -97,7 +97,8 @@ def main():
         submissions=command('submissions-before',['competitions','submissions','arc-prize-2026-arc-agi-3','--csv'])
         rows=list(csv.DictReader(io.StringIO(submissions)))
         if not rows or 'ref' not in rows[0]:raise RuntimeError('Unrecognized submission inventory; no submission')
-        if any(TAG in str(r) or 'arc3-codex-memory-v3-lab' in str(r) for r in rows):
+        if any(('memory-v3' in str(r) and 'scheduled20261101' in str(r)) or
+               'arc3-codex-memory-v3-lab' in str(r) for r in rows):
             decision['reason']='already_submitted';save();return
         # Durable attempt marker is written BEFORE the irreversible API call.
         (OUT/'attempted.json').write_text(json.dumps({'tag':TAG,'utc':datetime.now(timezone.utc).isoformat()}),encoding='utf8')
