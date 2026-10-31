@@ -51,3 +51,16 @@ for p in (OUT/'submitted-file').glob('**/*'):
             except Exception as exc:entry['inspection_error']=type(exc).__name__
         inventory.append(entry)
 (OUT/'access-audit.json').write_text(json.dumps({'operations':records,'download_inventory':inventory},indent=2),encoding='utf8')
+
+if os.environ.get('ARC_AUDIT_MODE')=='v3-smoke':
+    # Explicitly authorized private save-run. No competition submit command.
+    slug='petersharps/arc3-duck-codex-v3-control-1031'
+    existing=run('v3-target-preflight',['kernels','status',slug])
+    status=(OUT/'v3-target-preflight.txt').read_text(encoding='utf8')
+    if existing.get('returncode')==0:
+        print('Existing target kernel: preserve it, no duplicate push.',flush=True)
+    elif '404' in status or 'not found' in status.lower():
+        record=run('v3-target-push',['kernels','push','-p','arc-agi-3/duck-lab-candidates/v3-target-control'])
+        print('Authorized private v3 save-run push result:',record.get('returncode'),flush=True)
+    else:
+        print('Preflight inconclusive: no push.',flush=True)

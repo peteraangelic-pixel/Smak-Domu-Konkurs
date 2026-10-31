@@ -1,6 +1,11 @@
 name: ARC3 read-only submission artifact audit
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [audit, v3-smoke]
+        default: audit
 permissions:
   contents: read
 jobs:
@@ -20,6 +25,7 @@ jobs:
       - name: Read scored submission and test artifact access
         env:
           KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
+          ARC_AUDIT_MODE: ${{ inputs.mode }}
         run: python arc-agi-3/analysis/audit_submission_access.py
       - uses: actions/upload-artifact@v4
         if: always()
