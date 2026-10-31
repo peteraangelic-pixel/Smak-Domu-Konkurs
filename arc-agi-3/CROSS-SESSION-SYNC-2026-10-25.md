@@ -736,3 +736,47 @@ przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decy
   (smoke nie ma problemu capów; cap_over_fair dotyczył rerunu 110 gier).
 - Limit dzienny wyczerpany (0 remaining). Slot 31.10 otwiera się 00:00 UTC: **powtórka**
   (σ 2,5–3,9) albo **D′** (Gemma 6d081d52, n=4<1σ) — decyzja po wyniku 57811453.
+
+## 28. WYNIK v13.7: 13.28 (REGRESJA) + AUDYT PACZKI „GPT 6.1 SOL/ASTRA" (kontroler symboliczny) + KOREKTA LEKCJI §26 (31.10 ~15:20 UTC)
+
+### A. Wynik zweryfikowany (r122, Kaggle API)
+- **57811453 = 13.28 COMPLETE** (v11 23.89, v3 26.25; strata −10,61 vs v11). Smoke 22,59 ≠ rerun
+  (inny pomiar — pokrycie 10/110 gier). Slot 31.10 OTWARTY (0 zgłoszeń dziś). „a/call 5,3 nie jest
+  prognozą 50" (c4eeb067) — PRZYJMUJEMY, to był instrument, nie kryterium GO.
+- **Root-cause: brak logów rerunu (Kaggle nie wystawia), zmiany skonfiskowane.** Główny podejrzany
+  (hipoteza, nie dowód): **cap=0 w reżimie 110 gier** — v11 miał cap45k/r1 (gry zablokowane kończyły
+  się ~2× szybciej → fale ogonowe dostawały czas); v13.7 (cap=0) pozwala spalonej grze żreć pełne
+  ~48 min → ogon kolejki ucięty globalnym deadline'em → mniej ukończonych poziomów. Smoke (10 gier,
+  każdy i tak 48 min) tego NIE WIDZI (stąd 22,59). Alternatywy: PLAN_COMMIT=1, hint, escalate20
+  (koszty tokenów na 110 grach).
+- **KOREKTA LEKCJI §26 (rejestr)**: adjudykacja „nie uzbrajać" oparła się na trackach 10-gierkowych,
+  gdzie mechanizm cięcia w ogóle nie odpalał (ABANDON=0); Gemmin argument „kolejka nadrabia" dotyczył
+  tokenów, nie CZASU do deadline'u w falach. Na danych rerunu nie znam odpowiedzi — werdykt §26
+  nieważny dla reżimu 110 gier. NOWA REGUŁA: decyzje o rerunie nie na smoke-trackach.
+
+### B. Audyt paczki „START-HERE-REVIEW-20261031" (gałąź codex/arc-local-lab-v18-20261030, tip 3926007)
+- **Dokumentacja wzorowo uczciwa**: sami oddzielają wynik znanej gry od generalizacji („ft09 użyta
+  w rozwoju"), kwalifikują każdą liczbę („nie wynik Kaggle, nie prognoza 50+"), wycofują GO.
+- **Kod legalny (audit template_hook.py + template_transfer.py)**: polityka dostaje tylko
+  piksele/valid actions/publiczny numer poziomu; brak ID gry, baseline'ów, silnika, scoringu;
+  izolacja pamięci per state_path (nowy kontroler na grę); abstencja → fallback do oryginalnego
+  LLM; akcje wykonywane przez prawdziwe narzędzie Duck (action([MOUSE...])). 42 testy Py + 36 Rust.
+- **Artefakty spójne z deklaracjami**: paired-comparison (ft09 Δ3 poziomy, +28,57 RHAE, seed 731,
+  kwalifikacja wprost), public25 (75/75 identycznych śladów NumPy vs Rust; template 3 poziomy/25
+  akcji, abstencja na 24/25). NIE odtwarzałem lokalnego biegu hybrydy (Windows/venv/ich ft09 —
+  poza moim środowiskiem); odtwarzalność = ich 2 niezależne biegi (4,766s/4,813s) + SHA notebooka.
+- **Werdykt: NIE zgłaszać dziś** (zgodna z ich własną rekomendacją): brak A/B na Flash-Next/SGLang,
+  wartość dla ukrytych gier nieznana (abstencja 24/25 publicznych). Potencjał: notebook jest na
+  BAZIE v3 (26,25) + moduł → kandydat na 1.11/2.11 jako eksperyment Po odzyskaniu mistrza i po
+  ich własnych kryteriach (smoke 26+, A/B Flash-Next). Ryzyko fałszywego rozpoznania niskie
+  (sprzeczność → abstencja na poziomie; błędny klik = 1 zmarnowana akcja).
+- Bonus z ich gałęzi: „Read-only recovery of exact Kaggle v3 champion source" — mają odzyskane
+  DOKŁADNE źródło v3-championa (przyda się do powtórki/reprodukcji 26,25).
+
+### C. Propozycja slotu 31.10 (OTWARTY; wymaga GO usera)
+- **A (rekomendacja): v13.7 + LEVEL_TOKEN_CAP=45000 + RESETS_MAX=1** — JEDNA zmiana env vs
+  dzisiejsze 13.28 (reszta bajt w bajt); test hipotezy capu wprost; ~24+ = przyczyna znaleziona
+  i config na poziomie v11 z lepszym machinery; ~13 = cap niewinny → 1.11 rozbiór dalej.
+- **B: powtórka v11** (druga próbka 23,89; zero informacji diagnostycznej).
+- C (ich template): nie. 2.11: select best (26.25 stoi niezależnie).
+- Procedura jak dziś: push r-NNN midnight-launch → smoke COMPLETE → auto-submit (guard dzienny).
