@@ -1,0 +1,33 @@
+{
+  "unique_tool_calls": 63,
+  "unique_observed_tool_results": 60,
+  "calls_without_observed_result": [
+    "8PHCWD8Zv3tz6jlwwyqHdvVrQ0IMw7Zx",
+    "OIw9drYAX8TW5kEsqlM1gEhvxmC5Hc2d",
+    "sMhyrkqFzrkAan8iKXGUmrj1wGOvzpUp"
+  ],
+  "tool_errors": 0,
+  "tool_error_kinds": {},
+  "errors": [],
+  "calls_containing_action_code": 2,
+  "unique_feedback_results": 19,
+  "max_identical_code_calls": 20,
+  "most_repeated_code": [
+    {
+      "calls": 20,
+      "code": "a = current_frame.ascii.split('\\n')\nfor r in range(24, 50):\n    print(r, a[r][15:48])\n"
+    },
+    {
+      "calls": 9,
+      "code": "a = current_frame.ascii\nlines=a.split('\\n')\ngrid=[list(l) for l in lines]\nprint(\"    \" + \"\".join(str(c%10) for c in range(14,54)))\nfor r in range(29,50):\n    print(r, ''.join(grid[r][14:54]))\n"
+    },
+    {
+      "calls": 2,
+      "code": "import json\nseg = current_frame.segmentation\nprint(\"level\", current_frame.level, \"step\", current_frame.step)\nnodes = seg['nodes']\nfor n in nodes:\n    print(n['id'], n['color'], 'px', n['pixels'], 'hash', n['hash'][:8], 'rot', n['rotation'], 'sym', n['rotational_symmetry'])\n"
+    }
+  ],
+  "qualification": "Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.",
+  "finished": true,
+  "engine_actions": 2,
+  "levels_completed": 0
+}
