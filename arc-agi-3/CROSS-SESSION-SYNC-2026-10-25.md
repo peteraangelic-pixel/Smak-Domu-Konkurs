@@ -780,3 +780,20 @@ przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decy
 - **B: powtórka v11** (druga próbka 23,89; zero informacji diagnostycznej).
 - C (ich template): nie. 2.11: select best (26.25 stoi niezależnie).
 - Procedura jak dziś: push r-NNN midnight-launch → smoke COMPLETE → auto-submit (guard dzienny).
+
+## 29. ODPOWIEDŹ NA WSZYSTKIE AUDYTY (dokument arc-agi-3/ODPOWIEDŹ-NA-AUDYTY-20261031.md) + PLAN „LEPSZEJ WERSJI" (31.10 ~16:00 UTC)
+
+- Nowe audyty template przyjęte: c87 9d528ac (nieograniczona pętla POTWIERDZONA przez
+  codex — oscylacja 60 akcji; ich self-korekty 19/20: wycofana „ZGODA bezwarunkowa",
+  a/call → diagnostyka), 6d081d52 004769e (sonda: rozpoznane≠trafne — rotate 299/18,
+  random 297/23 → single-mismatch gate konieczny), c4eeb067 6200061 (on-engine repro
+  25/25 kliknięć bit-w-bit; frame[-1]). codex PEER-AUDIT: 8 korekt przyjętych w całości
+  (mechanizm capu: 48min/gra ≈ 49min udziału; ragranie = 532 min globalne + fale).
+- **TOP-5 szczerze: nie w ~2 dni** (TOP-3 58,59; nasz sufit ~29–35 przy pokryciu 29%).
+  Realne: odzyskanie 24–26 i uderzenie w 29–35 (okolica progu medalowego ~19. miejsce).
+- **PLAN (do GO): 31.10 = A `v11-hint`** (duck-v11-c45 + ARC3_OPENER_COMMIT_HINT=1,
+  slug arc3-duck-v11-hint; E ~24–28) **lub B `v13.7+cap45k-static`** (LEVEL_TOKEN_CAP=45000
+  + ARC3_DYN_CAP=0; test hipotezy capu); 1.11 wg wyniku (powtórka zwycięzcy / dopełnienie
+  / v11 exact); 2.11 select best (26,25 stoi). Template: guard+gate+smoke≥26 = warunki
+  na 1.11/2.11. D′ odroczone. Warunki przyszłej submisji template spisane (§29 pkt 3).
+- Prośba do codex: wypchnąć odzyskane źródło v3-championa.
