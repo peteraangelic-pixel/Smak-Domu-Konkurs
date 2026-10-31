@@ -1,0 +1,35 @@
+usage: kaggle competitions [-h]
+                           {list,files,download,submit,submissions,submission,leaderboard,team-submissions,submission-limits,submission-download,episodes,replay,logs,pages,hosts,host-add,data,settings,solution,launch,init,create,topics,topic-messages}
+                           ...
+
+options:
+  -h, --help            show this help message and exit
+
+commands:
+  {list,files,download,submit,submissions,submission,leaderboard,team-submissions,submission-limits,submission-download,episodes,replay,logs,pages,hosts,host-add,data,settings,solution,launch,init,create,topics,topic-messages}
+    list                List available competitions
+    files               List competition files
+    download            Download competition files
+    submit              Make a new competition submission
+    submissions         Show your competition submissions
+    submission          Show status and score for a single submission by its ref
+    leaderboard         Get competition leaderboard information
+    team-submissions    List a team's public submissions (every active submission for simulation competitions, or the public leaderboard submission for regular competitions)
+    submission-limits   Show your team's submission counts and remaining daily allowance for a competition
+    submission-download
+                        Download the submitted file for a single submission by its id
+    episodes            List episodes for a submission in a simulation competition
+    replay              Download the replay for a simulation episode
+    logs                Download agent logs for a simulation episode
+    pages               List pages for a competition
+    hosts               List hosts (users with host access) for a competition
+    host-add            Grant host access on a competition you host to a Kaggle user
+    data                Manage a competition's data files
+    settings            Manage settings for a competition you host
+    solution            Manage the private solution file for a competition you host
+    launch              Launch a competition you host, optionally at a future UTC time
+    init                Initialize folder with a competition-metadata.json template
+    create              Create a new competition from competition-metadata.json
+    topics              List discussion topics for a competition
+    topic-messages      ==SUPPRESS==
+
