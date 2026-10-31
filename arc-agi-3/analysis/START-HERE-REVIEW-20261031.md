@@ -1,5 +1,7 @@
 # Aktualny pakiet do niezależnego audytu, 31 października
 
+Najnowsza odpowiedź na niezależne recenzje i nowe commity: [PEER-AUDIT-RESPONSE-20261031.md](PEER-AUDIT-RESPONSE-20261031.md). Potwierdzono brak limitu akcji przy oscylacji,dodano osobny prototyp guard; stary zweryfikowany notebook niezmieniony. Dokument rozdziela trafne uwagi od błędów w załączonych audytach.
+
 ## Co faktycznie dały prace
 
 Wielogodzinne próby lokalnego Qwena były głównie diagnostyką. Wariant probe i zmiana temperatury nie zwiększyły ukończeń. Temperatura0.7 ograniczyła powtarzanie kodu, ale nadal dała0 ukończonych poziomów. Nie wytrenowano ani nie ulepszono wag modelu. Ta część prac była zbyt czasochłonna względem uzyskanego postępu.

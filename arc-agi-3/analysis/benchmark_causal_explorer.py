@@ -29,7 +29,13 @@ def run(job):
     from arcengine import ARCBaseGame
     cls=next(v for v in vars(mod).values() if isinstance(v,type) and v.__module__==mod.__name__ and issubclass(v,ARCBaseGame))
     engine=cls(); fd=engine.perform_action(ActionInput(id=GameAction.RESET))
-    if variant=='template' and backend=='rust':
+    if variant=='guarded':
+        from template_guarded import GuardedTemplateTransfer
+        if backend=='rust':
+            from native_rectangles import NativeRectangles
+            agent=GuardedTemplateTransfer(extract_rectangles=NativeRectangles())
+        else:agent=GuardedTemplateTransfer()
+    elif variant=='template' and backend=='rust':
         from native_rectangles import NativeRectangles
         agent=TemplateTransfer(extract_rectangles=NativeRectangles())
     else:agent=TemplateTransfer() if variant=='template' else CausalExplorer(responsive=variant=='causal')
@@ -46,7 +52,8 @@ def run(job):
         if str(fd.state).endswith(('WIN','GAME_OVER')):break
     return {'game':Path(path).stem,'variant':variant,'backend':backend,'levels_completed':int(fd.levels_completed),
             'actions':len(records),'seconds':time.perf_counter()-t,'state':str(fd.state),
-            'policy_sha256':hashlib.sha256(Path(__file__).with_name('template_transfer.py' if variant=='template' else 'causal_explorer.py').read_bytes()).hexdigest(),
+            'policy_sha256':hashlib.sha256(Path(__file__).with_name('template_guarded.py' if variant=='guarded' else 'template_transfer.py' if variant=='template' else 'causal_explorer.py').read_bytes()).hexdigest(),
+            'base_template_sha256':hashlib.sha256(Path(__file__).with_name('template_transfer.py').read_bytes()).hexdigest() if variant=='guarded' else None,
             'evaluator_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'trace':records,'template_hits':getattr(agent,'hits',0),'prediction_mismatches':getattr(agent,'mismatches',0),
             'qualification':'Forward-only observation policy,public games,no Kaggle score forecast.'}
@@ -57,13 +64,14 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--games',nargs='*')
     p.add_argument('--workers',type=int,default=16)
+    p.add_argument('--variants',nargs='+',choices=['uniform','causal','template','guarded'],default=['uniform','causal','template'])
     p.add_argument('--rect-backend',choices=['numpy','rust'],default='numpy')
     p.add_argument('--actions',type=int,default=256)
     p.add_argument('--out',type=Path,required=True)
     args=p.parse_args()
     if args.out.exists():raise FileExistsError(args.out)
     paths=[x for x in (ROOT/'games/environment_files').rglob('*.py') if not args.games or x.stem in args.games]
-    jobs=[(str(path),v,args.actions,args.rect_backend) for path in paths for v in ('uniform','causal','template')]
+    jobs=[(str(path),v,args.actions,args.rect_backend) for path in paths for v in args.variants]
     args.out.parent.mkdir(exist_ok=True,parents=True)
     with args.out.open('x',encoding='utf8') as f,ProcessPoolExecutor(max_workers=args.workers) as pool:
         futures={pool.submit(run,j):j for j in jobs}
