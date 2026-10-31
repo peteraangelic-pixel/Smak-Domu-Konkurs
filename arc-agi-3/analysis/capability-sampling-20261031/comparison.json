@@ -1,0 +1,63 @@
+{
+  "metric": "rhae_score_pct",
+  "pairs": [
+    {
+      "game": "ls20",
+      "seed": 731,
+      "families": [
+        "all",
+        "keyboard_only"
+      ],
+      "level_delta": 0,
+      "score_delta": 0.0,
+      "error": false
+    }
+  ],
+  "groups": {
+    "all": {
+      "trials": 1,
+      "games": 1,
+      "level_delta": 0,
+      "mean_score_delta": 0.0,
+      "regressed_games": []
+    },
+    "keyboard_only": {
+      "trials": 1,
+      "games": 1,
+      "level_delta": 0,
+      "mean_score_delta": 0.0,
+      "regressed_games": []
+    }
+  },
+  "no_level_regressions": true,
+  "no_group_score_regressions": true,
+  "error_free": true,
+  "qualification": "Descriptive paired public-game gate; no significance or hidden-score claim.",
+  "experimental_factor": "temperature",
+  "temperatures": [
+    "0",
+    "0.7"
+  ],
+  "actions": [
+    0,
+    5
+  ],
+  "levels": [
+    0,
+    0
+  ],
+  "api_calls": [
+    114,
+    46
+  ],
+  "max_identical_code_calls": [
+    94,
+    2
+  ],
+  "tool_errors": [
+    0,
+    0
+  ],
+  "source_and_notebook_identical": true,
+  "interpretation": "One local seed: sampling changed behavior and reduced repeated inspections, but did not improve completions or score. No candidate promotion and no Kaggle score prediction."
+}

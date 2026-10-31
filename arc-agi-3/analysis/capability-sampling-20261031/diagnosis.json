@@ -1,0 +1,33 @@
+{
+  "unique_tool_calls": 45,
+  "unique_observed_tool_results": 42,
+  "calls_without_observed_result": [
+    "3LEnTUC8abFvTlmLjY3j8UaNfIDKh9ZQ",
+    "BgK4Gk1QGkkzo3TbWyc2yvF2Qq6dzoCV",
+    "i9qnEehN0Hi8V1R4jMmbQYtHgK1zwM5h"
+  ],
+  "tool_errors": 0,
+  "tool_error_kinds": {},
+  "errors": [],
+  "calls_containing_action_code": 5,
+  "unique_feedback_results": 0,
+  "max_identical_code_calls": 2,
+  "most_repeated_code": [
+    {
+      "calls": 2,
+      "code": "\n# Examine the full gray area to understand what's a wall vs path.\na = current_frame.ascii.split('\\n')\nprint(\"rows 8-50, cols 12-56:\")\nfor r in range(8, 51):\n    print(r, a[r][12:56])\n"
+    },
+    {
+      "calls": 1,
+      "code": "\nimport collections\nseg = current_frame.segmentation\nnodes = seg['nodes']\nprint(\"level\", current_frame.level, \"step\", current_frame.step)\nfor n in nodes:\n    b = n['boundary']\n    print(n['id'], n['color'], 'pix', n['pixels'], 'hash', n['hash'], 'rot', n['rotation'], 'sym', n['rotational_symmetry'], 'bbox rows %d-%d cols %d-%d'%(min(p[0] for p in b),max(p[0] for p in b),min(p[1] for p in b),max(p[1] for p in b)))\n"
+    },
+    {
+      "calls": 1,
+      "code": "\n# Probe: move UP to see what moves\nr = action(['UP'])\nprint(r)\n"
+    }
+  ],
+  "qualification": "Action code is intent, not proof of executed engine actions. Missing tool outputs are unobserved, not assumed failures. API errors and tool errors are separate.",
+  "finished": true,
+  "engine_actions": 5,
+  "levels_completed": 0
+}

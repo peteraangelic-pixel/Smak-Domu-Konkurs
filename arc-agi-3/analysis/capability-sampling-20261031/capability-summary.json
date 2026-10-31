@@ -1,0 +1,49 @@
+{
+  "variant": "control",
+  "game": "ls20",
+  "seed": 731,
+  "model": "arc-lab-27b",
+  "budget": {
+    "generated_tokens": 8192,
+    "request_tokens": 4096,
+    "seconds": 3600
+  },
+  "game_sha256": "9607627b3d85bdb21ff28b40fefaa6a873691175981c6351b7e5a6637416f9d5",
+  "families": [
+    "all",
+    "keyboard_only"
+  ],
+  "levels_completed": 0,
+  "actions": 5,
+  "actions_per_level": [
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "rhae_score_pct": 0.0,
+  "generated_tokens": 8192,
+  "api_calls": 46,
+  "api_errors": 0,
+  "reasoning_tokens": 0,
+  "routes": [],
+  "memory_levels": 0,
+  "memory_pinned_chars": 0,
+  "note": "tokens=8192",
+  "error": null,
+  "seconds": 2221.8129999999946,
+  "image_scale": 4,
+  "notebook_sha256": "8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc",
+  "policy_env": {},
+  "thinking": "off",
+  "temperature": 0.7,
+  "oracle_replay": false,
+  "inspection_feedback": false,
+  "inspection_feedback_count": 0,
+  "valid_model_run": true,
+  "time_limit_binding": false,
+  "interpretation": "Single sampling ablation of a greedy repeat loop; one seed is insufficient for candidate promotion or a Kaggle score forecast."
+}

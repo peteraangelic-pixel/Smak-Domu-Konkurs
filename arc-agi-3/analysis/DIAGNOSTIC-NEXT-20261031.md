@@ -1,5 +1,9 @@
 # Diagnostic continuation,31 October
 
+## ZAKOŃCZONE około13:02local
+
+Czytaj `DIAGNOSTIC-FINAL-20261031.md`. Macierz v3/probe zakończona0 ukończeń we wszystkich4 próbach; dodatkowa ablacją temperatury0.7 zakończona0 ukończeń/5 akcji/8192 tokeny/2221.813s,0 API/tool errors,max identycznych kodów2 wobec94 w kontroli0. Nie ma potwierdzonej przewagi w ukończeniach. Dane i porównania zapisane, żadna próba nie jest aktywna, model LM Studio IDLE. Nie uruchamiaj nowych serii z tego monitora. Po archiwizacji i commicie usuń heartbeat. Dalsza treść tego pliku jest dziennikiem historycznym, nie listą aktywnych procesów.
+
 ## Aktualizacja po odzyskaniu najlepszego zgłoszenia
 
 NAJNOWSZE12:38local: macierz jest ZAKOŃCZONA, comparison.json zapisany. Wszystkie4 próby0 ukończeń; feedback29 aktywacji (ft09=10,ls20=19). Control2+0 akcji,probe3+2. Wszystkie zużyły8192 tokeny; brak błędów API/czasowego obcięcia. Łączny czas9273.75s (~2h35). Probe nie ma potwierdzonej przewagi, nie rekomendować submisji.
