@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from group_regressions import compare
+from materialize_duck import materialize
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'analysis/champion-probe-pair-20261031'
@@ -29,6 +30,12 @@ def main():
         import os
         f.write(str(os.getpid()))
     try:
+        for source,notebook in ARMS.values():
+            if not source.exists():
+                materialize(notebook,source.parent)
+            source_record=json.loads((source.parent/'source-manifest.json').read_text(encoding='utf8'))
+            if source_record['notebook_sha256']!=hashlib.sha256(notebook.read_bytes()).hexdigest():
+                raise ValueError(f'Source notebook mismatch: {source}')
         manifest={'games':['ft09','ls20'],'seed':731,'model':'arc-lab-27b',
                   'thinking':'off','generated_tokens':8192,'request_tokens':4096,
                   'seconds':3600,'inference_concurrency':1,
