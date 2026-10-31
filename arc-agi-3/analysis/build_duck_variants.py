@@ -29,8 +29,10 @@ def build(name, notebook=None,source_output=None):
                 'a/ARC3-Inference/'+relative if path.exists() else '/dev/null',
                 'b/ARC3-Inference/'+relative))
         agent=source/'inference/agent/tool_agent.py'
-        if name in ('memory','memory-v3'):
-            if name=='memory-v3':
+        if name in ('memory','memory-v3','memory-v3-recovery'):
+            if name=='memory-v3-recovery':
+                from memory_v3_recovery import source as selected_memory_source
+            elif name=='memory-v3':
                 from memory_v3 import source as selected_memory_source
             else:selected_memory_source=memory_source
             change('inference/agent/tool_agent.py',agent.read_text(encoding='utf8')+'\n\n'+selected_memory_source()+'\n')
@@ -61,7 +63,7 @@ def build(name, notebook=None,source_output=None):
         'ARC3_VARIANT["name"] = "codex-'+name+'-lab"\n']})
     nb['cells'][0]['source']=['# Codex '+name+' experiment\n'+
         'Unscored candidate. Base: '+str(notebook.name)+'. One isolated mechanism; serving and budget unchanged.\n'+
-        ('Memory adapted from lalalia9/vickyfym and rellik13/sirikilohit; compatibility fix preserves existing level notes.\n' if name in ('memory','memory-v3') else
+        ('Memory adapted from lalalia9/vickyfym and rellik13/sirikilohit; compatibility fix preserves existing level notes.\n' if name in ('memory','memory-v3','memory-v3-recovery') else
          'Feedback uses actual tool outcomes. No game IDs or internal engine access.\n' if name=='probe' else
          'Symbolic color relations from visible demonstrations, prediction checks and LLM fallback. No game IDs or engine access.\n' if name=='template' else
          'Observation-only strategy router and repeated-inspection guard. No game IDs or internal engine access.\n')]
@@ -81,7 +83,7 @@ def build(name, notebook=None,source_output=None):
 if __name__=='__main__':
     import argparse
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--name',choices=('memory','memory-v3','router','probe','template'))
+    p.add_argument('--name',choices=('memory','memory-v3','memory-v3-recovery','router','probe','template'))
     p.add_argument('--base-notebook',type=Path)
     p.add_argument('--source-output',type=Path)
     args=p.parse_args()

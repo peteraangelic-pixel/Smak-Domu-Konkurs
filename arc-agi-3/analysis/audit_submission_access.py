@@ -69,13 +69,27 @@ if mode in ('v3-smoke','memory-smoke'):
     else:
         print('Preflight inconclusive: no push.',flush=True)
 
-if mode in ('v3-watch','memory-watch'):
-    slug='petersharps/arc3-codex-memory-v3-lab' if mode=='memory-watch' else 'petersharps/arc3-duck-codex-v3-control-1031'
-    label='memory-target' if mode=='memory-watch' else 'v3-target'
+if mode=='memory-correction':
+    slug='petersharps/arc3-codex-memory-v3-lab'
+    pulled=OUT/'latest-memory'
+    result=run('memory-correction-preflight',['kernels','pull',slug,'-p',str(pulled)])
+    if result.get('returncode')==0:
+        old=Path('arc-agi-3/duck-lab-candidates/memory-v3/agent.ipynb')
+        actual=next(pulled.glob('*.ipynb'))
+        def codes(p):return [''.join(c['source']).rstrip('\n') for c in json.loads(p.read_text(encoding='utf8'))['cells'] if c['cell_type']=='code']
+        if codes(old)==codes(actual):
+            record=run('memory-correction-push',['kernels','push','-p','arc-agi-3/duck-lab-candidates/memory-v3-recovery'])
+            print('Correction push:',record.get('returncode'),flush=True)
+        else:print('Latest memory code differs; do not overwrite or duplicate correction.',flush=True)
+
+if mode in ('v3-watch','memory-watch','memory-correction-watch'):
+    slug='petersharps/arc3-codex-memory-v3-lab' if mode in ('memory-watch','memory-correction-watch') else 'petersharps/arc3-duck-codex-v3-control-1031'
+    label='memory-correction' if mode=='memory-correction-watch' else 'memory-target' if mode=='memory-watch' else 'v3-target'
+    version='2' if mode=='memory-correction-watch' else '1'
     deadline=time.monotonic()+6000
     events=[]
     while time.monotonic()<deadline:
-        record=run(label+'-status',['kernels','status',slug])
+        record=run(label+'-status',['kernels','status',slug+'/'+version])
         status=(OUT/(label+'-status.txt')).read_text(encoding='utf8')
         match=re.search(r'KernelWorkerStatus\.(\w+)',status)
         state=match.group(1).upper() if match else 'UNRESOLVED'
@@ -83,7 +97,7 @@ if mode in ('v3-watch','memory-watch'):
         (OUT/(label+'-watch-events.json')).write_text(json.dumps(events,indent=2),encoding='utf8')
         print(label+' status:',state,flush=True)
         if state in ('COMPLETE','ERROR','CANCELLED','CANCELED'):
-            run(label+'-output',['kernels','output',slug+'/1','-p',str(OUT/(label+'-output')),
+            run(label+'-output',['kernels','output',slug+'/'+version,'-p',str(OUT/(label+'-output')),
                                   '--file-pattern',r'(benchmark\.json|.*\.log|.*metrics.*\.json|budget_probe\.json)$'])
             break
         if len(events)>=3 and all(e['state']=='UNRESOLVED' for e in events[-3:]):
