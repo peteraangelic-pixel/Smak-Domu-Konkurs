@@ -1,5 +1,7 @@
 # Wynik końcowy diagnozy lokalnego Duck, 31.10.2026
 
+Zakres: wcześniejsze eksperymenty probe i temperatury. Ten raport nie ocenia późniejszego kontrolera template; jego wynik opisują SYMBOLIC-CONTROLLER-20261031.md i HYBRID-RESULT-20261031.md.
+
 **Nie uzyskano kandydata z potwierdzoną przewagą w ukończeniach. Nie rekomendujemy notebooka probe do zgłoszenia.**
 
 ## Zakończona macierz v3/probe
