@@ -55,11 +55,11 @@ for p in (OUT/'submitted-file').glob('**/*'):
 if os.environ.get('ARC_AUDIT_MODE')=='v3-smoke':
     # Explicitly authorized private save-run. No competition submit command.
     slug='petersharps/arc3-duck-codex-v3-control-1031'
-    existing=run('v3-target-preflight',['kernels','status',slug])
+    existing=run('v3-target-preflight',['kernels','list','--mine','--search',slug.split('/')[1],'--csv'])
     status=(OUT/'v3-target-preflight.txt').read_text(encoding='utf8')
-    if existing.get('returncode')==0:
+    if existing.get('returncode')==0 and slug in status:
         print('Existing target kernel: preserve it, no duplicate push.',flush=True)
-    elif '404' in status or 'not found' in status.lower():
+    elif existing.get('returncode')==0:
         record=run('v3-target-push',['kernels','push','-p','arc-agi-3/duck-lab-candidates/v3-target-control'])
         print('Authorized private v3 save-run push result:',record.get('returncode'),flush=True)
     else:
