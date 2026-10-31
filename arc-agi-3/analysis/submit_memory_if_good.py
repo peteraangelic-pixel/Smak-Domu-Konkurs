@@ -39,7 +39,14 @@ def gate(control,candidate):
 
 def main():
     OUT.mkdir(exist_ok=True,parents=True)
-    decision={'notebook':SLUG,'version':1,'utc':datetime.now(timezone.utc).isoformat(),'submitted':False}
+    config=json.loads((ROOT/'duck-lab-candidates/memory-v3/SUBMISSION-CANDIDATE.json').read_text(encoding='utf8'))
+    assert config['kernel']==SLUG
+    version=int(config['version']);assert version>=1
+    source=(ROOT/config['source']).resolve()
+    assert (ROOT/'duck-lab-candidates').resolve() in source.parents
+    assert len(config['sha256'])==64
+    version_ref=SLUG+'/'+str(version)
+    decision={'notebook':SLUG,'version':version,'sha256':config['sha256'],'utc':datetime.now(timezone.utc).isoformat(),'submitted':False}
     def save(): (OUT/'decision.json').write_text(json.dumps(decision,indent=2),encoding='utf8')
     def command(label,args):
         p=subprocess.run(['kaggle',*args],capture_output=True,text=True,timeout=180)
@@ -57,19 +64,18 @@ def main():
             decision['reason']='outside_authorized_date';save();return
         if (OUT/'attempted.json').exists():
             decision['reason']='previous_attempt_requires_review';save();return
-        status=command('kernel-status',['kernels','status',SLUG+'/1'])
+        status=command('kernel-status',['kernels','status',version_ref])
         if 'KernelWorkerStatus.COMPLETE' not in status:
             decision['reason']='kernel_not_complete';save();return
         pulled=OUT/'pulled'
-        command('kernel-pull',['kernels','pull',SLUG+'/1','-p',str(pulled),'-m'])
-        source=ROOT/'duck-lab-candidates/memory-v3/agent.ipynb'
-        assert hashlib.sha256(source.read_bytes()).hexdigest()=='1e73906cf1c99d65b17b41e18ecc7633438158aae42bc6383cb8570e97ca5a61'
+        command('kernel-pull',['kernels','pull',version_ref,'-p',str(pulled),'-m'])
+        assert hashlib.sha256(source.read_bytes()).hexdigest()==config['sha256']
         actual=next(pulled.glob('*.ipynb'))
         def code(p):return [''.join(c['source']).rstrip('\n') for c in json.loads(p.read_text(encoding='utf8'))['cells'] if c['cell_type']=='code']
         if code(source)!=code(actual):
             decision['reason']='published_code_mismatch';save();return
         output=OUT/'kernel-output'
-        command('kernel-output',['kernels','output',SLUG+'/1','-p',str(output),
+        command('kernel-output',['kernels','output',version_ref,'-p',str(output),
                                  '--file-pattern',r'(benchmark\.json|.*\.log|submission\.parquet)$'])
         control=json.loads((ROOT/'analysis/v3-target-result-20261031/v3-output/benchmark.json').read_text(encoding='utf8'))
         candidate=json.loads(next(output.rglob('benchmark.json')).read_text(encoding='utf8'))
@@ -96,7 +102,7 @@ def main():
         # Durable attempt marker is written BEFORE the irreversible API call.
         (OUT/'attempted.json').write_text(json.dumps({'tag':TAG,'utc':datetime.now(timezone.utc).isoformat()}),encoding='utf8')
         response=command('competition-submit',['competitions','submit','arc-prize-2026-arc-agi-3',
-                                              '-k',SLUG,'-v','1','-f','submission.parquet','-m',TAG])
+                                              '-k',SLUG,'-v',str(version),'-f','submission.parquet','-m',TAG.replace(' v1 ',f' v{version} ')])
         decision.update(submitted=True,reason='gates_passed_submission_accepted',response=response)
         save()
     except Exception as exc:

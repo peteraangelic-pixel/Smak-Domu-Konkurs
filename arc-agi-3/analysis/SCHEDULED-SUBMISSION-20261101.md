@@ -4,7 +4,9 @@ Użytkownik wyraźnie polecił: „wrzuc go na submisje jesli wynik bedzie okey,
 
 Termin: **2026-11-01 02:10 Europe/Warsaw = 2026-11-01 01:10 UTC**. Skrypt odmawia przed tym momentem i innego dnia. Automatyzacja ma wykonać tylko jedno sprawdzenie,zgłosić dokładną wersję1 albo zapisać powód pominięcia. Bez zastępczych wersji i bez ponawiania niejednoznacznego wysłania.
 
-Kandydat: petersharps/arc3-codex-memory-v3-lab/1. Lokalny notebook SHA2561e73906cf1c99d65b17b41e18ecc7633438158aae42bc6383cb8570e97ca5a61. Przed decyzją pobrać opublikowany kod wersji1 i porównać wszystkie komórki kodu.
+Kandydat początkowy: petersharps/arc3-codex-memory-v3-lab/1. Lokalny notebook SHA2561e73906cf1c99d65b17b41e18ecc7633438158aae42bc6383cb8570e97ca5a61. Przed decyzją pobrać opublikowany kod wybranej wersji i porównać wszystkie komórki kodu.
+
+**Rozszerzona zgoda użytkownika:** po sprawdzeniu testu pamięci wolno poprawić ten wariant i zgłosić poprawioną wersję. Każda zmieniona wersja wymaga własnego zakończonego testu na docelowym modelu,tej samej populacji i budżecie. Nie przenosić wyniku wersji1 na inne bajty. Wybrany notebook,numer wersji i hash zapisuje plik duck-lab-candidates/memory-v3/SUBMISSION-CANDIDATE.json; wykonawca korzysta z niego i ponownie sprawdza wszystkie bramki. Wybierz wyłącznie zmierzony wariant. Jeśli poprawiony jest słabszy lub niegotowy,wróć do wersji1 tylko jeśli sama przechodzi kryteria. Nowy test48min/gra z uruchomieniem serwera powinien wystartować najpóźniej około01:00 Warszawa,aby zostawić czas na ocenę przed02:10. Jeśli brak czasu,nie zgłaszaj niesprawdzonej poprawki.
 
 Kryteria „OK”,wszystkie naraz:
 
