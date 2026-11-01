@@ -1,0 +1,15 @@
+seeds=12, max_actions/level=4000
+
+=== REACTIVE (bez modelu) ===
+  keydoor        RHAE   7.86 ±0.00  solved 100.0%  akcji/poziom     89.0
+  switchorder    RHAE   0.14 ±0.17  solved  41.7%  akcji/poziom   2945.7
+  pushblock      RHAE   1.45 ±0.00  solved  66.7%  akcji/poziom   1349.0
+  colorclicks    RHAE   9.44 ±14.77  solved  66.7%  akcji/poziom   2228.9
+  TOTAL          RHAE   4.72 ± 2.09 (CI95)
+=== PLANNER (model + plan) ===
+  keydoor        RHAE 100.00 ±0.00  solved 100.0%  akcji/poziom     20.0
+  switchorder    RHAE   5.86 ±9.45  solved  11.1%  akcji/poziom   3559.8
+  pushblock      RHAE  45.23 ±0.00  solved 100.0%  akcji/poziom      7.0
+  colorclicks    RHAE   5.56 ±10.39  solved   8.3%  akcji/poziom   3667.9
+  TOTAL          RHAE  39.16 ± 2.43 (CI95)
+RÓŻNICA: +34.44 pkt
