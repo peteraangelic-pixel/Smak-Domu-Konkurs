@@ -1,0 +1,382 @@
+[
+  {
+    "file": "cn04-2fe56bfb_p0.log",
+    "parsed_python_calls": 24,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 24,
+    "observed_unique_results": 24,
+    "errors": [
+      {
+        "call_id": "call_c893650a15b14930b24fdcb6",
+        "error": "ValueError: min() iterable argument is empty",
+        "code": "# explicit reconstruction\nA=rect2(29,35,31,49)|blk_at(27,48)|blk_at(30,33)\ng=grid(current_frame)\nchs=[]\nfor cc,cl in comps(g,'c'):\n    cl=[p for p in cl if p[0]>2]\n    if cl: chs.append(set(cl))\nprint('charcoal comp sizes',[len(c) for c in chs])\nB=[c for c in chs if len(c)==135][0]\n# C from history base\nf=history[99].frame; gp=grid(f)\nP=set(); Rr=set()\nfor cc,cl in comps(gp,'p'): P|=set(cl)\nfor cc,cl in comps(gp,'R'): Rr|=set(cl)\nC=rotk_full(P|Rr,2)\nprint('A',len(A),'B',len(B),'C',len(C))\n# consistency: visible charcoal should be (C|A) minus yellow-covered\nY=set()\nfor cc,cl in comps(g,'Y'): Y|=set(cl)\nvis=set()\nfor c in chs: vis|=c\nprint('yellow cells',len(Y),bbox(Y))\nprint('(C|A) == vis|Y ?', (C|A)==(vis|Y), 'diff', len((C|A)^(vis|Y)))\nPI={'A':A,'B':B,'C':C}\nTABS={'A':[(27,48),(30,33)],'B':findtabs2(B),'C':sorted([(int(b[0]),int(b[1])) for b in blocks(Rr)])}\n# C tabs after 2 rotations:\nTABS['C']=rotpoints([(30,33),(45,48)],2,P|Rr)\nprint('tabs',TABS)\nSH={}\nfor nm in 'ABC':\n    for k in range(4):\n        SH[(nm,k)]=(rotk_full(PI[nm],k), rotpoints(TABS[nm],k,PI[nm]))\nres=solve3(SH)\nprint('sols',len(res))\nfor r in res[:5]: print(r)\n"
+      },
+      {
+        "call_id": "call_7ba1a88a86f94865a3ca56de",
+        "error": "ValueError: min() iterable argument is empty",
+        "code": "r=action([{'action':'MOUSE','row':21,'col':9}])\ng=grid(current_frame)\nY=set()\nfor cc,cl in comps(g,'Y'): Y|=set(cl)\nprint('active now bbox',bbox(Y),len(Y))\nr2=action(['DOWN']*6+['RIGHT']*2)\nprint('B moves:',r2['state'])\ng=grid(current_frame)\nY=set()\nfor cc,cl in comps(g,'Y'): Y|=set(cl)\nR2=set()\nfor cc,cl in comps(g,'R'): R2|=set(cl)\nprint('B body bbox',bbox(Y),len(Y),'tabs',sorted(blocks(R2)))\n"
+      },
+      {
+        "call_id": "call_f2b53937e08b4226ab363986",
+        "error": "StaleStateActionError: MOUSE(row=48, col=20) was not executed. The action immediately before it, MOUSE(row=45, col=45), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+        "code": "def active(f):\n    g=grid(f)\n    body=set(); red=set()\n    for col in 'SNYOpP':\n        for cc,cl in comps(g,col):\n            for p in cl:\n                if p[0]>2: body|=set(cl)\n    for cc,cl in comps(g,'R'):\n        for p in cl:\n            if p[0]>2: red|=set(cl)\n    return body,red\nrec={}\n# S already active\nb,r=active(current_frame)\nrec['S']=(b|r, sorted(blocks(r)))\nprint('S',len(b|r),rec['S'][1])\nfor name,(rr,cc) in [('U',(21,36)),('D',(45,45)),('bar',(48,20))]:\n    res=action([{'action':'MOUSE','row':rr,'col':cc}])\n    b,r=active(current_frame)\n    rec[name]=(b|r, sorted(blocks(r)))\n    print(name,len(b|r),rec[name][1],'state',res['state'])\nimport json\ndata={k:{'cells':sorted(v[0]),'tabs':v[1]} for k,v in rec.items()}\nprint('total cells',{k:len(v[0]) for k,v in rec.items()})\nprint('tabs',{k:v[1] for k,v in rec.items()})\n"
+      },
+      {
+        "call_id": "call_7c5a35cd665142f9bfacbee2",
+        "error": "ImportError: Module 'time' is not allowed in the sandbox.",
+        "code": "import time\ng=grid(current_frame)\nchs=[]\nfor cc,cl in comps(g,'c'):\n    cl=[p for p in cl if p[0]>2]\n    if cl: chs.append(set(cl))\nY=set(); Rr=set()\nfor cc,cl in comps(g,'Y'): Y|=set(cl)\nfor cc,cl in comps(g,'R'): Rr|=set(cl)\nPI={'S':[c for c in chs if len(c)==225][0],'U':[c for c in chs if len(c)==99][0],'D':[c for c in chs if len(c)==144][0],'B':Y|Rr}\nTABS={'S':[(27,24),(33,9)],'U':[(21,36),(21,48)],'D':[(42,45),(57,45)],'B':[(48,18),(48,24)]}\nt0=time.time()\nbest=solveN(PI,TABS,['S','U','D','B'])\nprint('time',round(time.time()-t0,1),'n solutions',len(best))\nfor b in best[:5]:\n    print('cost',b[0],'presses',b[1],'rot',b[2],'pairs',b[3],'u0',b[4],b[5])\n"
+      },
+      {
+        "call_id": "call_0ee2f5bae9ed4c459d9b3314",
+        "error": "IndexError: tuple index out of range",
+        "code": "from itertools import product\ng=grid(current_frame)\nchs=[]\nfor cc,cl in comps(g,'c'):\n    cl=[p for p in cl if p[0]>2]\n    if cl: chs.append(set(cl))\nY=set(); Rr=set()\nfor cc,cl in comps(g,'Y'): Y|=set(cl)\nfor cc,cl in comps(g,'R'): Rr|=set(cl)\nPI={'S':[c for c in chs if len(c)==225][0],'U':[c for c in chs if len(c)==99][0],'D':[c for c in chs if len(c)==144][0],'B':Y|Rr}\nTABS={'S':[(27,24),(33,9)],'U':[(21,36),(21,48)],'D':[(42,45),(57,45)],'B':[(48,18),(48,24)]}\nfound=None\nfor tot in (1,2,3):\n    ks_list=[ks for ks in product(range(4),repeat=4) if sum(ks)==tot]\n    res=[]\n    for ks in ks_list:\n        r=solveN2(PI,TABS,['S','U','D','B'],[ [k] for k in ks ])\n        res+=r\n    print('total rotations',tot,'combos',len(ks_list),'solutions',len(res))\n    if res:\n        res.sort(key=lambda t:t[0])\n        for x in res[:4]: print('  cost',x[0],'presses',x[1],'rot',x[2],'pairs',x[3],'u0',x[4],x[5])\n        found=res\n        break\n"
+      }
+    ]
+  },
+  {
+    "file": "dc22-fdcac232_p0.log",
+    "parsed_python_calls": 14,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 14,
+    "observed_unique_results": 14,
+    "errors": [
+      {
+        "call_id": "call_5e245f1ec6e84fd1a8f622e0",
+        "error": "AttributeError: 'TransitionView' object has no attribute 'step'",
+        "code": "out=[]\nfor t in transitions:\n    if t.before_frame is None or t.after_frame is None: continue\n    if t.before_frame.level!=3: continue\n    act=t.action\n    if 'MOUSE' in str(act) and '52' in str(act):\n        gb=find_green(t.before_frame); ga=find_green(t.after_frame)\n        out.append((t.step, str(act), gb, ga))\nfor o in out: print(o)\n"
+      }
+    ]
+  },
+  {
+    "file": "g50t-5849a774_p0.log",
+    "parsed_python_calls": 31,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "sim"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "simrun"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "simrun"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "simrun"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "simok"
+        ],
+        "code_excerpt": ""
+      }
+    ],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 31,
+    "observed_unique_results": 31,
+    "errors": [
+      {
+        "call_id": "call_832c536a91254b4594bd36bb",
+        "error": "ValueError: not enough values to unpack (expected 2, got 1)",
+        "code": "ADJ={\n(0,0):[(0,1),(1,0)],(0,1):[(0,0),(0,2)],(0,2):[(0,1),(0,3)],(0,3):[(0,2),(0,4)],\n(0,4):[(0,3),(0,5),(1,4)],(0,5):[(0,4),(0,6)],(0,6):[(0,5),(0,7)],(0,7):[(0,6),(1,7)],\n(1,0):[(0,0),(2,0)],(1,4):[(0,4),(2,4)],(1,7):[(0,7),(2,7)],\n(2,0):[(1,0)],(2,2):[(3,2)],(2,4):[(1,4),(3,4)],(2,7):[(1,7),(3,7)],\n(3,2):[(2,2),(4,2)],(3,4):[(2,4),(4,4)],(3,7):[(2,7),(4,7)],\n(4,0):[(4,1),(5,0)],(4,1):[(4,0),(4,2)],(4,2):[(3,2),(4,1)],(4,4):[(3,4),(4,5)],\n(4,5):[(4,4)],(4,7):[(3,7),(5,7)],(5,0):[(4,0),(6,0)],(5,7):[(4,7),(6,7)],\n(6,0):[(5,0),(7,0)],(6,7):[(5,7),(7,7)],(7,0):[(6,0),(7,1)],(7,1):[(7,0),(7,2)],\n(7,2):[(7,1),(7,3)],(7,3):[(7,2),(7,4)],(7,4):[(7,3),(7,5)],(7,5):[(7,4),(7,6)],\n(7,6):[(7,5),(7,7)],(7,7):[(6,7),(7,6)]}\nSTART=(2,0);GOAL=(2,2)\nPAD={'R':(7,2),'Y':(2,4),'B':(4,5)}   # R=red1, B=red2(pad), Y=yellow\nHOME={'R':(4,2),'B':(7,5),'Y':(2,7)}\nPUSH={'R':(5,2),'B':(6,5),'Y':(2,6)}\ndef sim(moves, recs, verbose=False):\n    \"\"\"moves: list of direction-free target cells (my positions t=1..n). recs: list of recordings (lists of cells).\n       Returns dict with ok, reason, overlaps, goal.\"\"\"\n    pos=START; path=[START]+list(moves); overlaps=[]; latchY=False\n    for t in range(1,len(path)):\n        # validate move\n        if path[t] not in ADJ.get(path[t-1],[]): return {'ok':False,'reason':'bad move t=%d'%t,'t':t}\n        # echo positions at tick t\n        epos=[]\n        for i,rec in enumerate(recs):\n            p=rec[t-1] if t<=len(rec) else rec[-1]\n            parked = t>=len(rec)\n            epos.append((i,p,parked))\n        # who occupies pads this tick (player + echoes)\n        occ={}\n        for k,pk in ['R','Y','B']:\n            who=[]\n            if path[t]==PAD[pk]: who.append('P')\n            for i,p,pa in epos:\n                if p==PAD[pk]: who.append('E%d'%i)\n            occ[pk]=who\n        # blobs\n        blob={}\n        for k in HOME:\n            if occ[k]: blob[k]=PUSH[k]\n            elif k=='Y' and latchY: blob[k]=PUSH[k]\n            else: blob[k]=HOME[k]\n        if 'P' in occ['Y']: latchY=True\n        if path[t] in blob.values(): return {'ok':False,'reason':'blocked by blob %s at t=%d'%(k,t),'t':t,'cell':path[t]}\n        # overlap check\n        for i,p,pa in epos:\n            if p==path[t]:\n                same_prev = (t>1 and any(p2==path[t-1] for j,p2,q in epos if j==i))\n                overlaps.append((t,i,'parked' if pa else ('with' if same_prev else 'converge')))\n        # blocked by parked echo (absorb)\n        for i,p,pa in epos:\n            if pa and p==path[t]:\n                return {'ok':False,'reason':'absorb echo%d at t=%d'%(i,t),'t':t}\n    return {'ok':path[-1]==GOAL,'goal':path[-1]==GOAL,'reason':'reached '+str(path[-1]),'overlaps':overlaps,'n':len(path)-1,'latchY':latchY}\nimport json\nopen('/dev/null','w') if False else None\nprint('sim defined')\nprint(sim([(1,0),(0,0)],[],verbose=True))\n"
+      },
+      {
+        "call_id": "call_dcb2257b05534281a58cc38f",
+        "error": "ImportError: Module 'inspect' is not allowed in the sandbox.",
+        "code": "import inspect\nsrc=inspect.getsource(simrun)\nsrc=src.replace(\"kind='parked' if pa else ('converge' if not (t>1 and any(q==path[t-1] for j,q,_ in epos if j==i)) else 'together')\",\n                \"prev=path[t-1] if t>1 else (2,0)\\n                kind='parked' if pa else ('converge' if not any(q==prev for j,q,_ in epos if j==i) else 'together')\")\nns={}\nexec(src, {'maze':maze}, ns)\nsimrun=ns['simrun']\nrecC=[(1,0),(2,0),(1,0),(0,0),(0,1),(0,2),(0,3),(0,4),(1,4),(2,4),(3,4),(4,4),(4,5)]\nfor m in range(0,5):\n    for pk in ('shallow','deep'):\n        base=buildD(m,pk,[])\n        r=simrun(base,[recC],strict=True)\n        print(m,pk,len(base)-1,r['ok'],r['reason'],r.get('overlaps'))\n"
+      },
+      {
+        "call_id": "call_c19fe5ce84284e78bfde1499",
+        "error": "TypeError: 'NoneType' object is not subscriptable",
+        "code": "def searchE3(recs, maxt=60, freet=2):\n    ADJ=maze(); START=(2,0); GOAL=(2,2)\n    from collections import deque\n    init=(START,0,False); q=deque([init]); par={init:None}\n    while q:\n        c,t,l=q.popleft()\n        if t>=maxt: continue\n        for n in ADJ[c]:\n            nl=l or (n==(2,4))\n            blob,cur=blobstate(recs,n,t+1,nl)\n            if n in blob.values(): continue\n            prev=c if t>0 else START\n            bad=False\n            for i,rec in enumerate(recs):\n                if cur[i]==n:\n                    parked=(t+1)>=len(rec)\n                    kind='parked' if parked else ('converge' if eposat(rec,t)!=prev else 'together')\n                    if not (kind=='together' and t+1<=freet): bad=True;break\n            if bad: continue\n            st=(n,t+1,nl)\n            if st in par: continue\n            par[st]=(c,t,l)\n            if n==GOAL:\n                out=[];node=st\n                while node is not None: out.append(node[0]); node=par[node]\n                out.reverse(); return out\n            q.append(st)\n    return None\nsols,lens=searchD(31,40)\nrecC=[(1,0),(2,0),(1,0),(0,0),(0,1),(0,2),(0,3),(0,4),(1,4),(2,4),(3,4),(4,4),(4,5)]\nbest=None\nfor s in sols:\n    recD=s[1:]\n    sol=searchE3([recC,recD])\n    print('recD len',len(recD),'-> runE', None if not sol else len(sol)-1)\n    if sol and (best is None or len(sol)<len(best[2])): best=(recC,recD,sol)\nprint('BEST runE len',len(best[2])-1)\nprint('runD:',best[1])\nprint('runE:',best[2][1:])\nprint('runD overlaps:',overlapkinds([recC],[(2,0)]+best[1]))\nprint('runE overlaps:',overlapkinds([best[0],best[1]],best[2]))\n"
+      },
+      {
+        "call_id": "call_199c700fc3514336a801c6c0",
+        "error": "ValueError: not enough values to unpack (expected 4, got 3)",
+        "code": "import heapq\ndef searchE4(recs, maxt=60):\n    ADJ=maze(); START=(2,0); GOAL=(2,2)\n    init=(START,0,False)\n    best={init:0}; par={init:None}; pq=[(0,init,0)]\n    while pq:\n        cost,c,t,l=heapq.heappop(pq)\n        if cost>best.get((c,t,l),1e9): continue\n        if c==GOAL:\n            out=[];node=(c,t,l)\n            while node is not None: out.append(node[0]); node=par[node]\n            out.reverse(); return cost,out\n        if t>=maxt: continue\n        for n in ADJ[c]:\n            nl=l or (n==(2,4))\n            blob,cur=blobstate(recs,n,t+1,nl)\n            if n in blob.values(): continue\n            prev=c if t>0 else START\n            bad=False; add=0\n            for i,rec in enumerate(recs):\n                if cur[i]==n:\n                    parked=(t+1)>=len(rec)\n                    kind='parked' if parked else ('converge' if eposat(rec,t)!=prev else 'together')\n                    if kind!='together': bad=True;break\n                    add+=1\n            if bad: continue\n            nc=cost+add\n            st=(n,t+1,nl)\n            if nc<best.get(st,1e9):\n                best[st]=nc; par[st]=(c,t,l); heapq.heappush(pq,(nc,n,t+1,nl))\n    return None\nsols,lens=searchD(31,40)\nrecC=[(1,0),(2,0),(1,0),(0,0),(0,1),(0,2),(0,3),(0,4),(1,4),(2,4),(3,4),(4,4),(4,5)]\nfor s in sols:\n    recD=s[1:]\n    r=searchE4([recC,recD])\n    if not r: print(len(recD),'none'); continue\n    cost,path=r\n    print('recD',len(recD),'runE len',len(path)-1,'overlap-ticks',cost,'path',path[1:])\n"
+      },
+      {
+        "call_id": "call_e9fabe76e0954053911baa70",
+        "error": "NameError: name 'globals' is not defined",
+        "code": "f=current_frame\nprint('step',f.step,'level',f.level,'shape',f.shape)\ng=grid(f) if 'grid' in globals() else None\ntry:\n    print('bar', bar_len(f))\nexcept Exception as e:\n    print('bar err',e)\n# locate key objects compactly via segmentation\nseg=f.segmentation\ncols={}\nfor n in seg['nodes']:\n    cols.setdefault(n['color'],[]).append((n['pixels'],n['boundary'][0]))\nfor c,v in sorted(cols.items(), key=lambda kv:-sum(p for p,_ in kv[1])):\n    print(c, sum(p for p,_ in v), v[:6])\n"
+      },
+      {
+        "call_id": "call_c30f8a4acea043cea1b10264",
+        "error": "NameError: name 'eval' is not defined",
+        "code": "f=current_frame\nfor name in ('st','S','S2','build2'):\n    fn=eval(name)\n    try:\n        v=fn(f) if name!='build2' else fn(f)\n        s=repr(v)\n        print(name,'->',s[:600])\n    except Exception as e:\n        print(name,'ERR',e)\n    print('---')\n"
+      }
+    ]
+  },
+  {
+    "file": "ka59-38d34dbb_p0.log",
+    "parsed_python_calls": 26,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "model_state5",
+          "step5",
+          "model_goal5"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "step5"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "model_state5"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "step5"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "step5b"
+        ],
+        "code_excerpt": ""
+      }
+    ],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 26,
+    "observed_unique_results": 26,
+    "errors": [
+      {
+        "call_id": "call_5993b5400ced43e08921f531",
+        "error": "AttributeError: 'TransitionView' object has no attribute 'step'",
+        "code": "def build_pass(f):\n    g=grid(f); P=set()\n    for r in range(59):\n        for c in range(64):\n            if g[r][c] in 'wc': P.add((r,c))\n    return frozenset(P)\nYOFF=frozenset([(0,3),(0,4),(0,5),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(6,3),(6,4),(6,5),(7,3),(7,4),(7,5),(8,3),(8,4),(8,5)])\nB3=frozenset([(i,j) for i in range(3) for j in range(3)])\nD={'UP':(-3,0),'DOWN':(3,0),'LEFT':(0,-3),'RIGHT':(0,3)}\ndef cells5(sh,p): return frozenset((p[0]+a,p[1]+b) for a,b in sh)\ndef parse5(f):\n    g=grid(f)\n    def one(pred):\n        cs=[(r,c) for r in range(63) for c in range(64) if pred(g[r][c])]\n        cl=comps2(cs); cl.sort(key=lambda L:(min(a for a,b in L),min(b for a,b in L)))\n        out=[]\n        for L in cl:\n            r0=min(a for a,b in L);c0=min(b for a,b in L)\n            out.append((r0,c0,len(L)))\n        return out\n    ns=[x for x in one(lambda ch: ch in 'NW')]\n    ys=[x for x in one(lambda ch: ch=='Y')]\n    return ns,ys\ndef model_state5(frame):\n    P=build_pass(frame)\n    ns,ys=parse5(frame)\n    return {'P':P,'b':[ns[0][:2],ns[1][:2]],'y':ys[0][:2],'sel':0}\ndef step5(state,action):\n    P=state['P']\n    if isinstance(action,dict):\n        return state\n    d=D.get(action)\n    if d is None: return None\n    sh=[B3,B3,YOFF]; pos=[state['b'][0],state['b'][1],state['y']]; s=state['sel']\n    dest=(pos[s][0]+d[0],pos[s][1]+d[1])\n    dc=cells5(sh[s],dest)\n    if not dc<=P: return None\n    hit=None\n    for i in range(3):\n        if i==s: continue\n        if dc & cells5(sh[i],pos[i]): hit=i\n    if hit is None:\n        np=list(pos); np[s]=dest\n        return {'P':P,'b':[np[0],np[1]],'y':np[2],'sel':s}\n    # launch hit\n    for k in range(5,22):\n        lp=(pos[hit][0]+3*k*d[0],pos[hit][1]+3*k*d[1])\n        lc=cells5(sh[hit],lp)\n        if not lc<=P: continue\n        bad=False\n        for i in range(3):\n            if i in (hit,): continue\n            occ = dc if i==s else cells5(sh[i],pos[i])\n            if lc & occ: bad=True;break\n        if bad: continue\n        np=list(pos); np[s]=dest; np[hit]=lp\n        return {'P':P,'b':[np[0],np[1]],'y':np[2],'sel':s}\n    return None\ndef model_goal5(state):\n    return state['y']==(8,35) and set(state['b'])=={(29,50),(53,38)}\ns5=model_state5(current_frame)\nprint('state',s5['b'],s5['y'],'goal',model_goal5(s5))\n# validate on the level's transitions\nimport collections\nacc=collections.Counter(); miss=[]\nfor t in transitions:\n    if t.before_frame.level!=4: continue\n    try:\n        b=model_state5(t.before_frame)\n    except Exception as e:\n        miss.append(('parse',t.step,str(e))); continue\n    a=t.action if isinstance(t.action,str) else t.action\n    try:\n        pr=step5(b,a) if isinstance(a,str) else b\n    except Exception as e:\n        miss.append(('err',t.step,str(e))); continue\n    try: af=model_state5(t.after_frame)\n    except Exception as e: af=None\n    if pr==af: acc['ok']+=1\n    else:\n        acc['bad']+=1\n        if len(miss)<4: miss.append((t.step,a,pr,af))\nprint(acc)\nfor m in miss: print(m)\n"
+      },
+      {
+        "call_id": "call_564e39bd6e3841e687d1a516",
+        "error": "IndexError: list index out of range",
+        "code": "def step5(state,action):\n    YOFF=frozenset([(0,3),(0,4),(0,5),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(6,3),(6,4),(6,5),(7,3),(7,4),(7,5),(8,3),(8,4),(8,5)])\n    B3=frozenset([(i,j) for i in range(3) for j in range(3)])\n    D={'UP':(-3,0),'DOWN':(3,0),'LEFT':(0,-3),'RIGHT':(0,3)}\n    P=state['P']; sh=[B3,B3,YOFF]; pos=[state['b'][0],state['b'][1],state['y']]; s=state['sel']\n    if isinstance(action,dict):\n        if action.get('action')!='MOUSE': return None\n        cell=(action['row'],action['col'])\n        t=None\n        for i in (0,1):\n            if cell in cells5(B3,pos[i]): t=i\n        if t is None or t==s: return None\n        return {'P':P,'b':list(pos[:2]),'y':pos[2],'sel':t}\n    d=D.get(action)\n    if d is None: return None\n    def cs(i,p): return frozenset((p[0]+a,p[1]+b) for a,b in sh[i])\n    dest=(pos[s][0]+d[0],pos[s][1]+d[1]); dc=cs(s,dest)\n    if not dc<=P: return None\n    hit=None\n    for i in range(3):\n        if i==s: continue\n        if dc & cs(i,pos[i]): hit=i\n    if hit is None:\n        np=list(pos); np[s]=dest\n        return {'P':P,'b':[np[0],np[1]],'y':np[2],'sel':s}\n    for k in range(5,22):\n        lp=(pos[hit][0]+3*k*d[0],pos[hit][1]+3*k*d[1]); lc=cs(hit,lp)\n        if not lc<=P: continue\n        bad=False\n        for i in range(3):\n            if i==hit: continue\n            occ = dc if i==s else cs(i,pos[i])\n            if lc & occ: bad=True;break\n        if bad: continue\n        np=list(pos); np[s]=dest; np[hit]=lp\n        return {'P':P,'b':[np[0],np[1]],'y':np[2],'sel':s}\n    return None\nimport collections\nacc=collections.Counter(); miss=[]\nfor t in transitions:\n    if t.before_frame.level!=4: continue\n    b=model_state5(t.before_frame); af=model_state5(t.after_frame)\n    a=t.action\n    pr=step5(b,a) if isinstance(a,str) else step5(b,a)\n    if pr==af: acc['ok']+=1\n    else:\n        acc['bad']+=1\n        if len(miss)<5: miss.append((t.after_frame.step,a,pr,af))\nprint(acc)\nfor m in miss: print(m)\n"
+      },
+      {
+        "call_id": "call_e5bd08f85f9e49b59de46e65",
+        "error": "IndexError: list index out of range",
+        "code": "def model_state5(frame):\n    P=build_pass(frame); g=grid(frame)\n    cs=[(r,c) for r in range(63) for c in range(64) if g[r][c] in 'NW']\n    cl=comps2(cs)\n    cl.sort(key=lambda L:(min(x[0] for x in L),min(x[1] for x in L)))\n    wd=[(r,c) for r in range(63) for c in range(64) if g[r][c]=='W']\n    sel=0\n    for i,L in enumerate(cl):\n        if wd and wd[0] in L: sel=i\n    b=[(min(x[0] for x in L),min(x[1] for x in L)) for L in cl]\n    ys=[(r,c) for r in range(63) for c in range(64) if g[r][c]=='Y']\n    y=(min(r for r,c in ys),min(c for r,c in ys))\n    return {'P':P,'b':b,'y':y,'sel':sel}\nimport collections\nacc=collections.Counter(); miss=[]\nH=[h for h in history if h.frame.level==4]\nfor i in range(1,len(H)):\n    try:\n        b=model_state5(H[i-1].frame); af=model_state5(H[i].frame)\n    except Exception: acc['skip']+=1; continue\n    pr=step5(b,H[i].action); exp=b if pr is None else pr\n    if sd(exp)==sd(af): acc['ok']+=1\n    else:\n        acc['bad']+=1\n        if len(miss)<6: miss.append((H[i].frame.step,H[i].action,sd(exp),sd(af)))\nprint('n',len(H),'acc',dict(acc))\nfor m in miss: print(m)\n"
+      },
+      {
+        "call_id": "call_e517a7d38e2a413db182dba7",
+        "error": "IndexError: list index out of range",
+        "code": "def stp(state,act,P):\n    YOFF=frozenset([(0,3),(0,4),(0,5),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(6,3),(6,4),(6,5),(7,3),(7,4),(7,5),(8,3),(8,4),(8,5)])\n    B3=frozenset([(i,j) for i in range(3) for j in range(3)])\n    D={'UP':(-3,0),'DOWN':(3,0),'LEFT':(0,-3),'RIGHT':(0,3)}\n    sh=[B3,B3,YOFF]; pos=[state[0],state[1],state[2]]; s=state[3]\n    if act in ('S0','S1'):\n        t=int(act[1])\n        if t==s: return None\n        return (pos[0],pos[1],pos[2],t)\n    d=D.get(act)\n    if d is None: return None\n    def cs(i,p): return frozenset((p[0]+a,p[1]+b) for a,b in sh[i])\n    dest=(pos[s][0]+d[0],pos[s][1]+d[1]); dc=cs(s,dest)\n    hit=None\n    for i in range(3):\n        if i==s: continue\n        if dc & cs(i,pos[i]): hit=i\n    if hit is None:\n        if not dc<=P: return None\n        np=list(pos); np[s]=dest\n        return (np[0],np[1],np[2],s)\n    for k in range(5,22):\n        lp=(pos[hit][0]+3*k*d[0],pos[hit][1]+3*k*d[1]); lc=cs(hit,lp)\n        if not lc<=P: continue\n        bad=False\n        for i in range(3):\n            if i==hit: continue\n            occ = cs(s,pos[s]) if i==s else cs(i,pos[i])\n            if lc & occ: bad=True;break\n        if bad: continue\n        np=list(pos); np[hit]=lp\n        return (np[0],np[1],np[2],s)\n    return None\nimport collections\nP0=build_pass(current_frame)\nst0=model_state5(current_frame)\ns0=(st0['b'][0],st0['b'][1],st0['y'],st0['sel'])\nacc=collections.Counter(); miss=[]\nH=[h for h in history if h.frame.level==4]\ndef conv(a):\n    if isinstance(a,str) and a.startswith('MOUSE'): return None\n    return a\nfor i in range(1,len(H)):\n    try:\n        b=model_state5(H[i-1].frame); af=model_state5(H[i].frame)\n    except Exception: acc['skip']+=1; continue\n    a=H[i].action\n    if isinstance(a,str) and a.startswith('MOUSE'):\n        import re as _r\n        m=_r.search(r'row=(\\d+),\\s*col=(\\d+)',a)\n        r_,c_=int(m.group(1)),int(m.group(2))\n        pr=None\n        for t in (0,1):\n            if (r_,c_) in {(b['b'][t][0]+i2,b['b'][t][1]+j2) for i2 in range(3) for j2 in range(3)}:\n                pr=stp((b['b'][0],b['b'][1],b['y'],b['sel']),'S'+str(t),P0)\n        a='MOUSE'\n    else:\n        pr=stp((b['b'][0],b['b'][1],b['y'],b['sel']),a,P0)\n    exp=(b['b'][0],b['b'][1],b['y'],b['sel']) if pr is None else pr\n    got=(af['b'][0],af['b'][1],af['y'],af['sel'])\n    if exp==got: acc['ok']+=1\n    else:\n        acc['bad']+=1\n        if len(miss)<4: miss.append((H[i].frame.step,a,exp,got))\nprint('acc',dict(acc))\nfor m in miss: print(m)\nprint('start',s0)\n"
+      }
+    ]
+  },
+  {
+    "file": "ls20-9607627b_p0.log",
+    "parsed_python_calls": 22,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "step_dest"
+        ],
+        "code_excerpt": ""
+      }
+    ],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 22,
+    "observed_unique_results": 22,
+    "errors": [
+      {
+        "call_id": "call_5e9531a9be8343bea4c71127",
+        "error": "StaleStateActionError: DOWN was not executed. The action immediately before it, DOWN, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+        "code": "amap={'U':'UP','D':'DOWN','L':'LEFT','R':'RIGHT'}\npos=blockpos(current_frame)\nprint('start',pos,'bar',barof(current_frame))\nfor ch in ['D','D','D','L','L']:\n    r=action([amap[ch]]); nb=blockpos(current_frame)\n    print(ch,nb,'bar',barof(current_frame),r['state'],'LVL' if r.get('level_completed') else '')\n    pos=nb\nprint('anim?',last_action_call_result.get('animation',{}).get('transient_bbox') if isinstance(last_action_call_result,dict) else None)\n"
+      },
+      {
+        "call_id": "call_f07d121c2f0c44d2818946ba",
+        "error": "TypeError: 'NoneType' object is not subscriptable",
+        "code": "LAB,ADJ=build(current_frame.ascii.split('\\n'))\nLAUNCH_ADJ={(20,44),(20,34),(25,54),(25,44),(25,39),(35,19),(35,9),(40,24),(40,34),(40,44),(40,54)}\nADJ2={k:[x for x in v if x not in LAUNCH_ADJ] for k,v in ADJ.items()}\npts={'start':(5,49),'gem':(30,34),'plus':(30,24),'Y1':(15,19),'GOAL':(5,9)}\nfor k,s in pts.items():\n    print(k,{k2:(lambda p:(len(p)-1) if p else -1)(nodes_path(ADJ2,s,t)) for k2,t in pts.items()})\np=nodes_path(ADJ2,(5,49),(30,34)); print('start->gem',''.join(mv(x,y) for x,y in zip(p,p[1:])))\np=nodes_path(ADJ2,(30,34),(30,24)); print('gem->plus',''.join(mv(x,y) for x,y in zip(p,p[1:])))\np=nodes_path(ADJ2,(30,24),(15,19)); print('plus->Y1',''.join(mv(x,y) for x,y in zip(p,p[1:])))\np=nodes_path(ADJ2,(15,19),(5,9)); print('Y1->GOAL',''.join(mv(x,y) for x,y in zip(p,p[1:])))\np=nodes_path(ADJ2,(30,24),(5,9)); print('plus->GOAL',(len(p)-1) if p else -1)\n"
+      }
+    ]
+  },
+  {
+    "file": "m0r0-492f87ba_p0.log",
+    "parsed_python_calls": 28,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "predict"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "predict2"
+        ],
+        "code_excerpt": ""
+      },
+      {
+        "id": "[ASSISTANT TOOL CALL: python]",
+        "check_model_calls": 0,
+        "plan_calls": 0,
+        "model_defs": [
+          "step_pair"
+        ],
+        "code_excerpt": ""
+      }
+    ],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 28,
+    "observed_unique_results": 28,
+    "errors": [
+      {
+        "call_id": "call_d04e07de8893474384fc28f9",
+        "error": "TypeError: str.join() takes exactly one argument (4 given)",
+        "code": "def snap2(fr):\n    m=map4(fr); ag=set(ags4(fr))\n    P=[(12,3),(1,4),(6,8),(6,14)]\n    return ''.join(m[5][4],m[9][3],m[5][11],m[9][11]), ''.join('X' if p in ag else '.' for p in P)\nprint('step  doors(g,o,p5,p9)  occ(12,3)(1,4)(6,8)(6,14)')\nfor tr in transitions:\n    if tr.before_frame.level!=5: continue\n    d0,o0=snap2(tr.before_frame); d1,o1=snap2(tr.after_frame)\n    act=tr.action if isinstance(tr.action,str) else str(tr.action)[:12]\n    if d0!=d1 or o0!=o1:\n        print(tr.before_frame.step, act, d0,'/',o0,' ->',d1,'/',o1)\n"
+      },
+      {
+        "call_id": "call_fbe0b5edbd714530b20fc7ed",
+        "error": "NameError: name 'sp4' is not defined",
+        "code": "sol=['UP','LEFT','UP','UP','UP','UP','LEFT','LEFT','LEFT']\nA,B=(1,3),(6,10); out=None\nfor i,act in enumerate(sol):\n    A,B=sp4(A,B,act)\n    try: r=action([act])\n    except Exception as e: print('HALT',i,type(e).__name__); break\n    got=sorted(ags4(current_frame)); exp=sorted([A,B])\n    if r.get('level_completed'): print(i,act,'LEVEL COMPLETED',got); break\n    if r.get('game_over'): print(i,act,'GAME OVER',got); break\n    if got!=exp: print('MISMATCH',i,act,'exp',exp,'got',got); break\nelse:\n    print('plan done',ags4(current_frame))\n"
+      },
+      {
+        "call_id": "call_31397d41cdbf4141beff771d",
+        "error": "StaleStateActionError: DOWN was not executed. The action immediately before it, DOWN, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+        "code": "for act in ['DOWN','DOWN','DOWN']:\n    r=action([act]); m=l6map(current_frame)\n    print(act,ags4(current_frame),'doors',[m[7][c] for c in (4,10)],{k:r.get(k) for k in ('no_op','level_completed')})\n"
+      }
+    ]
+  },
+  {
+    "file": "s5i5-18d95033_p0.log",
+    "parsed_python_calls": 19,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 19,
+    "observed_unique_results": 19,
+    "errors": [
+      {
+        "call_id": "call_6eb9f683ef8a4f3683d56c5d",
+        "error": "StaleStateActionError: MOUSE(row=57, col=41) was not executed. The action immediately before it, MOUSE(row=57, col=36), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+        "code": "for (r,c,lab) in [(57,36,\"green L\"),(57,41,\"green R\"),(57,6,\"blue L\"),(57,11,\"blue R\"),(57,21,\"orange L\"),(57,26,\"orange R\"),(57,51,\"sky L\"),(57,56,\"sky R\")]:\n    res = action([{'action':'MOUSE','row':r,'col':c}])\n    d = frame_diff()\n    print(\"==\",lab,res.get('gameplay_changed'),\"cells\",d.get('changed_cell_count'))\n    print(brief(d)[:400])\n"
+      }
+    ]
+  },
+  {
+    "file": "sc25-635fd71a_p0.log",
+    "parsed_python_calls": 17,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 18,
+    "observed_unique_results": 18,
+    "errors": []
+  },
+  {
+    "file": "su15-1944f8ab_p0.log",
+    "parsed_python_calls": 23,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 23,
+    "observed_unique_results": 23,
+    "errors": [
+      {
+        "call_id": "call_466b28227f39467cab931e6b",
+        "error": "TypeError: unsupported operand type(s) for -: 'str' and 'float'",
+        "code": "import math\ndef pieces(f):\n    out=[]\n    for o in objs(f):\n        r,c,n=o[0],o[1],o[3]\n        k={1:1,4:2,9:3,16:4}[n]\n        out.append((r,c,k))\n    return out\ndef pc_dist(p,cr,cc):\n    r,c,k=p\n    dr=max(r-cr,0,cr-(r+k-1)); dc=max(c-cc,0,cc-(c+k-1))\n    return math.hypot(dr,dc)\ndef repel(f):\n    ps=pieces(f); iv=invc(f)\n    if not iv: return None\n    # most dangerous invader = smallest distance to any piece\n    best=None\n    for g in iv:\n        ir,ic=g[0],g[1]\n        for p in ps:\n            # approx distance center->piece\n            r,c,k=p\n            dr=max(r-ir,0,ir-(r+k-1)); dc=max(c-ic,0,ic-(c+k-1))\n            d=math.hypot(dr,dc)\n            if best is None or d<best[0]: best=(d,(ir,ic),p)\n    if best[0]>9.5: return None\n    (ir,ic),p=best[1],best[2]\n    r,c,k=p\n    pr,pc=r+(k-1)/2,c+(k-1)/2\n    vx,vx2=ir-pr,ic-pc\n    n=math.hypot(vx,vx2) or 1\n    ux,uy=vx/n,vx2/n\n    for off in (4,5,6,3,7):\n        cr=round(ir-ux*off); cc=round(ic-uy*off)\n        if not(10<=cr<=62 and 0<=cc<=63): continue\n        if all(pc_dist(q,cr,cc)>=9 for q in ps): return (cr,cc)\n    return None\ndef run(clicks):\n    log=[]\n    for step in clicks:\n        rp=repel(current_frame)\n        if rp:\n            rr=action([{'action':'MOUSE','row':rp[0],'col':rp[1]}])\n            log.append(('REPEL',rp,'go' if rr.get('game_over') else ''))\n            if rr.get('game_over') or rr.get('level_completed'): return log,rr\n        cr,cc=step\n        rr=action([{'action':'MOUSE','row':cr,'col':cc}])\n        log.append((step,[o for o in objs(current_frame) if o[3]>1],[(round(g[0],1),round(g[1],1)) for g in invc(current_frame)],current_frame.ascii.split('\\n')[63].count('W')))\n        if rr.get('game_over') or rr.get('level_completed'): return log,rr\n    return log,rr\nplan=[(14,10),(48,48),(41,48),(35,49),(31,49)]\nlog,rr=run(plan)\nfor L in log: print(L)\nprint('lc',rr.get('level_completed'),'go',rr.get('game_over'))\n"
+      },
+      {
+        "call_id": "call_356040b54f234f2fb91fd281",
+        "error": "StaleStateActionError: MOUSE(row=31, col=49) was not executed. The action immediately before it, MOUSE(row=35, col=49), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+        "code": "plan=[(14,10),(48,48),(41,48),(35,49),(31,49)]\nlog,rr=run(plan)\nfor L in log: print(L)\nprint('lc',rr.get('level_completed'),'go',rr.get('game_over'))\n"
+      }
+    ]
+  },
+  {
+    "file": "tn36-ef4dde99_p0.log",
+    "parsed_python_calls": 13,
+    "check_model_syntax_calls": 0,
+    "plan_syntax_calls": 0,
+    "model_definition_calls": [],
+    "potential_validation_results": [],
+    "qualification": "Captured snapshots only; parsed counts may repeat retained calls. Unique IDs separately counted. No canonical call is not absence of own models or whole-run use.",
+    "observed_unique_calls": 13,
+    "observed_unique_results": 13,
+    "errors": []
+  }
+]
