@@ -1,0 +1,12 @@
+{
+  "sha256": "79ce4a8359426c17d15703bddab4c2a30d05b295918aa5955d167e9b5b65c311",
+  "base_sha256": "8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc",
+  "extra_patches": 1,
+  "env_unchanged": true,
+  "changed_sources": [
+    "inference/agent/tool_agent.py",
+    "inference/utils/install_observation_cache.py",
+    "inference/utils/observation_literal_cache.py"
+  ],
+  "scope": "Bounded literal scratch variables on identical observations; invalidation on action/error/state change. No quality measurement."
+}

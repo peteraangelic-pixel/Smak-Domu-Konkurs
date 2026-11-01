@@ -68,7 +68,11 @@ def install(tool_agent,sandbox):
             attempted[0]=True;cache.clear()  # BEFORE any action, including refusal/failure.
             return action_handler(*args,**kw)
         kwargs['action_handler']=action
-        result=raw_run(**kwargs)
+        try:
+            result=raw_run(**kwargs)
+        except BaseException:
+            cache.clear()
+            raise
         if attempted[0] or result.get('error'):
             cache.clear()
         else:
@@ -84,4 +88,11 @@ def install(tool_agent,sandbox):
         return result
     tool_agent.run_sandboxed_python=run
     tool_agent.ToolAgent._run_python_tool=tool
+    original_prompt=tool_agent._build_system_prompt
+    note='Small literal scratch variables may survive read-only calls only for an identical observation (bounded cache). Any action attempt, error, or observation change clears them; recompute after acting. Functions retain their existing session rules.'
+    def prompt(*args,**kwargs):
+        text=original_prompt(*args,**kwargs)
+        return text.replace('Python variables reset between tool calls.',note)
+    tool_agent._build_system_prompt=prompt
+    tool_agent._PYTHON_TOOL_DESCRIPTION+=' '+note
     tool_agent._observation_cache_installed=True

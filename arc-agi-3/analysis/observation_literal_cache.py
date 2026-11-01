@@ -56,7 +56,7 @@ class ObservationLiteralCache:
                 text=json.dumps(candidate,ensure_ascii=False)
                 if len(text.encode('utf8'))>65536:raise ValueError('byte limit')
                 data=candidate
-            except (ValueError,TypeError,OverflowError):skipped.append(name)
+            except (ValueError,TypeError,OverflowError,UnicodeError):skipped.append(name)
         self.token=observation_token;self.payload=json.dumps(data,ensure_ascii=False)
         return {'retained':list(data),'skipped':skipped}
 

@@ -1,4 +1,4 @@
-"""Boundary tests for the unintegrated scratch-cache prototype."""
+"""Codec limits; sandbox integration is verified separately."""
 from observation_literal_cache import ObservationLiteralCache
 
 c=ObservationLiteralCache()
@@ -15,4 +15,11 @@ class Dangerous:
 r=c.capture({'bad':Dangerous(),'nan':float('nan'),'text':'__import__("os")'},observation_token='safe')
 assert r['retained']==['text']
 assert c.restore(observation_token='safe')['text']=='__import__("os")'
-print('8 scratch-cache boundary checks passed; no sandbox integration or quality claim')
+c.capture({'v'+str(i):i for i in range(100)},observation_token='names')
+assert len(c.restore(observation_token='names'))==64
+c.capture({'v'+str(i):'\U0001f600'*16000 for i in range(4)},observation_token='bytes')
+assert len(c.payload.encode('utf8'))<=65536
+cyclic=[];cyclic.append(cyclic)
+r=c.capture({'cycle':cyclic,'surrogate':'\ud800','big':1<<4097,'okay':17},observation_token='limits')
+assert r['retained']==['okay']
+print('Scratch-cache codec boundaries passed, including UTF-8 bytes, 64 names, cyclic values and unsupported types; no LLM quality claim')

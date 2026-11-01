@@ -1,0 +1,29 @@
+{
+  "workers": 16,
+  "jobs": 12,
+  "budget": {
+    "node_cap": 50000,
+    "sec_cap": 120,
+    "max_levels": 6
+  },
+  "replicas": 2,
+  "genome": {
+    "bfs_branch": 0,
+    "beam": 120,
+    "max_clicks": 8,
+    "click_candidates": 12,
+    "min_moves": 1,
+    "calib_step": 4
+  },
+  "change": "Unsupported clone type uses original priority and beam120, rather than only beam120.",
+  "scope": "Targeted offline infrastructure regression; no LLM quality or competition score claim.",
+  "source_sha256": {
+    "target_fallback_cpu.py": "c85cdfb421a21a08f660b6d9d789fbd73c17f6a97fb540775ea2277a1625490f",
+    "extended_search_experiment.py": "5668e5acba3617d31a6c6ddc4a91efb5454925e496c751506723962a7c05c2b5",
+    "fast_sweep.py": "c528d7829d37a96455c6808aa7f303bb433ac613d4feff4db6b480b06f824483",
+    "fast_state_clone.py": "ea9e05ae2bc84c14365e8f6ec45e7509608081fb8aa83962abd12b8d815ef070",
+    "sweep2.py": "b305b5be75182e302c417d0aef946b2fd82b84d621eab794174e46f9f421bf5c",
+    "native_kernels.py": "2ded6cd3065628814b2542c1835c4f09f9a8056d5b940f0aed1995bec12b4fdd",
+    "fast-clone-certificate-20261101.json": "100a2bc91f5ca240e516d85c39a852e7c72dfc25c539fe6f9ca67898e68203d7"
+  }
+}
