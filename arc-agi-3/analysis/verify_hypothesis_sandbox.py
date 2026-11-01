@@ -7,8 +7,17 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'analysis/champion-recovery-20261031/materialized-clean/ARC3-Inference'))
 os.environ['ARC3_WORLD_MODEL']='1'
 from inference.agent import python_tool_sandbox as sandbox
-from install_hypothesis_tools import install
-install(sandbox)
+from inference.agent import tool_agent as ta
+from install_hypothesis_tools import install,install_agent,GUIDANCE
+original_description=ta._PYTHON_TOOL_DESCRIPTION
+install_agent(ta,sandbox)
+description=ta._PYTHON_TOOL_DESCRIPTION
+install_agent(ta,sandbox)
+assert ta._PYTHON_TOOL_DESCRIPTION==description
+assert description.startswith(original_description) and description.count(GUIDANCE)==1
+agent=ta.ToolAgent(model='verification-only',provider='lmstudio')
+spec=agent._tools(ROOT/'analysis/hypothesis-fixture/state.json')
+assert 'choose_probe' in json.dumps(spec),spec
 before=sandbox._SANDBOX_BOOTSTRAP
 install(sandbox)
 assert before==sandbox._SANDBOX_BOOTSTRAP
