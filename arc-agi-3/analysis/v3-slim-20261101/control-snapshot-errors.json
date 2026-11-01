@@ -1,0 +1,220 @@
+{
+  "games": [
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\cn04-2fe56bfb_p0.log",
+      "observed_unique_calls": 43,
+      "observed_unique_results": 43,
+      "errors": [
+        {
+          "call_id": "call_669bc3c9b784444e9b921c12",
+          "error": "TypeError: 'bool' object is not subscriptable",
+          "code": "r=action([{'action':'MOUSE','row':32,'col':44}]+['DOWN']*8+['LEFT']*4)\nprint('exec',r['executed'][-3:],'stop',r.get('stop_reason'),'level_done',r.get('level_completed'))\nprint('grays',grays(),'nonbg',nonbg())\ng=current_frame.ascii.split('\\n')\nprint([ (i,''.join(g[i][20:44])) for i in range(36,50) ])\n"
+        },
+        {
+          "call_id": "call_c3fd1c9494284953954c233d",
+          "error": "NameError: name 'j' is not defined",
+          "code": "r=action([{'action':'MOUSE','row':21,'col':9},'UP','RIGHT','RIGHT','RIGHT','RIGHT'])\nres=last_action_call_result\nprint('exec',res.get('executed'),'stop',res.get('stop_reason'),'lvl_done',res.get('level_completed'))\nprint('grays',grays(),'nonbg',nonbg())\ng=current_frame.ascii.split('\\n')\ndef art(cells):\n    r0=min(r for r,c in cells); c0=min(c for r,c in cells)\n    d={}\n    for r,c in cells: d[((r-r0)//3,(c-c0)//3)]=g[r][c]\n    nr=max(k[0] for k in d); nc=max(k[1] for k in d)\n    return [''.join(d.get((i,j),'.') for i in range(nr+1)) for i in range(nc+1)]\nfor comp in comps(g):\n    if len(comp)<30: continue\n    print('n',len(comp),'tl',min(r for r,c in comp),min(c for r,c in comp),sorted({g[r][c] for r,c in comp}))\n    print('\\n'.join(art(comp)))\n    print()\n"
+        },
+        {
+          "call_id": "call_40c3a22b5bf24e48b3e0bc0d",
+          "error": "AttributeError: 'HistoryEntryView' object has no attribute 'step'",
+          "code": "r=action([{'action':'MOUSE','row':21,'col':36},{'action':'MOUSE','row':42,'col':45},{'action':'MOUSE','row':48,'col':18}])\nres=last_action_call_result\nprint('exec',res.get('executed'),res.get('stop_reason'))\nfor h in history[-3:]:\n    gg=h.frame.ascii.split('\\n')\n    print('--- step',h.step)\n    for comp in compsg(gg,'b'):\n        if len(comp)<9: continue\n        cols={g2 for g2 in comp for _ in [0]} if False else sorted({gg[x][y] for (x,y) in comp})\n        if 'R' in cols or 'c' in cols and len(comp)>0:\n            if cols==['c']: continue\n            a=art(comp,gg)\n            print('n',len(comp),'tl',a[0],cols)\n            print('\\n'.join(a[1]))\n"
+        },
+        {
+          "call_id": "call_32a6c73cded4436f8d373cd4",
+          "error": "NameError: name 'BLK' is not defined",
+          "code": "TGT={'A':(3,(26,32)),'B':(1,(38,17)),'D':(1,(32,17)),'P':(0,(11,17))}\ngrid={}; from collections import Counter; cnt=Counter(); pr={}\nfor c,(ori,tl) in TGT.items():\n    sh=rs(BLK[c],ori); br,bc=tl[0]//3,tl[1]//3\n    pr[c]={(r+br,cc+bc) for r,cc in sh['prong']}\n    for (r,cc) in sh['body']: grid[(r+br,cc+bc)]=c\n    for (r,cc) in sh['prong']:\n        k=(r+br,cc+bc); cnt[k]+=1\n        if k not in grid: grid[k]=c\nrows=sorted(set(r for r,c in grid)); cols=sorted(set(c for r,c in grid))\nfor r in range(min(rows),max(rows)+1):\n    print(''.join(('#' if cnt.get((r,c),0)>1 else grid.get((r,c),'.')) for c in range(min(cols),max(cols)+1)))\nprint('shared joints',[ (k,v) for k,v in cnt.items() if v>1])\nimport itertools\nfor a,b in itertools.combinations(TGT,2):\n    if pr[a]&pr[b]: print(a,b,len(pr[a]&pr[b]))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 1,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\dc22-fdcac232_p0.log",
+      "observed_unique_calls": 21,
+      "observed_unique_results": 21,
+      "errors": [
+        {
+          "call_id": "call_e91bcb41b96948698b62b236",
+          "error": "StaleStateActionError: MOUSE(row=33, col=28) was not executed. The action immediately before it, MOUSE(row=33, col=17), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "for (r,c),name in [((33,17),'purple vert strip'),((33,28),'purple horiz strip'),((37,31),'yellow box')]:\n    b4=passable(current_frame); before=set(objs(current_frame))\n    res=action([{'action':'MOUSE','row':r,'col':c}])\n    after=set(objs(current_frame))\n    print(name,'no_op',res.get('no_op'),'comp',res.get('level_completed'),'passdiff',len(b4.symmetric_difference(passable(current_frame))),'knob',knobpos(current_frame))\n    d=sorted(before-after)+sorted(after-before)\n    for x in d[:8]: print('    ',x)\n"
+        },
+        {
+          "call_id": "call_24adb878943d4064854b6d74",
+          "error": "StaleStateActionError: LEFT was not executed. The action immediately before it, UP, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "k0=knobpos(current_frame)\nres=action(['UP'])\nk1=knobpos(current_frame)\nprint('UP from',k0,'->',k1,'no_op',res.get('no_op'),'gameplay_changed',res.get('gameplay_changed'))\nif k1==k0:\n    res=action(['LEFT']); print('LEFT ->',knobpos(current_frame),'no_op',res.get('no_op'))\nrows=current_frame.ascii.split('\\n')\nfor r in range(38,48): print(r, rows[r][10:22])\n"
+        },
+        {
+          "call_id": "call_d43302fed38b414283abbab8",
+          "error": "StaleStateActionError: UP was not executed. The action immediately before it, UP, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "r=action(['RIGHT']); print('RIGHT knob',knobpos(current_frame),'no_op',r.get('no_op'))\nr=action(['UP']); print('UP knob',knobpos(current_frame),'no_op',r.get('no_op'))\nr=action(['UP']); print('UP2 knob',knobpos(current_frame),'no_op',r.get('no_op'))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\g50t-5849a774_p0.log",
+      "observed_unique_calls": 28,
+      "observed_unique_results": 28,
+      "errors": [
+        {
+          "call_id": "call_b3cbe4581f334babae5f2bf0",
+          "error": "NameError: name 'c1' is not defined",
+          "code": "OC={(8,8),(8,14),(8,20),(8,26),(8,32),(8,38),(8,44),(8,50),(14,8),(14,32),(14,50),(20,8),(20,20),(20,32),(20,50),\n(26,20),(26,32),(26,50),(32,8),(32,14),(32,20),(32,32),(32,38),(32,50),(38,8),(38,50),(44,8),(44,50),(50,8),(50,14),\n(50,20),(50,26),(50,32),(50,38),(50,44),(50,50)}\nD={'UP':(-6,0),'DOWN':(6,0),'LEFT':(0,-6),'RIGHT':(0,6)}\nPLATE=(20,32); YBLOCK=(20,50); BTN1=(32,38); BOX1=(32,20); BTN2=(50,20); BOX2=(50,38); GOAL=(20,20)\ndef sim_plan(c1,c2,latch0,start=(20,8),maxt=80):\n    import collections\n    n1=len(c1)-1; n2=len(c2)-1\n    def gpos(t):\n        return c1[min(t,n1)], c2[min(t,n2)]\n    start_state=(start,0,latch0)\n    q=collections.deque([start_state]); par={start_state:None}\n    while q:\n        pos,t,latch=q.popleft()\n        if pos==GOAL:\n            out=[]; s=(pos,t,latch)\n            while par[s] is not None:\n                out.append(par[s][3]); s=par[s][2]\n            return out[::-1], t\n        g1,g2=gpos(t)\n        ents={pos,g1,g2}\n        blocked=set()\n        if latch=='home': blocked.add(YBLOCK)\n        if BTN1 not in ents: blocked.add(BOX1)\n        if BTN2 not in ents: blocked.add(BOX2)\n        for m,dd in D.items():\n            np_=(pos[0]+dd[0],pos[1]+dd[1])\n            if np_ not in OC or np_ in blocked: continue\n            t2=t+1\n            ng1,ng2=gpos(t2)\n            nl=latch\n            plate_occupied_t = PLATE in ents\n            entered = (np_==PLATE) or (ng1==PLATE and g1!=PLATE) or (ng2==PLATE and g2!=PLATE)\n            if (not plate_occupied_t) and entered: nl = 'moved' if latch=='home' else 'home'\n            ns=(np_,t2,nl)\n            if ns not in par:\n                par[ns]=((pos,t,latch),None,None,m); q.append(ns)\n    return None,None\nplan,T=sim_plan(c1,c2,'moved')\nprint('found',plan is not None,'len',len(plan) if plan else 0,'final t',T)\nprint(plan)\n"
+        },
+        {
+          "call_id": "call_ed9cc5d33e9547b8b4aaa905",
+          "error": "IndexError: tuple index out of range",
+          "code": "def sim_final(c1,c2,latch0,start=(20,8),maxt=120):\n    OC={(8,8),(8,14),(8,20),(8,26),(8,32),(8,38),(8,44),(8,50),(14,8),(14,32),(14,50),(20,8),(20,20),(20,32),(20,50),\n    (26,20),(26,32),(26,50),(32,8),(32,14),(32,20),(32,32),(32,38),(32,50),(38,8),(38,50),(44,8),(44,50),(50,8),(50,14),\n    (50,20),(50,26),(50,32),(50,38),(50,44),(50,50)}\n    D={'UP':(-6,0),'DOWN':(6,0),'LEFT':(0,-6),'RIGHT':(0,6)}\n    PLATE=(20,32); YBLOCK=(20,50); BTN1=(32,38); BOX1=(32,20); BTN2=(50,20); BOX2=(50,38); GOAL=(20,20)\n    import collections\n    n1=len(c1)-1; n2=len(c2)-1\n    def gp(t): return c1[min(t,n1)], c2[min(t,n2)]\n    s0=(start,0,latch0)\n    q=collections.deque([s0]); par={s0:None}\n    while q:\n        pos,t,latch=q.popleft()\n        if pos==GOAL:\n            out=[]; s=(pos,t,latch)\n            while par[s] is not None:\n                out.append(par[s][3]); s=par[s][0]\n            return out[::-1],t\n        if t>=maxt: continue\n        g1,g2=gp(t); ents={pos,g1,g2}\n        blocked=set()\n        if latch=='home': blocked.add(YBLOCK)\n        if BTN1 not in ents: blocked.add(BOX1)\n        if BTN2 not in ents: blocked.add(BOX2)\n        for m,dd in D.items():\n            np_=(pos+dd[0],pos[1]+dd[1]) if False else (pos[0]+dd[0],pos[1]+dd[1])\n            if np_ not in OC or np_ in blocked: continue\n            t2=t+1; ng1,ng2=gp(t2); nl=latch\n            occ = PLATE in ents\n            ent = (np_==PLATE) or (ng1==PLATE and g1!=PLATE) or (ng2==PLATE and g2!=PLATE)\n            if (not occ) and ent: nl='moved' if latch=='home' else 'home'\n            ns=(np_,t2,nl)\n            if ns not in par: par[ns]=((pos,t,latch),m); q.append(ns)\n    return None,None\nm1,c1=runpaths(131,141); m2,c2=runpaths(143,177)\nplan,T=sim_final(c1,c2,'moved')\nprint('len',len(plan) if plan else None,'T',T)\nprint(plan)\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\ka59-38d34dbb_p0.log",
+      "observed_unique_calls": 28,
+      "observed_unique_results": 28,
+      "errors": [
+        {
+          "call_id": "call_2d10cd9d3be14862a69920ed",
+          "error": "IndexError: string index out of range",
+          "code": "PLUS=[(dr,dc) for dr in range(9) for dc in range(9) if not((dr<3 and dc<3) or (dr<3 and dc>5) or (dr>5 and dc<3) or (dr>5 and dc>5))]\nRING=set(); FIXED=set()\nfor r in range(63):\n    for c in range(64):\n        ch=current_frame.ascii[r][c]\n        if ch=='c': RING.add((r,c))\n        elif ch=='Y' and c<40: FIXED.add((r,c))\nR0,R1,C0,C1=5,58,5,58\ndef pluscells(pr,pc): return {(pr+dr,pc+dc) for dr,dc in PLUS}\ndef okplus(pr,pc,extra):\n    obs=RING|FIXED|extra\n    for (r,c) in pluscells(pr,pc):\n        if r<R0 or r>R1 or c<C0 or c>C1: return False\n        if (r,c) in obs: return False\n    return True\ndef slide(pr,pc,d,extra):\n    dr,dc={'U':(-3,0),'D':(3,0),'L':(0,-3),'R':(0,3)}[d]\n    # plus slides cell-by-cell (1 cell steps) until blocked\n    best=(pr,pc); r,c=pr,pc\n    while okplus(r+dr,c+dc,extra):\n        r,c=r+dr,c+dc; best=(r,c)\n    return best\ndef gcells(gr,gc): return {(gr+i,gc+j) for i in range(3) for j in range(3)}\ndef okg(gr,gc): return R0<=gr and gr+2<=R1 and C0<=gc and gc+2<=C1\ndef step(st,act):\n    (pr,pc,gr,gc)=st\n    d={'UP':'U','DOWN':'D','LEFT':'L','RIGHT':'R'}[act]\n    dr,dc={'U':(-3,0),'D':(3,0),'L':(0,-3),'R':(0,3)}[d]\n    nr,nc=gr+dr,gc+dc\n    if not okg(nr,nc): return None\n    tgt=gcells(nr,nc)\n    if tgt & pluscells(pr,pc):\n        npr,npc=slide(pr,pc,d,set())\n        if (npr,npc)==(pr,pc): return None\n        return (npr,npc,gr,gc)\n    return (pr,pc,nr,nc)\ndef bfs(start,goalp,goalg,maxn=400000):\n    import collections\n    q=collections.deque([(start,[])]); seen={start}\n    while q:\n        st,path=q.popleft()\n        if len(path)>14: continue\n        for act in ['UP','DOWN','LEFT','RIGHT']:\n            ns=step(st,act)\n            if ns is None or ns in seen: continue\n            npath=path+[act]\n            if ns[0]==goalp[0] and ns[1]==goalp[1] and ns[2]==goalg[0] and ns[3]==goalg[1]:\n                return npath\n            seen.add(ns); q.append((ns,npath))\n            if len(seen)>maxn: return ('exploded',len(seen))\n    return None\nstart=(20,50,41,26)\nprint('states sample', step(start,'UP'), step(start,'LEFT'))\np=bfs(start,(35,35),(29,35))\nprint('plan', p if isinstance(p,str) else (len(p),p))\n"
+        },
+        {
+          "call_id": "call_84039859d1e84a759c34521f",
+          "error": "NameError: name 'RING' is not defined",
+          "code": "print('ring cells rows19-32:', sorted([(r,c) for (r,c) in RING if r<33]))\nprint('fixed sample:', sorted(FIXED)[:5], sorted(FIXED)[-5:])\n"
+        },
+        {
+          "call_id": "call_be009a87e0cb4b43a6aacd2a",
+          "error": "ValueError: min() iterable argument is empty",
+          "code": "run(['DOWN','DOWN','DOWN','DOWN','DOWN','DOWN','DOWN','DOWN','DOWN','LEFT','LEFT'])\nm=l3_model()\nprint('free',bb2(m['free']),'fixed',bb2({p for p in m['fixed'] if p[1]<34}),'green',m['green_tl'],'bar',bar(current_frame))\nprint('last', last_action_call_result.get('level_completed'), last_action_call_result.get('game_over'), last_action_call_result.get('done'))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\ls20-9607627b_p0.log",
+      "observed_unique_calls": 32,
+      "observed_unique_results": 32,
+      "errors": [
+        {
+          "call_id": "call_ef42e5ecbed8492db097739a",
+          "error": "StaleStateActionError: RIGHT was not executed. The action immediately before it, RIGHT, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "OC3,BR=oc3(current_frame)\nS=pos(current_frame); T2=(30,19); MY=(45,29); T1=(15,34); PL=(10,49); BX=(50,54)\np1=path_actions(bfs_path(OC3,S,T2)); print('S->T2',len(p1),''.join(p1))\nok=go(p1,'st1 S->T2')\nprint(' bar',barc(),'tokens',[tuple(n['boundary'][0]) for n in current_frame.segmentation['nodes'] if n['color']=='Y' and n['pixels']<=12])\np2=path_actions(bfs_path(OC3,pos(current_frame),MY)); print('T2->MY',len(p2),''.join(p2))\nif ok: ok=go(p2,'st2 ->mystery')\nprint(' bar',barc(),'pos',pos(current_frame))\nprint(' hud',g3b(current_frame,'hud'),' box',g3b(current_frame,'box'))\na=current_frame.ascii.split('\\n')\nprint('mystery area now rows45-49 cols29-33'); [print('  ',a[r][29:34]) for r in range(45,50)]\n"
+        },
+        {
+          "call_id": "call_eea590e034354cd399edd779",
+          "error": "StaleStateActionError: DOWN was not executed. The action immediately before it, LEFT, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "OC4,BR=oc3(current_frame)\np=path_actions(bfs_path(OC4,pos(current_frame),(30,34))); print('S->MY',len(p),''.join(p))\nfor a in p:\n    r=action([a]); print(a,pos(current_frame),'bar',barc())\nprint('HUD',g3b(current_frame,'hud'))\np=path_actions(bfs_path(OC4,pos(current_frame),(15,19))); print('->TA',len(p),''.join(p))\nfor a in p:\n    r=action([a])\nprint('pos',pos(current_frame),'bar',barc(),'HUD',g3b(current_frame,'hud'),'tokens',[(n['boundary'][0]) for n in current_frame.segmentation['nodes'] if n['color']=='Y' and n['pixels']<=12])\n"
+        },
+        {
+          "call_id": "call_fc3d67ba50af4aedbd22d4d0",
+          "error": "NameError: name 'D7' is not defined",
+          "code": "def nbrs_dir2(p,oc,d,blocked):\n    r,c=p; out=[]\n    for nm,dr,dc in (('UP',-5,0),('DOWN',5,0),('LEFT',0,-5),('RIGHT',0,5)):\n        q=(r+dr,c+dc)\n        if q not in oc or q in blocked: continue\n        if nm in d.get(q,()): continue\n        out.append((q,nm))\n    return out\ndef bfs3(s,e,oc,d,blocked):\n    import collections\n    prev={s:None}; dq=collections.deque([s])\n    while dq:\n        cur=dq.popleft()\n        if cur==e: break\n        for q,nm in nbrs_dir2(cur,oc,d,blocked):\n            if q not in prev: prev[q]=(cur,nm); dq.append(q)\n    if e not in prev: return None\n    path=[]; cur=e\n    while prev[cur] is not None: path.append(prev[cur][1]); cur=prev[cur][0]\n    return path[::-1]\nBL7={k for k,v in D7.items() if v is None}\nS=pos(current_frame); PL=(30,24); MY=(30,34); TA=(15,19); TB=(50,34); BX=(5,9)\npts=[('S',S),('PL',PL),('MY',MY),('TA',TA),('TB',TB),('BX',BX)]\nfor k1,v1 in pts:\n    out=[]\n    for k2,v2 in pts:\n        if k1==k2: out.append(' -')\n        else:\n            p=bfs3(v1,v2,OC7,D7,BL7); out.append(('%2d'%len(p) if p else ' X'))\n    print(k1,out)\np=bfs3(S,MY,OC7,D7,BL7); print('S->MY',''.join(p) if p else None)\np=bfs3(S,TA,OC7,D7,BL7); print('S->TA',''.join(p) if p else None)\np=bfs3(S,BX,OC7,D7,BL7); print('S->BX',''.join(p) if p else None)\np=bfs3(S,PL,OC7,D7,BL7); print('S->PL',''.join(p) if p else None)\n"
+        },
+        {
+          "call_id": "call_ea90ec84b9df4a26b68cb8f0",
+          "error": "StaleStateActionError: UP was not executed. The action immediately before it, LEFT, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "OC7,BR7,D7=danger(current_frame); BL7={k for k,v in D7.items() if v is None}\np=bfs3(pos(current_frame),(30,34),OC7,D7,BL7); print('->MY',''.join(p),len(p))\nfor a in p:\n    r=action([a]); print(a,pos(current_frame),'bar',barc())\nprint('HUD',g3b(current_frame,'hud'),'BOX',g3b(current_frame,'box'))\np=bfs3(pos(current_frame),(15,19),OC7,D7,BL7); print('->TA',''.join(p),len(p))\nfor a in p: r=action([a])\nprint('pos',pos(current_frame),'bar',barc(),'tokens',[tuple(n['boundary'][0]) for n in current_frame.segmentation['nodes'] if n['color']=='Y' and n['pixels']<=12])\nprint('HUD',g3b(current_frame,'hud'))\n"
+        },
+        {
+          "call_id": "call_2ebd6395a0664d2b89b93d52",
+          "error": "NameError: name 'OC8' is not defined",
+          "code": "S=pos(current_frame); print('S',S,'in OC8',S in OC8)\nprint('nbrs',[(d,(S[0]+DIR[d][0],S[1]+DIR[d][1]),(S[0]+DIR[d][0],S[1]+DIR[d][1]) in OC8) for d in DIR])\nmiss=[c for c in [((45,49),(40,49)),((45,49),(45,44)),((45,49),(45,54)),((45,49),(50,49))] if c[1] not in OC8]\nprint('missing',miss)\nprint('OC8 count',len(OC8))\nimport collections\n# which OC cells are near avatar\nnear=[c for c in OC8 if abs(c[0]-45)<=10 and abs(c[1]-49)<=10]\nprint('near',sorted(near))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\m0r0-492f87ba_p0.log",
+      "observed_unique_calls": 30,
+      "observed_unique_results": 30,
+      "errors": [
+        {
+          "call_id": "call_ccdd4de428654cd09dfaf700",
+          "error": "NameError: name 'f' is not defined",
+          "code": "from collections import deque\nF3=sorted(f|mk2)\ndef step3(ab,a,F):\n    A,B=ab\n    if a not in ('UP','DOWN','LEFT','RIGHT'): return ab\n    dA={'UP':(-1,0),'DOWN':(1,0),'LEFT':(0,-1),'RIGHT':(0,1)}[a]\n    dB={'UP':(-1,0),'DOWN':(1,0),'LEFT':(0,1),'RIGHT':(0,-1)}[a]\n    nA=(A[0]+dA[0],A[1]+dA[1]); nB=(B[0]+dB[0],B[1]+dB[1])\n    freeA=nA in F; freeB=nB in F\n    if freeA and freeB and nA==nB: freeA=freeB=False\n    if freeA and freeB and nA==B and nB==A:\n        push=(B[0]+dA[0],B[1]+dA[1])\n        if push in F: return (nA,push)\n        freeA=freeB=False\n    A_vac=freeA and nA!=B and nA!=nB\n    B_vac=freeB and nB!=A and nA!=nB\n    okA=freeA and (nA!=B or B_vac)\n    okB=freeB and (nB!=A or A_vac)\n    return ((nA if okA else A),(nB if okB else B))\nstart=((9,3),(9,9))\nMARK={(1,6),(2,1),(5,8)}\ndef bfs3(start,pred,F,maxd=22):\n    dist={start:0};par={start:None};act={start:None};q=deque([start]);hit=None\n    while q:\n        s=q.popleft()\n        if pred(s): hit=s;break\n        if dist[s]>=maxd: continue\n        for a in ('UP','DOWN','LEFT','RIGHT'):\n            n=step3(s,a,F)\n            if n==s or n in dist: continue\n            dist[n]=dist[s]+1;par[n]=s;act[n]=a;q.append(n)\n    if not hit: return None,len(dist)\n    p=[];s=hit\n    while par[s] is not None: p.append(act[s]);s=par[s]\n    return (hit,list(reversed(p))),len(dist)\nr,sz=bfs3(start,lambda s: (set(s)&MARK)!=set(),F3)\nprint('reach any marker:',r,'states',sz)\n"
+        },
+        {
+          "call_id": "call_29bb68efbd3a4bf7b3bf7e20",
+          "error": "StaleStateActionError: LEFT was not executed. The action immediately before it, UP, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "for a in ['RIGHT','RIGHT']:\n    r=action([a]); f2,bk2,mk3,_=l3map(current_frame)\n    print(a,'blocks',sorted(bk2),'mk',sorted(mk3),'DONE' if r.get('level_completed') else '')\n# now try pressing toward gates from both sides\nfor a in ['UP','LEFT']:\n    r=action([a]); f2,bk2,mk3,_=l3map(current_frame)\n    print(a,'blocks',sorted(bk2),'mk',sorted(mk3),'DONE' if r.get('level_completed') else '','OVER' if r.get('game_over') else '')\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\s5i5-18d95033_p0.log",
+      "observed_unique_calls": 27,
+      "observed_unique_results": 27,
+      "errors": [
+        {
+          "call_id": "call_1d3c6ef9c6b643d081a0fe23",
+          "error": "TypeError: unsupported operand type(s) for -: 'int' and 'NoneType'",
+          "code": "def rstate(fr):\n    a=fr.ascii.split('\\n')\n    dr=[r for r in range(12,62) for c in range(30,33) if a[r][c]=='r']\n    Ly=45-dr[0] if dr else None\n    def mr(ch,c0,c1): \n        rs=[r for r in range(0,62) for c in range(c0,c1+1) if a[r][c]==ch]\n        return min(rs) if rs else None\n    return (Ly, 17-mr('b',51,53), 20-mr('N',9,11), 23-mr('R',45,47), 53-mr('O',18,20))\nBTN={'Y+':(54,34),'Y-':(54,28),'O-':(57,6),'O+':(57,12)}\nIDX={'Y':0,'O':4}\ncur=[11,14,14,14,23]\nseq=['O-']*6+['Y+']*8\nfor a in seq:\n    r=action([{'action':'MOUSE','row':BTN[a][0],'col':BTN[a][1]}])\n    s2=list(cur); s2[IDX[a[0]]] += 3 if a[1]=='+' else -3\n    got=rstate(current_frame)\n    print(a,'noop',r.get('no_op'),'want',tuple(s2),'got',got,'done',r.get('level_completed'),'over',r.get('game_over'))\n    if r.get('no_op') or r.get('game_over') or r.get('level_completed'): break\n    if tuple(s2)!=got: print('  DESYNC'); break\n    cur=s2\nprint('end',cur)\n"
+        },
+        {
+          "call_id": "call_871302a24a684992b37a9b7e",
+          "error": "NameError: name 'pur6' is not defined",
+          "code": "PUR=pur6(current_frame)\ndef validB(st):\n    C,dot=chain6(st)\n    for (r,c),v in C.items():\n        if len(v)>1: return False\n        if r<0 or r>62 or c<0 or c>63: return False\n        if (r,c) in PUR: return False\n    return True\nsol=solve6()\nok=[]\nfor c,s,rot in sol:\n    if validB(s): ok.append((c,s,rot))\nprint('valid targets',len(ok))\nfor c,s,rot in ok[:15]:\n    C,dot=chain6(s); rs=[r for r,_ in C]; cs=[c for _,c in C]\n    print(c,s,'rot',rot,'bbox rows',min(rs),max(rs),'cols',min(cs),max(cs))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\sc25-635fd71a_p0.log",
+      "observed_unique_calls": 23,
+      "observed_unique_results": 23,
+      "errors": [
+        {
+          "call_id": "call_e9bd9ebf86394519aa534f9c",
+          "error": "TypeError: unsupported operand type(s) for -: 'int' and 'tuple'",
+          "code": "prev=None\nfor h in history:\n    b=barg(h.frame); s=h.frame.step\n    if s>=55 and prev is not None and b and prev[1]:\n        d=b[2]-prev[1]\n        if d!=0 and (d>0 or abs(d)!=2): print(s, str(h.action)[:14], prev[1],'->',b[2], 'delta',d)\n    prev=(s,b)\n"
+        },
+        {
+          "call_id": "call_839113f0af764debb1ecbf34",
+          "error": "NameError: name 'LINE' is not defined",
+          "code": "go('LEFT',8); print('L8',tips(current_frame),'green?',[(r,c) for r in range(39,42) for c in range(11,15) if current_frame.ascii.split('\\n')[r][c]=='N'])\ngo('DOWN',2); go('RIGHT',1); go('LEFT',1); print('pos',tips(current_frame),'bar',barg(current_frame))\nprint(enter(LINE), 'bar',barg(current_frame))\na=current_frame.ascii.split('\\n')\nprint('orange socket:'); [print(f\"{r:2d}  \"+a[r][2:20]) for r in range(42,48)]\nprint('right bar locks:'); [print(f\"{r:2d}  \"+a[r][49:56]) for r in range(15,24)]\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\su15-1944f8ab_p0.log",
+      "observed_unique_calls": 16,
+      "observed_unique_results": 16,
+      "errors": [
+        {
+          "call_id": "call_9c6c285a13c447208d66416b",
+          "error": "StaleStateActionError: UNDO was not executed. The action immediately before it, UNDO, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "def dots(f):\n    out=[]\n    for n in f.segmentation['nodes']:\n        if n['color']=='S' and n['pixels']==1:\n            b=n['boundary']\n            if b[0][0]>10: out.append((b[0][0],b[0][1]))\n    return out\nlog=[]\nfor i in range(26):\n    r = action([{'action':'UNDO'}])\n    f = current_frame\n    d = dots(f); bl = blocks(f)\n    log.append((f.step, len(d), len(bl), blobcol(f)))\n    if len(d)==8 and not bl: break\nprint(log[-6:])\nprint('level', current_frame.level, 'step', current_frame.step, 'W', prevw(current_frame))\nprint('dots', dots(current_frame), 'blob', blobcol(current_frame), 'hunt', hunt(current_frame))\n"
+        },
+        {
+          "call_id": "call_18baab34812a4027a9eb24d4",
+          "error": "StaleStateActionError: UNDO was not executed. The action immediately before it, UNDO, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "for i in range(2):\n    r = action([{'action':'UNDO'}])\n    print(i, r.get('no_op'), current_frame.step, 'blob', blobcol(current_frame), 'hunt', hunt(current_frame), blocks(current_frame), 'dots', dots(current_frame), 'W', prevw(current_frame))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-target-result-20261031\\v3-output\\prompts\\tn36-ef4dde99_p0.log",
+      "observed_unique_calls": 25,
+      "observed_unique_results": 25,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    }
+  ],
+  "observed_errors": 25,
+  "bool_as_mapping_errors": 1
+}

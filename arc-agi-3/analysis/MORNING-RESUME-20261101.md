@@ -17,3 +17,5 @@ Kontrola wynikowa:33 ukończenia/27.49667 na10 publicznych grach,48min/gra,concu
 Uruchomiono zlecenie prywatnego save-run Actions41287899335,tryb slim-smoke. Nie jest to submisja konkursowa. Odczytać potwierdzenie przyjęcia z artefaktu slim-target-push.txt,zanim uzna się test za uruchomiony. Nie zmieniono ani nie nadpisano poprzednich kandydatów.
 
 Uruchomienie41287899335 nie dotarło do Kaggle API: CLI nie miało six. Nie jest pomiarem agenta. Naprawiono workflow (kaggle==2.2.5,six) i fail-fast CLI. Zlecenie41288008573 potwierdziło Kernel version1 successfully pushed. Kolektor41288053823 pobierze wynik;nie uruchamiać duplikatu.
+
+09:30:slim nadal w toku;nie dublowano GPU. Przeanalizowano niezależnie native tool-call IDs w10 snapshotach kontroli:25 obserwowanych błędów,w tym9 zabezpieczeń stale-state i9 NameError. Szczegóły i ograniczenia w v3-slim-20261101/NEXT-HYPOTHESIS.md;przy kolejnym wyniku użyć analyze_prompt_snapshots.py do porównania. Nie implementowano jeszcze automatycznej retencji zmiennych ani nie uznano liczby błędów za wynik gry.
