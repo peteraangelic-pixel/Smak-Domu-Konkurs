@@ -1,0 +1,81 @@
+{
+  "trials": 3072,
+  "baseline_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7198581560283688
+  },
+  "selected_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 2,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5212765957446809,
+    "balanced_fields": 0.7304964539007093
+  },
+  "baseline_holdout": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7254901960784313
+  },
+  "selected_holdout": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7254901960784313
+  },
+  "selected_sha256": "d039ea7a2dd3bd05a7368f2b3ff67099ecb50e0c81aa9161f760f3c2aaadd44e",
+  "selected_edits": [
+    {
+      "kind": "numeric_literal",
+      "site": 0,
+      "old": 1.5,
+      "new": 2
+    },
+    {
+      "kind": "numeric_literal",
+      "site": 32,
+      "old": 2,
+      "new": 0
+    },
+    {
+      "kind": "numeric_literal",
+      "site": 8,
+      "old": 4,
+      "new": 2
+    }
+  ],
+  "qualification": "AST numeric repair of one frozen LLM model on new observed transitions; not an agent or Kaggle result."
+}

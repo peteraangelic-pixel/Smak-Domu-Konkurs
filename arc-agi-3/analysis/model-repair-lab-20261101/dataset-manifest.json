@@ -1,0 +1,29 @@
+{
+  "workers": 16,
+  "episodes": 16,
+  "train_seeds": [
+    9100,
+    9101,
+    9102,
+    9103,
+    9104,
+    9105,
+    9106,
+    9107
+  ],
+  "holdout_seeds": [
+    9108,
+    9109,
+    9110,
+    9111,
+    9112,
+    9113,
+    9114,
+    9115
+  ],
+  "probes_per_episode": 12,
+  "base_model_sha256": "0bc99b23406fc490baa22a03640a3e056f30cee900a15a753723c180ad8da206",
+  "evaluator_sha256": "a68191e99993ea94824fb0c642b5b4eb556ddc3cd145c2f1364f3a1121b362cf",
+  "game_sha256": "1944f8aba6f2f8860d991745ba768131f02d918bcd5465466e85fcb2726d115a",
+  "qualification": "New public forward probe episodes at one fixture; frozen model and seed split before evaluation. No game-completion or Kaggle score claim. Not unseen-game generalization."
+}

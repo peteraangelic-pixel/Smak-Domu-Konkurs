@@ -1,0 +1,25 @@
+{
+  "sha256": "4be03c90d313c949356bde62e383bb61216cfc10172935bdbaed330ba60c3e66",
+  "edits": [
+    {
+      "mask": 0,
+      "distance": "chebyshev",
+      "rounding": "truncate",
+      "radius": 4
+    }
+  ],
+  "training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 1,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5106382978723404,
+    "balanced_fields": 0.7269503546099291
+  }
+}

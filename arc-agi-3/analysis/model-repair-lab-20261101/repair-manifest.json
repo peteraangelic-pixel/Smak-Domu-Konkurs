@@ -1,0 +1,10 @@
+{
+  "workers": 16,
+  "max_generations": 3,
+  "max_candidates_per_generation": 1024,
+  "parent_beam": 4,
+  "base_sha256": "0bc99b23406fc490baa22a03640a3e056f30cee900a15a753723c180ad8da206",
+  "runner_sha256": "cf55d4c22b42de20aa15a36549335ae5fbbea61cc775962e8d7b776ffb224705",
+  "selection": "Training balanced exact-transition accuracy, then field accuracy, then errors/edit count. Holdout not read until finalist frozen.",
+  "scope": "AST numeric repair of one frozen LLM model on new observed transitions; not an agent or Kaggle result."
+}

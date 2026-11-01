@@ -1,0 +1,68 @@
+{
+  "candidates": 192,
+  "baseline_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7198581560283688
+  },
+  "selected_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 1,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5106382978723404,
+    "balanced_fields": 0.7269503546099291
+  },
+  "baseline_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7254901960784313
+  },
+  "selected_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7254901960784313
+  },
+  "selected_sha256": "4be03c90d313c949356bde62e383bb61216cfc10172935bdbaed330ba60c3e66",
+  "selected_config": {
+    "mask": 0,
+    "distance": "chebyshev",
+    "rounding": "truncate",
+    "radius": 4
+  },
+  "final_test": "Not opened: no training+validation advantage.",
+  "qualification": "One public fixture prediction repair; not unseen games, completions, or Kaggle score."
+}

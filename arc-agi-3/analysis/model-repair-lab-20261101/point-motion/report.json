@@ -1,0 +1,99 @@
+{
+  "candidates": 193,
+  "baseline_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7198581560283688
+  },
+  "selected_training": {
+    "samples": 96,
+    "counts": {
+      "changed": 47,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 6,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5638297872340425,
+    "balanced_fields": 0.7765957446808511
+  },
+  "baseline_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7254901960784313
+  },
+  "selected_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 4,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5392156862745098,
+    "balanced_fields": 0.7745098039215688
+  },
+  "selected_config": {
+    "radius": 8,
+    "speed": 8,
+    "eating": false,
+    "fast": false,
+    "distance": "euclidean"
+  },
+  "selected_sha256": "9a5b7ab15076a3dc70601242febfefb7dfcb98a962c5fe2ff8cedb25146e9046",
+  "final_episode_errors": [],
+  "final_samples_total": 192,
+  "novel_final_samples": 185,
+  "baseline_final": {
+    "samples": 185,
+    "counts": {
+      "changed": 101,
+      "noop": 84
+    },
+    "correct": {
+      "changed": 0,
+      "noop": 84
+    },
+    "errors": 0,
+    "balanced_exact": 0.5,
+    "balanced_fields": 0.7161716171617163
+  },
+  "selected_final": {
+    "samples": 185,
+    "counts": {
+      "changed": 101,
+      "noop": 84
+    },
+    "correct": {
+      "changed": 16,
+      "noop": 84
+    },
+    "errors": 0,
+    "balanced_exact": 0.5792079207920792,
+    "balanced_fields": 0.7953795379537953
+  },
+  "qualification": "Missing branch induced from training only; parameters selected on train; old holdout=validation; fresh final episodes after freezing. One public fixture, not completions/Kaggle."
+}
