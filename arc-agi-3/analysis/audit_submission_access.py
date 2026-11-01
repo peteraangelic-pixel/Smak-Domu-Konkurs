@@ -54,11 +54,13 @@ for p in (OUT/'submitted-file').glob('**/*'):
 (OUT/'access-audit.json').write_text(json.dumps({'operations':records,'download_inventory':inventory},indent=2),encoding='utf8')
 
 mode=os.environ.get('ARC_AUDIT_MODE')
-if mode in ('v3-smoke','memory-smoke'):
+if mode in ('v3-smoke','memory-smoke','slim-smoke'):
     # Explicitly authorized private save-run. No competition submit command.
     slug='petersharps/arc3-codex-memory-v3-lab' if mode=='memory-smoke' else 'petersharps/arc3-duck-codex-v3-control-1031'
     label='memory-target' if mode=='memory-smoke' else 'v3-target'
     package='arc-agi-3/duck-lab-candidates/memory-v3' if mode=='memory-smoke' else 'arc-agi-3/duck-lab-candidates/v3-target-control'
+    if mode=='slim-smoke':
+        slug='petersharps/arc3-duck-codex-v3-slim-1101';label='slim-target';package='arc-agi-3/duck-lab-candidates/v3-slim'
     existing=run(label+'-preflight',['kernels','list','--mine','--search',slug.split('/')[1],'--csv'])
     status=(OUT/(label+'-preflight.txt')).read_text(encoding='utf8')
     if existing.get('returncode')==0 and slug in status:
@@ -82,11 +84,12 @@ if mode=='memory-correction':
             print('Correction push:',record.get('returncode'),flush=True)
         else:print('Latest memory code differs; do not overwrite or duplicate correction.',flush=True)
 
-if mode in ('v3-watch','memory-watch','memory-correction-watch'):
+if mode in ('v3-watch','memory-watch','memory-correction-watch','slim-watch'):
     slug='petersharps/arc3-codex-memory-v3-lab' if mode in ('memory-watch','memory-correction-watch') else 'petersharps/arc3-duck-codex-v3-control-1031'
     if mode=='memory-correction-watch':slug='petersharps/arc3-codex-memory-v3-recovery'
     label='memory-correction' if mode=='memory-correction-watch' else 'memory-target' if mode=='memory-watch' else 'v3-target'
     version='2' if mode=='memory-correction-watch' else '1'
+    if mode=='slim-watch':slug='petersharps/arc3-duck-codex-v3-slim-1101';label='slim-target'
     deadline=time.monotonic()+6000
     events=[]
     while time.monotonic()<deadline:
