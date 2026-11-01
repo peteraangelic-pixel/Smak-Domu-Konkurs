@@ -61,9 +61,22 @@ def compare(candidate,controls):
                             'new_zeros':[r['game_id'] for r in rows if r['candidate_levels']==0<r['control_levels']],
                             'wins':sum(r['level_delta']>0 for r in rows),'losses':sum(r['level_delta']<0 for r in rows),
                             'ties':sum(r['level_delta']==0 for r in rows)})
+    exported_tokens=sum(g['final_generated_tokens'] for g in raw['game_runs'])
+    log_tokens=None;log_source=None
+    for path in sorted(candidate.glob('*.log')):
+        try:events=json.loads(path.read_text(encoding='utf8'))
+        except (ValueError,UnicodeError):continue
+        if not isinstance(events,list):continue
+        text=''.join(e.get('data','') for e in events if isinstance(e,dict))
+        matches=re.findall(r'ARC3 smoke: games=\d+ gen_tokens=(\d+) ',text)
+        if matches:
+            log_tokens=int(matches[-1]);log_source=path.name
     return {'candidate_summary':summary,'candidate_benchmark_sha256':hashlib.sha256((candidate/'benchmark.json').read_bytes()).hexdigest(),
             'candidate_states':{g['game_id']:g['state'] for g in raw['game_runs']},
-            'candidate_total_tokens':sum(g['final_generated_tokens'] for g in raw['game_runs']),
+            'candidate_export_total_tokens':exported_tokens,
+            'candidate_total_tokens':exported_tokens if exported_tokens else log_tokens,
+            'candidate_tokens_source':'benchmark export' if exported_tokens else log_source,
+            'candidate_export_token_warning':('Zero export tokens are missing telemetry, not zero inference, when final notebook logs report token usage.' if not exported_tokens else None),
             'same_corpus_verified':True,'comparisons':comparisons,'activation':evidence(candidate),
             'limitations':['Public save-run; not a competition score or forecast.',
                            'Benchmark corpus checked here; model, code hash, and configured budgets must be checked against pinned notebook/RUN separately.',
