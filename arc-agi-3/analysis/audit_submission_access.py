@@ -56,7 +56,7 @@ for p in (OUT/'submitted-file').glob('**/*'):
 (OUT/'access-audit.json').write_text(json.dumps({'operations':records,'download_inventory':inventory},indent=2),encoding='utf8')
 
 mode=os.environ.get('ARC_AUDIT_MODE')
-if mode in ('v3-smoke','memory-smoke','slim-smoke','levelscope-smoke','control-retest-smoke','hypotheses-smoke','validation-smoke'):
+if mode in ('v3-smoke','memory-smoke','slim-smoke','levelscope-smoke','control-retest-smoke','hypotheses-smoke','validation-smoke','validation-retest-smoke'):
     # Explicitly authorized private save-run. No competition submit command.
     slug='petersharps/arc3-codex-memory-v3-lab' if mode=='memory-smoke' else 'petersharps/arc3-duck-codex-v3-control-1031'
     label='memory-target' if mode=='memory-smoke' else 'v3-target'
@@ -71,6 +71,8 @@ if mode in ('v3-smoke','memory-smoke','slim-smoke','levelscope-smoke','control-r
         slug='petersharps/arc3-duck-codex-v3-hypotheses-1101';label='hypotheses-target';package='arc-agi-3/duck-lab-candidates/v3-hypotheses'
     if mode=='validation-smoke':
         slug='petersharps/arc3-duck-codex-v3-validation-1101';label='validation-target';package='arc-agi-3/duck-lab-candidates/v3-validation'
+    if mode=='validation-retest-smoke':
+        slug='petersharps/arc3-duck-codex-v3-validation-retest-1101';label='validation-retest';package='arc-agi-3/duck-lab-candidates/v3-validation-retest'
     existing=run(label+'-preflight',['kernels','list','--mine','--search',slug.split('/')[1],'--csv'])
     status=(OUT/(label+'-preflight.txt')).read_text(encoding='utf8')
     if existing.get('returncode')==0 and slug in status:
@@ -94,7 +96,7 @@ if mode=='memory-correction':
             print('Correction push:',record.get('returncode'),flush=True)
         else:print('Latest memory code differs; do not overwrite or duplicate correction.',flush=True)
 
-if mode in ('v3-watch','memory-watch','memory-correction-watch','slim-watch','levelscope-watch','control-retest-watch','hypotheses-watch','validation-watch'):
+if mode in ('v3-watch','memory-watch','memory-correction-watch','slim-watch','levelscope-watch','control-retest-watch','hypotheses-watch','validation-watch','validation-retest-watch'):
     slug='petersharps/arc3-codex-memory-v3-lab' if mode in ('memory-watch','memory-correction-watch') else 'petersharps/arc3-duck-codex-v3-control-1031'
     if mode=='memory-correction-watch':slug='petersharps/arc3-codex-memory-v3-recovery'
     label='memory-correction' if mode=='memory-correction-watch' else 'memory-target' if mode=='memory-watch' else 'v3-target'
@@ -104,6 +106,7 @@ if mode in ('v3-watch','memory-watch','memory-correction-watch','slim-watch','le
     if mode=='control-retest-watch':slug='petersharps/arc3-duck-codex-v3-retest-1101';label='control-retest'
     if mode=='hypotheses-watch':slug='petersharps/arc3-duck-codex-v3-hypotheses-1101';label='hypotheses-target'
     if mode=='validation-watch':slug='petersharps/arc3-duck-codex-v3-validation-1101';label='validation-target'
+    if mode=='validation-retest-watch':slug='petersharps/arc3-duck-codex-v3-validation-retest-1101';label='validation-retest'
     deadline=time.monotonic()+6000
     events=[]
     while time.monotonic()<deadline:
