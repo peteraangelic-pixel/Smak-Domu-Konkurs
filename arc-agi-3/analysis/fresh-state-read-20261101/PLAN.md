@@ -1,5 +1,7 @@
 # Fresh-board read after a no-op
 
+Status: COMPLETE and REJECTED,27levels /22.5073950, new zero dc22. See RESULT.md and raw results. Do not repeat or promote based on the earlier infrastructure verification.
+
 Candidate: exactv3 plus one sandbox behavior change. SHA517ef0970880357c70fd2c76fa1fd53288833839f60dc09c4067a0894af1fe6e. No scratchcache, nudge, slim, scope change or solved-level memory. Base SHA8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc. Environment/model/budgets remain unchanged.
 
 Motivation: actual control snippets explicitly recompute positions after an UP no-op and then try LEFT; the stale-state latch still rejects LEFT. The existing error tells the model to re-read current_frame. This variant makes a real read of the current FrameView.ascii or segmentation clear only that latch. Reading before the no-op, old aliases, history frames or step/level metadata does not clear it. Internal frame refreshes inside action() do not count as user reads.
