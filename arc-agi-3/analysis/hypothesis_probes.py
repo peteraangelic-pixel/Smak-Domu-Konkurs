@@ -25,6 +25,7 @@ def validate(hypotheses, transitions):
     observed. No prediction is silently substituted for an observation.
     An incomplete/erroring model cannot pass a validation gate.
     """
+    print('HYPOTHESIS_VALIDATE models='+str(len(hypotheses))+' transitions='+str(len(transitions)))
     reports=[]
     for model in hypotheses:
         correct=errors=0; mismatches=[]
@@ -52,6 +53,7 @@ def choose_probe(hypotheses, frame, valid_actions, costs=None):
     supply allowed actions; this module never invents mouse coordinates. It
     cannot certify action safety and does not execute its recommendation.
     """
+    print('HYPOTHESIS_PROBE models='+str(len(hypotheses))+' actions='+str(len(valid_actions)))
     if len(hypotheses)<2:return None
     ranked=[]
     for i,action in enumerate(valid_actions):

@@ -48,4 +48,6 @@ def no_action(*args,**kwargs):raise AssertionError('Verification must not execut
 r=sandbox.run_sandboxed_python(code=code,timeout_seconds=10,initial_state={},action_handler=no_action)
 assert not r.get('error'),r
 assert 'HYPOTHESIS_SANDBOX_OK' in r['stdout'],r
+assert 'HYPOTHESIS_PROBE models=2 actions=2' in r['stdout'],r
+assert 'HYPOTHESIS_VALIDATE models=2 transitions=1' in r['stdout'],r
 print(json.dumps({'real_isolated_sandbox':True,'idempotent_install':True,'probe_and_evidence_validation':True,'game_actions':len(r.get('action_results',[])),'scope':'Synthetic mechanics; no LLM or ARC quality measurement.'}))
