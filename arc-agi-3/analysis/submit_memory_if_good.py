@@ -63,6 +63,8 @@ def main():
         # Do not spend a slot on a later day after a stale scheduled wakeup.
         if datetime.now(timezone.utc).date()!=NOT_BEFORE.date():
             decision['reason']='outside_authorized_date';save();return
+        if config.get('eligible') is False:
+            decision['reason']='no_qualifying_version';decision['selection_reason']=config.get('selection_reason');save();return
         if (OUT/'attempted.json').exists():
             decision['reason']='previous_attempt_requires_review';save();return
         status=command('kernel-status',['kernels','status',version_ref])

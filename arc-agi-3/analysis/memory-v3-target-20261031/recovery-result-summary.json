@@ -1,0 +1,237 @@
+{
+  "quality_gate": false,
+  "detail": {
+    "checks": {
+      "all_scores_finite": true,
+      "more_than33_completions": false,
+      "score_above_control": false,
+      "no_new_zero_games": false,
+      "no_crashed_games": true
+    },
+    "mean_score": 17.105261633460763,
+    "control_mean": 27.496670817884922,
+    "levels": 25
+  },
+  "activation": {
+    "capture": 25,
+    "pinned": 18,
+    "recovery": 0,
+    "errors": 0
+  },
+  "smoke_ok": true,
+  "summary": {
+    "source": "arc-agi-3\\analysis\\memory-v3-target-20261031\\recovery-result\\submission-access-20261031\\memory-correction-output\\benchmark.json",
+    "scope": "PUBLIC_SAVE_RUN_NOT_SCORED_RERUN",
+    "games": 10,
+    "levels": 25,
+    "score_mean": 17.105261633460767,
+    "actions": 1463,
+    "closed_actions": 1061,
+    "unfinished_actions": 402,
+    "unfinished_action_share": 0.2747778537252221,
+    "closed_actions_per_completion": 42.44,
+    "all_actions_per_completion": 58.52,
+    "rows": [
+      {
+        "game_id": "tn36-ef4dde99",
+        "completed": 4,
+        "actions": 131,
+        "closed_actions": 131,
+        "unfinished_actions": 0,
+        "actions_per_level": [
+          11,
+          56,
+          37,
+          27,
+          0,
+          0,
+          0
+        ],
+        "score": 34.040618804132315,
+        "wall_seconds": 2893.724124118,
+        "first_action_s": 976.8770870430001,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "m0r0-492f87ba",
+        "completed": 3,
+        "actions": 149,
+        "closed_actions": 149,
+        "unfinished_actions": 0,
+        "actions_per_level": [
+          27,
+          40,
+          82,
+          0,
+          0,
+          0
+        ],
+        "score": 28.57142857142857,
+        "wall_seconds": 2896.7816237829998,
+        "first_action_s": 941.522194857,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "cn04-2fe56bfb",
+        "completed": 3,
+        "actions": 96,
+        "closed_actions": 93,
+        "unfinished_actions": 3,
+        "actions_per_level": [
+          16,
+          49,
+          28,
+          3,
+          0,
+          0
+        ],
+        "score": 28.57142857142857,
+        "wall_seconds": 2880.856895589,
+        "first_action_s": 944.1926652720001,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "dc22-fdcac232",
+        "completed": 0,
+        "actions": 108,
+        "closed_actions": 0,
+        "unfinished_actions": 108,
+        "actions_per_level": [
+          108,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "score": 0.0,
+        "wall_seconds": 2880.7897124889996,
+        "first_action_s": 0.3956883739999739,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "ka59-38d34dbb",
+        "completed": 2,
+        "actions": 257,
+        "closed_actions": 114,
+        "unfinished_actions": 143,
+        "actions_per_level": [
+          18,
+          96,
+          143,
+          0,
+          0,
+          0,
+          0
+        ],
+        "score": 10.714285714285714,
+        "wall_seconds": 2880.6897555329997,
+        "first_action_s": 938.552039064,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "sc25-635fd71a",
+        "completed": 3,
+        "actions": 190,
+        "closed_actions": 90,
+        "unfinished_actions": 100,
+        "actions_per_level": [
+          40,
+          5,
+          45,
+          100,
+          0,
+          0
+        ],
+        "score": 22.033509700176367,
+        "wall_seconds": 2880.820464456,
+        "first_action_s": 954.265718369,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "s5i5-18d95033",
+        "completed": 2,
+        "actions": 76,
+        "closed_actions": 73,
+        "unfinished_actions": 3,
+        "actions_per_level": [
+          23,
+          50,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "score": 8.333333333333332,
+        "wall_seconds": 2880.495315429,
+        "first_action_s": 960.4167239290001,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "ls20-9607627b",
+        "completed": 3,
+        "actions": 242,
+        "closed_actions": 224,
+        "unfinished_actions": 18,
+        "actions_per_level": [
+          42,
+          98,
+          84,
+          18,
+          0,
+          0,
+          0
+        ],
+        "score": 17.286098963394885,
+        "wall_seconds": 2880.6210002340003,
+        "first_action_s": 980.089613325,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "su15-1944f8ab",
+        "completed": 3,
+        "actions": 98,
+        "closed_actions": 72,
+        "unfinished_actions": 26,
+        "actions_per_level": [
+          11,
+          23,
+          38,
+          26,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "score": 10.787626962142197,
+        "wall_seconds": 2880.44806238,
+        "first_action_s": 935.710717382,
+        "final_generated_tokens": 0
+      },
+      {
+        "game_id": "g50t-5849a774",
+        "completed": 2,
+        "actions": 116,
+        "closed_actions": 115,
+        "unfinished_actions": 1,
+        "actions_per_level": [
+          82,
+          33,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "score": 10.714285714285714,
+        "wall_seconds": 2881.7019976389997,
+        "first_action_s": 982.734595692,
+        "final_generated_tokens": 0
+      }
+    ]
+  },
+  "log_file": "arc-agi-3\\analysis\\memory-v3-target-20261031\\recovery-result\\submission-access-20261031\\memory-correction-output\\arc3-codex-memory-v3-recovery.log"
+}
