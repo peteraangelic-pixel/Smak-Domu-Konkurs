@@ -3,8 +3,11 @@ import json
 import os
 from pathlib import Path
 import sys
+import argparse
 ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT/'analysis/champion-recovery-20261031/materialized-clean/ARC3-Inference'))
+p=argparse.ArgumentParser();p.add_argument('--source',type=Path,default=ROOT/'analysis/champion-recovery-20261031/materialized-clean/ARC3-Inference')
+args=p.parse_args()
+sys.path.insert(0,str(args.source.resolve()))
 os.environ['ARC3_WORLD_MODEL']='1'
 from inference.agent import python_tool_sandbox as sandbox
 from inference.agent import tool_agent as ta
