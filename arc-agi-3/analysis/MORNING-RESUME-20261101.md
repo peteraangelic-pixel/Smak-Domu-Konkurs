@@ -139,3 +139,5 @@ NastępnyODRĘBNYpełnyagent:exactv3+ogólnainstrukcjasprawdzaniakolejnościzdar
 23:38 Warszawa:single transition-schema private launch dispatched41358073698,receipt before dispatch. Workflow queued;canonical Kaggle version not yet verified. SHA4d8171ba,exact-v3 only missing-step guidance,shipped sandbox PASS. Next collect launch artifact,verify accepted slug/version1,then ONE transition-schema-watch. Do not repeat launch or claim accepted before evidence.
 
 23:53 Warszawa:transition-schema canonical version1 acceptance confirmed by launch41358073698 artifact push receipt,slug unchanged. Started ONE read-only watcher41359294254,mode transition-schema-watch,artifact arc-submission-access-57811453/submission-access-20261031/transition-schema-output. RUN pinned. No duplicate GPU.
+
+02Nov00:53Warsaw:transition-schema COMPLETE26/18.94431525,no new zeros,vscontrol1 1win5loss4tie/vscontrol2 1/7/2. REJECT,do not replicate. ACTIVATION/COMPARISON/raw preserved. Next inspect actual model/tool failures and choose materially different mechanism;not more schema messages blindly. No active GPU.
