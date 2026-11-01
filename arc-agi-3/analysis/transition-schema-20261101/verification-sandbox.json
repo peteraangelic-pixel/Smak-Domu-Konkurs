@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "missing_step": {
+    "stdout": "",
+    "result": null,
+    "error": "Traceback (most recent call last):\n  File \"<python_tool>\", line 1, in <module>\nAttributeError: TRANSITION_SCHEMA: TransitionView has no step attribute. Use before_frame.step or after_frame.step for the corresponding frame index; frame aliases after_frame. Supported transition fields: action, before_frame, after_frame, frame, result. Choose the before/after frame required by your comparison.",
+    "action_results": [],
+    "keepable_functions": []
+  },
+  "valid_steps": {
+    "stdout": "",
+    "result": [
+      0,
+      1
+    ],
+    "error": "",
+    "action_results": [],
+    "keepable_functions": []
+  },
+  "qualification": "Real isolated sandbox only;not packaged or quality-tested.",
+  "fixture_correction": "Patch expanded bootstrap;raw literal omits injected dependency sources."
+}
