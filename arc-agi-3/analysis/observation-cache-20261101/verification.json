@@ -1,0 +1,13 @@
+{
+  "same_observation_restores_literals": true,
+  "step_change_invalidates": true,
+  "new_game_isolated": true,
+  "agents_isolated": true,
+  "caught_invalid_action_invalidates": true,
+  "snippet_error_invalidates": true,
+  "protected_frame_not_persisted": true,
+  "level_change_invalidates": true,
+  "install_idempotent": true,
+  "cache_cleared_before_action_callback": true,
+  "scope": "Actual ToolAgent and isolated Python processes; synthetic observations, no LLM quality claim."
+}
