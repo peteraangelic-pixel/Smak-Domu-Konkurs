@@ -1,0 +1,40 @@
+{
+  "sha256": "d5d1cf89177f5c3fb41df14532a68cb30f2cfae3c7dae9d5b481ab2028c91f79",
+  "config": {
+    "radius": 8,
+    "speed": 8,
+    "merge_radius": 6,
+    "anchor": "moved",
+    "offset": 1,
+    "motion": "linear_round",
+    "include_start": false,
+    "pool": "before"
+  },
+  "edits": [
+    {
+      "radius": 8,
+      "speed": 8,
+      "merge_radius": 6,
+      "anchor": "moved",
+      "offset": 1,
+      "motion": "linear_round",
+      "include_start": false,
+      "pool": "before"
+    }
+  ],
+  "training": {
+    "samples": 97,
+    "counts": {
+      "changed": 48,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 42,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.9375,
+    "balanced_fields": 0.9722222222222223
+  },
+  "training_prediction_fingerprint": "6a470f3beab0e6ddb5b705910f272b07d10ff1c8a77aff099f6322d001bb7e82"
+}

@@ -37,3 +37,8 @@ All final probe episodes and model evaluations returned without runtime errors. 
 The original LLM had already seen its historical trajectory; those old transitions were therefore not described as held out. The final observations come from new deterministic probe sequences from the same fixture. Program variants share an encoder and contain a model-specific repair template; this is not yet a general online code-repair system. Terminal transitions are excluded by the evaluator and that censoring is recorded. A follow-up must use fresh final seeds and must diagnose the remaining TRAINING residuals rather than tune against this final bank.
 
 `verification.json` checks disjoint seed banks, selection written before final observations, source identity and counts. Recorded program SHA values hash UTF-8 code strings with LF newlines; Windows `Path.write_text` saved CRLF artifacts. Both normalized program and local artifact hashes are recorded explicitly, with the original files preserved. The same program is being evaluated; raw-byte hashes across newline conversions must not be conflated.
+
+
+## Latest: contact/merge repair and recorded rollouts
+
+See `contact-merge/RESULT.md`: TRAIN-supported merge/first-contact hypotheses,1783source variants/309training behaviors,16processes. Fresh final bank9400–9415:81/94changed+73/73unchanged versus64/94+73/73 for the prior model. Balanced exact84.04→93.09%;13changed predictions still wrong. Frozen8-step recorded rollout endpoints41/59correct versus11/59;18remainwrong. No new completed levels, no Kaggle score, one public fixture only. Corrected global-dedup audit in contact-rollouts-dedup;initial audit raw preserved with SUPERSEDED notice. Final labels now open:do not reuse for fitting.
