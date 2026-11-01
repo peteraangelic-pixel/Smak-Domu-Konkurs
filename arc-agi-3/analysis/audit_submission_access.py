@@ -38,6 +38,8 @@ for label,args in [
 ]:
     record=run(label,args);records.append(record)
     print(label,record.get('returncode','timeout'),flush=True)
+    if label=='cli-version' and record.get('returncode')!=0:
+        raise RuntimeError('Kaggle CLI failed before API access; no push or status polling performed')
 
 inventory=[]
 for p in (OUT/'submitted-file').glob('**/*'):
