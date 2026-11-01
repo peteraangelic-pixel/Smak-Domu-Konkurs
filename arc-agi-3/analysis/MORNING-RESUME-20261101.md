@@ -108,3 +108,6 @@ Nowy niezależny wariant v3-fresh-read spakowany SHA517ef0970880357c70fd2c76fa1f
 
 
 19:28 Warszawa: fresh-read przyjęty jako canonical petersharps/arc3-duck-codex-v3-fresh-read-1101/1,launch41336669526. Watcher READ-ONLY41336768604,mode fresh-read-watch,artifact arc-submission-access-57811453/submission-access-20261031/fresh-read-output. RUN zapisany;nie dublować ani podmieniać notebookaSHA517ef097. Brak wyniku jakości. To prywatny test,nie submisja konkursowa.
+
+
+19:41 Warszawa: fresh-read watcher41336768604 nadal in_progress;bez duplikatu i bez zmiany testowanego notebooka. Niezależny odczyt upstream da-fr/arc-agi-3-solution:HEAD10882e332d883af3e61616df8c8a17d03a328a75 z30.09.2026,brak nowego upstreamowego rozwiązania w ostatnich8commitach. Audyt zachowanych promptów kontroli2:retained-function context występuje we wszystkich10grach(10–31wystąpień na snapshot),brak widocznych rejectionnotes. Nie potwierdza to hipotezy globalnie niedziałającej retencji;nie wdrażać automatycznego przechwytywania stałych na podstawie samego przypuszczenia. Snapshoty nie są pełną historią;wystąpienia nie są liczbą niezależnych tur.
