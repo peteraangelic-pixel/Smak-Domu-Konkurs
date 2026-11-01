@@ -1,0 +1,143 @@
+{
+  "games": [
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\cn04-2fe56bfb_p0.log",
+      "observed_unique_calls": 15,
+      "observed_unique_results": 15,
+      "errors": [
+        {
+          "call_id": "call_bca5f68751444adaa102b8a4",
+          "error": "NameError: name 'cands' is not defined",
+          "code": "CUR = {'G':(0,(14,20)), 'Y':(0,(11,32)), 'F':(0,(32,29))}\ndef cost2(c,T):\n    tot=3+c['kg']+c['km']+c['kf']\n    for k,(br,bc) in c['base'].items():\n        cr,cc=CUR[k][1]; tot += (abs(br+T[0]-cr)+abs(bc+T[1]-cc))//3\n    return tot\nranked=[]\nfor c in cands:\n    r0,c0,r1,c1=c['ext']\n    lo_r,hi_r,lo_c,hi_c = 2-r0,62-r1,1-c0,62-c1\n    if lo_r>hi_r or lo_c>hi_c: continue\n    best=None\n    for Tr in range(lo_r,hi_r+1):\n        sr=sum(abs(c['base'][k][0]+Tr-CUR[k][1][0]) for k in c['base'])\n        for Tc in range(lo_c,hi_c+1):\n            sc=sum(abs(c['base'][k][1]+Tc-CUR[k][1][1]) for k in c['base'])\n            if (Tr-2)%3 or (Tc-1)%3: pass\n            cc=(sr+sc)//3 + 3 + c['kg']+c['km']+c['kf']\n            if best is None or cc<best[0]: best=(cc,(Tr,Tc))\n    ranked.append((c['ov'],best[0],c['kg'],c['km'],c['kf'],best[1],c['dims'],c))\nranked.sort(key=lambda x:(x[0],x[1]))\nfor b in ranked[:5]:\n    ov,cc,kg,km,kf,T,dims,c=b\n    tg={k:(c['base'][k][0]+T[0], c['base'][k][1]+T[1]) for k in c['base']}\n    print('ov',ov,'cost',cc,'rots G/Y/F',kg,km,kf,'targets',tg,'dims',dims)\n"
+        },
+        {
+          "call_id": "call_41b695fadc3042ecaa1378fc",
+          "error": "NameError: name 'ranked' is not defined",
+          "code": "def render(c,T):\n    Gb,gt1,gt2 = Gr[c['kg']]; Yb,yt1,yt2 = Yr[c['km']]; Fb,ft1,ft2 = Fr[c['kf']]\n    cells={}\n    for (sh,col) in [(Gb,'G'),(gt1,'g'),(gt2,'g')]:\n        for (r,cc) in sh: cells[(r+T[0],cc+T[1])]=col\n    for (sh,col) in [(Yb,'Y'),(yt1,'y'),(yt2,'y')]:\n        for (r,cc) in sh: cells[(r+c['base']['Y'][0]+T[0],cc+c['base']['Y'][1]+T[1])]=col\n    for (sh,col) in [(Fb,'F'),(ft1,'f'),(ft2,'f')]:\n        for (r,cc) in sh: cells[(r+c['base']['F'][0]+T[0],cc+c['base']['F'][1]+T[1])]=col\n    rs=[p[0] for p in cells]; cs=[p[1] for p in cells]\n    r0,r1,c0,c1=min(rs),max(rs),min(cs),max(cs)\n    out=[]\n    for rr in range(r0,r1+1):\n        out.append(''.join(cells.get((rr,cc),'.') for cc in range(c0,c1+1)))\n    return '\\n'.join(out)\nb18 = ranked[0]; b54 = min(ranked,key=lambda x:x[1])\nprint('=== ov18 plan rots',b18[2],b18[3],b18[4],'slide',b18[5])\nprint(render(b18[7],b18[5]))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\dc22-fdcac232_p0.log",
+      "observed_unique_calls": 6,
+      "observed_unique_results": 6,
+      "errors": [
+        {
+          "call_id": "call_db69c1550beb4a46a3caa024",
+          "error": "StaleStateActionError: MOUSE(row=27, col=45) was not executed. The action immediately before it, MOUSE(row=28, col=56), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "G={'action':'MOUSE','row':28,'col':56}\nYL={'action':'MOUSE','row':27,'col':45}\nfor i in range(2):\n    r=action([G]); f=current_frame\n    print('G',i,'r10',rowmap(f,10),'r20',rowmap(f,20),'pin',pinlog(f),'lvl',r.get('level_completed'),'over',r.get('game_over'))\nfor i in range(2):\n    r=action([YL]); f=current_frame\n    print('Y',i,'r14',rowmap(f,14),'r19',rowmap(f,19),'r10',rowmap(f,10),'pin',pinlog(f),'lvl',r.get('level_completed'))\nprint('bar',current_frame.ascii.split('\\n')[63].count('W'))\n"
+        },
+        {
+          "call_id": "call_877a9876d63f49d0a0fedb83",
+          "error": "StaleStateActionError: MOUSE(row=28, col=56) was not executed. The action immediately before it, MOUSE(row=28, col=56), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "G={'action':'MOUSE','row':28,'col':56}\nYL={'action':'MOUSE','row':27,'col':45}\nfor i in range(3):\n    r=action([G]); f=current_frame\n    print('G',i,'r10',rowmap(f,10),'r20',rowmap(f,20),'pin',pinlog(f),'lvl',r.get('level_completed'),'over',r.get('game_over'))\nfor i in range(2):\n    r=action([YL]); f=current_frame\n    print('Y',i,'r14',rowmap(f,14),'r19',rowmap(f,19),'r10',rowmap(f,10),'pin',pinlog(f),'lvl',r.get('level_completed'))\nprint('bar',bar(current_frame))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\g50t-5849a774_p0.log",
+      "observed_unique_calls": 15,
+      "observed_unique_results": 15,
+      "errors": [
+        {
+          "call_id": "call_c59ff98811ff4d719bb58154",
+          "error": "NameError: name 'r' is not defined",
+          "code": "fr=current_frame\nls=fr.ascii.split('\\n')\nG=[[ls[r][c] for c in range(64)] for r in range(64)]\nrows=[8,14,20,26,32,38,44,50]; cols=[8,14,20,26,32,38,44,50]\ndef fit(r,c,ring_ok=True):\n    ok=True\n    for dr in range(5):\n        for dc in range(5):\n            v=G[r+dr][c+dc]\n            if v!='B':\n                if dr==2 and dc==2: continue\n                return False\n    return True\nF=set((r,c) for r in rows for c in cols if fit(r,c))\nprint('fits',sorted(F))\nstart=(26,50); goal=(20,26)\nimport collections\ndef bfs(blocked):\n    seen={start}; q=collections.deque([start]); par={start:None}\n    while q:\n        r,c=q.popleft()\n        for dr,dc in ((6,0),(-6,0),(0,6),(0,-6)):\n            nr,nc=r+dr,c+dc\n            if (nr,nc) in F and (nr,nc) not in blocked and (nr,nc) not in seen:\n                seen.add((nr,nc)); par[(nr,nc)]=(r,c); q.append((nr,nc))\n    return seen,par\nseen,par=bfs(set())\nprint('reachable',len(seen),'goal reachable',(goal in seen))\n# which cells are blocked by plugs?\nplugA=[(r,c) for r in range(64) for c in range(64) if 39<=r<=41 and 15<=c<=17]\nblkA=[(r,c) for r,c in [(R,C) for R in rows for C in cols] if (r,c) not in F and any(r<=p<=r+4 and c<=q<=c+4 for p,q in plugA)]\nprint('cells blocked by plugA',blkA)\nblkB=[(r,c) for R in rows for C in cols if (R,C) not in F and 50<=R<=50 and 38<=C<=42]\nprint('cells blocked by plugB(5x5 at 50,38)',[(R,C) for R in rows for C in cols if (R,C)==(50,38)])\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\ka59-38d34dbb_p0.log",
+      "observed_unique_calls": 9,
+      "observed_unique_results": 9,
+      "errors": [
+        {
+          "call_id": "call_a919603380ea49ef903b6b54",
+          "error": "StaleStateActionError: RIGHT was not executed. The action immediately before it, RIGHT, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "for ac in ['UP','UP','UP','RIGHT','RIGHT','RIGHT','RIGHT','RIGHT','RIGHT','RIGHT','LEFT']:\n    r=action([ac])\n    print(ac,sorted(rings()[0].items()),pluses(current_frame),'WIN' if r['level_completed'] else '')\n    if r['level_completed']: break\nprint('bar',bar(current_frame))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\ls20-9607627b_p0.log",
+      "observed_unique_calls": 24,
+      "observed_unique_results": 24,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\m0r0-492f87ba_p0.log",
+      "observed_unique_calls": 25,
+      "observed_unique_results": 25,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\s5i5-18d95033_p0.log",
+      "observed_unique_calls": 15,
+      "observed_unique_results": 15,
+      "errors": [
+        {
+          "call_id": "call_7767da7b5f8746758a1f68d9",
+          "error": "KeyError: 'Y'",
+          "code": "run([{'action':'MOUSE','row':57,'col':28}]*5)\nprint('--- push N right')\nrun([{'action':'MOUSE','row':57,'col':43}]*4)\nprint('--- grow N down')\nrun([{'action':'MOUSE','row':57,'col':58}]*6)\n"
+        },
+        {
+          "call_id": "call_a16d6256a1db498282c5a0d8",
+          "error": "KeyError: 'Y'",
+          "code": "run([{'action':'MOUSE','row':48,'col':48}]*3)\nprint('--- S extends')\nrun([{'action':'MOUSE','row':48,'col':35}]*12)\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\sc25-635fd71a_p0.log",
+      "observed_unique_calls": 19,
+      "observed_unique_results": 19,
+      "errors": [
+        {
+          "call_id": "call_3eaee943b56d4c5fafe1c80f",
+          "error": "TerminalStateActionError: the previous action reported game_over. The level has been reset to its start, so the board you planned against is gone and this action was not executed. The next turn begins from the new state.",
+          "code": "for c in [50,35,30,35]: action([{'action':'MOUSE','row':50 if c==35 or c==30 else 50,'col':c}]) if False else None\nfor (r,c) in [(50,30),(50,35),(55,25),(55,30)]: action([{'action':'MOUSE','row':r,'col':c}])\nprint('pad',snap())\na=current_frame.ascii.split('\\n')\nprint('   '+''.join(str(c%10) for c in range(29,58)))\nfor r in range(17,37): print(r,a[r][29:58])\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\su15-1944f8ab_p0.log",
+      "observed_unique_calls": 13,
+      "observed_unique_results": 13,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-slim-20261101\\completed-download\\submission-access-20261031\\slim-target-output\\prompts\\tn36-ef4dde99_p0.log",
+      "observed_unique_calls": 18,
+      "observed_unique_results": 18,
+      "errors": [
+        {
+          "call_id": "call_e8d8dabd5a8a4d79822773c1",
+          "error": "AttributeError: 'TransitionView' object has no attribute 'step'",
+          "code": "def icon_sel(f):\n    aa=f.ascii.split('\\n')\n    # icon borders: left icon roughly rows 52-62 cols 5-18, right icon cols 19-32\n    left=sum(1 for x in range(52,63) for y in range(5,19) if aa[x][y]=='b')\n    right=sum(1 for x in range(52,63) for y in range(19,33) if aa[x][y]=='b')\n    return 'A' if left>right else 'B'\ndef prog(f):\n    aa=f.ascii.split('\\n')\n    return [''.join(aa[rr][c] for c in (39,44,49,54)) for rr in (33,36,39,42,45,48)]\ndef blkbb(f):\n    aa=f.ascii.split('\\n')\n    b=[(x,y) for x in range(4,32) for y in range(33,64) if aa[x][y]=='Y' and x>=13]\n    if not b: return None\n    return (min(p[0] for p in b),min(p[1] for p in b))\nfor t in transitions:\n    if t.after_frame.level!=2: continue\n    before=t.before_frame; after=t.after_frame\n    if blkbb(before)!=blkbb(after) or blkbb(after)!=blkbb(current_frame):\n        pass\n    print(t.step,t.action,icon_sel(before),'bb',blkbb(before),'->',blkbb(after),'prog',','.join(prog(before)))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    }
+  ],
+  "observed_errors": 10,
+  "bool_as_mapping_errors": 0
+}
