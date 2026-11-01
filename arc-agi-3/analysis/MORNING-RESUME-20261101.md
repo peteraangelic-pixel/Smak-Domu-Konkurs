@@ -51,3 +51,5 @@ Na prośbę użytkownika ponownie odczytano6 gałęzi:nowe audyty c87 dc15143f,7
 13:46 Warszawa:retest41303444503 nadal w toku. Dodano ograniczoną telemetrię rzeczywistych wywołań HYPOTHESIS_PROBE/HYPOTHESIS_VALIDATE do NIEURUCHOMIONEGO pakietu hipotez. Przebudowany SHA7fff0787f3ec9442ce26aa6e74807b5eaabfaa8ae0a8d681184786c83a61d1b4 (zastępuje przedtestowy c126ff;żaden nie ma wyniku LLM). Clean materialize do instrumented-materialized i sandbox z wysyłanych źródeł przeszły,łącznie ze znacznikami wywołań. Cel:odróżnić obecność opisu API od realnego użycia. Kontrola aktywna bez zmian,bez drugiegoGPU.
 
 14:01 Warszawa:identyczna kontrola2 COMPLETE38/36.09039 wobec kontroli1 33/27.49667. Sama zmienność dała+8.59pkt;scope36/29.90 nie ma potwierdzonej przewagi. Brak crashy,1,771,848tokenów. Kolejny kandydat:hypotheses SHA7fff0787,bez scope/slim,jeden mechanizm i własna telemetria.
+
+Hypotheses przyjęte jako wersja1:launch41309256324,watch41309317454. Aktywny JEDEN prywatny test po zakończeniu kontroli2. Automatyzacja zaktualizowana. Sprawdzać rzeczywiste znaczniki helperów w wynikach narzędzi i ukończenia wobec obu kontroli;nie mylić opisu API z aktywacją.
