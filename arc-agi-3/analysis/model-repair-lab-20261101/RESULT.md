@@ -1,5 +1,7 @@
 # Model-repair CPU laboratory — prediction improvement, not a ready planner
 
+Latest stage: [composed repair and one actual discriminating experiment](composed/RESULT.md). On a new final bank it predicts68/107changed states correctly versus17/107for the earlier repair, with78/78unchanged states correct. This remains prediction research, not an improved Kaggle agent. The earlier stages below remain unchanged evidence.
+
 The experiment starts from the first complete model program written by the target LLM in the recorded su15 run. It does not read the game's implementation to repair that program. An evaluation-only runner replays a public trace to obtain the fixture, then gathers NEW forward probe episodes. The repairer receives only model code and encoded before/action/after observations. No engine API, game ID or replay prefix is part of a submission policy.
 
 Sixteen processes generated8training and8validation episodes,96transitions each. Click proposals used the existing Rust ctypes connected-component kernel, serial inside each worker; exact frame encoding used the SDK's Python segmentation. Dynamic Python model programs were evaluated in16processes; no Rust speedup is claimed for their execution. The frozen encoder and seed split were recorded before evaluation. This is one public environment/level, not32different games.

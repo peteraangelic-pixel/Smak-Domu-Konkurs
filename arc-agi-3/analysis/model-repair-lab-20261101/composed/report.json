@@ -1,0 +1,145 @@
+{
+  "candidates": 768,
+  "baseline_training": {
+    "samples": 97,
+    "counts": {
+      "changed": 48,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 6,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.5625,
+    "balanced_fields": 0.7777777777777779
+  },
+  "selected_training": {
+    "samples": 97,
+    "counts": {
+      "changed": 48,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 34,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.8541666666666667,
+    "balanced_fields": 0.90625
+  },
+  "baseline_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 4,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.5392156862745098,
+    "balanced_fields": 0.7745098039215688
+  },
+  "selected_validation": {
+    "samples": 96,
+    "counts": {
+      "changed": 51,
+      "noop": 45
+    },
+    "correct": {
+      "changed": 35,
+      "noop": 45
+    },
+    "errors": 0,
+    "balanced_exact": 0.8431372549019608,
+    "balanced_fields": 0.9052287581699345
+  },
+  "selected_config": {
+    "lo": 10,
+    "hi": 62,
+    "dr": 1.5,
+    "dc": 1.5,
+    "metric": "chebyshev",
+    "rounding": "int",
+    "pool": "before",
+    "fast": false,
+    "eating": true
+  },
+  "selected_sha256": "1b37d84a78e81df8d449d114cab5c8ce3ad9bc939fedeabdf7a7a02e3822940d",
+  "region": {
+    "initial_hypotheses": [
+      [
+        10,
+        60
+      ],
+      [
+        10,
+        61
+      ],
+      [
+        10,
+        62
+      ]
+    ],
+    "actual_discriminating_probes": [
+      {
+        "candidate_intervals": [
+          [
+            10,
+            60
+          ],
+          [
+            10,
+            61
+          ],
+          [
+            10,
+            62
+          ]
+        ],
+        "chosen_row": 62,
+        "col": 32,
+        "observed_change": true,
+        "survivors": [
+          [
+            10,
+            62
+          ]
+        ]
+      }
+    ]
+  },
+  "final_episode_errors": [],
+  "novel_final_samples": 185,
+  "baseline_final": {
+    "samples": 185,
+    "counts": {
+      "changed": 107,
+      "noop": 78
+    },
+    "correct": {
+      "changed": 17,
+      "noop": 76
+    },
+    "errors": 0,
+    "balanced_exact": 0.5666187395159358,
+    "balanced_fields": 0.776499720424954
+  },
+  "selected_final": {
+    "samples": 185,
+    "counts": {
+      "changed": 107,
+      "noop": 78
+    },
+    "correct": {
+      "changed": 68,
+      "noop": 78
+    },
+    "errors": 0,
+    "balanced_exact": 0.8177570093457944,
+    "balanced_fields": 0.881619937694704
+  },
+  "qualification": "Compositional prediction model at one public fixture, not general agent/completions/Kaggle score."
+}

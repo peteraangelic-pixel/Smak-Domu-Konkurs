@@ -1,0 +1,41 @@
+{
+  "config": {
+    "lo": 10,
+    "hi": 62,
+    "dr": 1.5,
+    "dc": 1.5,
+    "metric": "chebyshev",
+    "rounding": "int",
+    "pool": "before",
+    "fast": false,
+    "eating": true
+  },
+  "sha256": "1b37d84a78e81df8d449d114cab5c8ce3ad9bc939fedeabdf7a7a02e3822940d",
+  "training": {
+    "samples": 97,
+    "counts": {
+      "changed": 48,
+      "noop": 49
+    },
+    "correct": {
+      "changed": 34,
+      "noop": 49
+    },
+    "errors": 0,
+    "balanced_exact": 0.8541666666666667,
+    "balanced_fields": 0.90625
+  },
+  "edits": [
+    {
+      "lo": 10,
+      "hi": 62,
+      "dr": 1.5,
+      "dc": 1.5,
+      "metric": "chebyshev",
+      "rounding": "int",
+      "pool": "before",
+      "fast": false,
+      "eating": true
+    }
+  ]
+}
