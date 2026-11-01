@@ -3,7 +3,7 @@
 Prepared notebook: `duck-lab-candidates/v3-observation-cache/agent.ipynb`.
 SHA256: `79ce4a8359426c17d15703bddab4c2a30d05b295918aa5955d167e9b5b65c311`.
 Base: exact v3, SHA `8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc`.
-Status: packaged, actual shipped sandbox verified, private version1 accepted; target-model result pending. RUN.json pins launch41327293449 and watcher41327369505. No quality measurement yet.
+Status: COMPLETE and REJECTED,29levels /19.7412252. Restore worked in all ten games, but quality did not improve. See RESULT.md, SUMMARY.json and COMPARISON.json. Do not repeat unchanged.
 
 One mechanism: retain bounded literal scratch variables across read-only snippets on the identical observation. Real actions, attempted invalid actions, errors, changed frames, step, level, runtime path or agent identity invalidate the cache. Host invalidation occurs before invoking the action callback; a child flag also catches attempts rejected before the callback. No functions, modules, objects, pickle or eval are stored. Limits: 64 names / 65536 UTF-8 bytes. Existing function retention and all v3 budget/env settings are preserved; no validation nudge, slim, scope change or solved-level memory is included.
 

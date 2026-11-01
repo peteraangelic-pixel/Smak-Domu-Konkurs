@@ -32,10 +32,12 @@ def evidence(folder):
             if any(isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='check_model' for n in ast.walk(tree)):
                 syntax.append(cid)
         restored={cid:[int(n) for n in re.findall(r'OBSERVATION_CACHE restored=(\d+)',text)] for cid,text in results.items() if re.search(r'OBSERVATION_CACHE restored=\d+',text)}
+        fresh_reads={cid:text.count('FRESH_STATE_READ reobserved=1') for cid,text in results.items() if 'FRESH_STATE_READ reobserved=1' in text}
         diagnostics=analyze(path)
         games.append({'snapshot':path.name,'snapshot_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
                       'observed_unique_calls':len(calls),'validation_request_occurrences':requests,
                       'syntactic_check_model_call_ids':syntax,'cache_restore_tool_results':restored,
+                      'fresh_state_read_tool_results':fresh_reads,
                       'observed_tool_errors':[{k:v for k,v in e.items() if k!='code'} for e in diagnostics['errors']]})
     return {'games':games,'scope':'Retained snapshots only, deduplicated by native call ID within a game. Syntactic check_model calls need not execute. Missing evidence does not establish whole-run absence.'}
 

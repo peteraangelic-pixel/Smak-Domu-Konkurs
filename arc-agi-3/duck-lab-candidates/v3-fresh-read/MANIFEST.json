@@ -1,0 +1,11 @@
+{
+  "sha256": "517ef0970880357c70fd2c76fa1fd53288833839f60dc09c4067a0894af1fe6e",
+  "base_sha256": "8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc",
+  "extra_patches": 1,
+  "env_unchanged": true,
+  "changed_sources": [
+    "inference/agent/python_tool_sandbox.py",
+    "inference/utils/fresh_state_read.py"
+  ],
+  "scope": "Only re-reading current board clears stale-belief latch; other guards retained. No quality measurement."
+}
