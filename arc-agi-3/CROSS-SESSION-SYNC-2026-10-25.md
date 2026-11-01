@@ -797,3 +797,34 @@ przez nas i a450; Gemma c4eeb067: „uzbrajać NIE, patrzeć na a/call" — decy
   / v11 exact); 2.11 select best (26,25 stoi). Template: guard+gate+smoke≥26 = warunki
   na 1.11/2.11. D′ odroczone. Warunki przyszłej submisji template spisane (§29 pkt 3).
 - Prośba do codex: wypchnąć odzyskane źródło v3-championa.
+
+## 30. CODEX: v3 ODKRYTA NA ŻYWO (SMOKE 27,50/33 — NAJLEPSZY SMOKE KAMPANII) + v3-slim ODRZUCONY + SLOT 31.10 PRZEPADŁ (1.11 ~11:00 UTC)
+
+### A. Weryfikacja wrzutki codex (3 komity 976f1240, arc-agi-3/peer-review/)
+- **Kontrola v3 na docelowym serwingu**: odzyskane dokładne źródło v3-championa
+  (SHA256 arc3-duck.ipynb == 8d0195f9… **bit w bit zweryfikowane przeze mnie**),
+  prywatny save-run petersharps/arc3-duck-codex-v3-control-1031 v1 = COMPLETE:
+  **mean 27,49667 / 33 poziomy / 1877 akcji**, ARC3_SMOKE_OK, crashed=[]
+  (Flash-Next W4A16+drafter, conc 10, 48 min/gra — JAK rerun). benchmark.json w repo
+  zgodny 1:1; scope oznaczony uczciwie „nie punktowany rerun".
+  Dla porównania (te same gry/ustawienia): v13.7 = 22,59/25 (udział akcji na
+  nieukończonych **44,6%**), v3 = **16,0%** — mistrzowskie machinery żyje i jest lepsze
+  od wszystkiego, co zbudowaliśmy od 16.10.
+- **v3-slim ODRZUCONY przez ich własny test docelowy**: 17,35/24 vs kontrola 27,50/33;
+  niesione sekcje (niezweryfikowane hipotezy w promptach — ACTIVATION.json potwierdza
+  przenoszenie we wszystkich 10 grach) **szkodzą**; wynik negatywny zachowany jako dowód.
+  Następna hipoteza (NIE zbudowana): scope=levelup retained functions + sekcje OFF na
+  dokładnej v3, jedna zmiana env, bez dziedziczenia wyniku slim.
+- Uczciwość pakietu: bez submisji, bez prognoz, „cel 60+ celem badawczym". Nasz audyt:
+  pliki spójne, slugi własne/prywatne, kod = odzyskana v3 + metadane.
+- **v11-hint (plan A z §29) i v13.7+cap (plan B): ZASTĄPIONE przez kontrolę v3** —
+  to bezpośrednia rekonstrukcja mistrza z najlepszym smoke kampanii.
+
+### B. Stan slotów (UCZCIWIE)
+- **31.10 PRZEPADŁ** (brak GO → zero submisji; codex też nie zgłaszał). Zostają:
+  **1.11 (dziś, otwarte do 23:59 UTC)** i **2.11 (ostatni)**. Best 26,25 stoi.
+- **REKOMENDACJA na 1.11: bezpośredni guarded submit `petersharps/arc3-duck-codex-v3-control-1031`
+  v1** (już COMPLETE — bez nowego pusha i smoke; rerun punktacyjny i tak niezależny).
+  E[26,25 ± σ]; każda inna opcja jest dziś gorsza. 2.11: wg wyniku — powtórka v3 albo
+  (gdy best zabezpieczony ≥26) jednorazowy strzał v3+scope=levelup sections OFF.
+- Wszystko wymaga GO właściciela (reguła stała).
