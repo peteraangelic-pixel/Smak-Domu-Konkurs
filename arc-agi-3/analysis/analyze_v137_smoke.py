@@ -21,9 +21,9 @@ def summarize(path):
     return {'source':str(path),'scope':'PUBLIC_SAVE_RUN_NOT_SCORED_RERUN',
             'games':len(rows),'levels':completed,'score_mean':statistics.mean(r['score'] for r in rows),
             'actions':total,'closed_actions':closed,'unfinished_actions':total-closed,
-            'unfinished_action_share':(total-closed)/total,
-            'closed_actions_per_completion':closed/completed,
-            'all_actions_per_completion':total/completed,'rows':rows}
+            'unfinished_action_share':(total-closed)/total if total else None,
+            'closed_actions_per_completion':closed/completed if completed else None,
+            'all_actions_per_completion':total/completed if completed else None,'rows':rows}
 
 
 if __name__=='__main__':

@@ -26,5 +26,12 @@
   ],
   "remaining_failure": "lf52 replica1 timeout240s",
   "default_control_preserved": true,
-  "qualification": "Offline original-engine search profile; no LLM score claim."
+  "qualification": "Offline original-engine search profile; no LLM score claim.",
+  "targeted_full_fallback_test": {
+    "control_timeouts": 1,
+    "candidate_timeouts": 2,
+    "verified_levels_each": 0,
+    "decision": "not_promoted",
+    "report": "analysis/target-fallback-cpu-20261101/report.json"
+  }
 }
