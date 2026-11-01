@@ -4,7 +4,7 @@ on:
     inputs:
       mode:
         type: choice
-        options: [audit, v3-smoke, v3-watch, memory-smoke, memory-watch, memory-correction, memory-correction-watch, slim-smoke, slim-watch, levelscope-smoke, levelscope-watch, control-retest-smoke, control-retest-watch, hypotheses-smoke, hypotheses-watch, validation-smoke, validation-watch, validation-retest-smoke, validation-retest-watch, observation-cache-smoke, observation-cache-watch, fresh-read-smoke, fresh-read-watch, phase-lesson-smoke, phase-lesson-watch, memory-submit]
+        options: [audit, v3-smoke, v3-watch, memory-smoke, memory-watch, memory-correction, memory-correction-watch, slim-smoke, slim-watch, levelscope-smoke, levelscope-watch, control-retest-smoke, control-retest-watch, hypotheses-smoke, hypotheses-watch, validation-smoke, validation-watch, validation-retest-smoke, validation-retest-watch, observation-cache-smoke, observation-cache-watch, fresh-read-smoke, fresh-read-watch, phase-lesson-smoke, phase-lesson-watch, phase-lesson-retest-smoke, phase-lesson-retest-watch, memory-submit]
         default: audit
 permissions:
   contents: read
