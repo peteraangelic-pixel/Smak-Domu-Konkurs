@@ -1,0 +1,47 @@
+{
+  "training": [
+    {
+      "config": {
+        "depth_weight": 0.001,
+        "beam": 512
+      },
+      "games": 17,
+      "errors": 0,
+      "verified_levels": 16,
+      "mean_weighted_completion": 5.522875816993464
+    },
+    {
+      "config": {
+        "depth_weight": 0.0,
+        "beam": 120
+      },
+      "games": 17,
+      "errors": 0,
+      "verified_levels": 15,
+      "mean_weighted_completion": 5.359477124183007
+    }
+  ],
+  "holdout": [
+    {
+      "config": {
+        "depth_weight": 0.0,
+        "beam": 120
+      },
+      "games": 8,
+      "errors": 0,
+      "verified_levels": 3,
+      "mean_weighted_completion": 1.7857142857142856
+    },
+    {
+      "config": {
+        "depth_weight": 0.001,
+        "beam": 512
+      },
+      "games": 8,
+      "errors": 0,
+      "verified_levels": 5,
+      "mean_weighted_completion": 3.5714285714285716
+    }
+  ],
+  "qualification": "Original-engine offline priority-search experiment, independently replayed; no LLM or hidden-score claim."
+}
