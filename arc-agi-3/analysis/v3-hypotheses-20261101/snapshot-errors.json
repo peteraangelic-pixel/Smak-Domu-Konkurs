@@ -1,0 +1,173 @@
+{
+  "games": [
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\cn04-2fe56bfb_p0.log",
+      "observed_unique_calls": 28,
+      "observed_unique_results": 28,
+      "errors": [
+        {
+          "call_id": "call_bc20aac9b5ca4d8194ef6ae0",
+          "error": "NameError: name 'APX' is not defined",
+          "code": "CURnow={'A':(14,20),'B':(32,29),'C':(11,32)}\nrows=[]\nfor rel in APX:\n    ks={'A':rel[0],'B':rel[1],'C':rel[2]}\n    base={'A':(0,0),'B':(rel[3],rel[4]),'C':(rel[5],rel[6])}\n    best=None\n    for u in range(-20,21):\n        for v in range(-20,21):\n            F0=(14+3*u,8+3*v)\n            tp={n:(ks[n],(F0[0]+base[n][0],F0[1]+base[n][1])) for n in 'ABC'}\n            ok=True; cost=0\n            for n in 'ABC':\n                dr=tp[n][1][0]-CURnow[n][0]; dc=tp[n][1][1]-CURnow[n][1]\n                if dr%3 or dc%3: ok=False;break\n                if not all(0<=r<=63 and 0<=c<=63 for r,c in cells3(n,tp[n][0],tp[n][1])[0]): ok=False;break\n                cost+=abs(dr)//3+abs(dc)//3+(ks[n]-0)%4\n            if not ok: continue\n            ov=overlap_amt(tp)\n            if best is None or (ov,cost)<best[:2]: best=(ov,cost,tp)\n    if best: rows.append(best)\nrows.sort(key=lambda t:(t[0],t[1]))\nfor r in rows[:8]: print('ovl',r[0],'cost',r[1],{n:(r[2][n][0],r[2][n][1]) for n in 'ABC'})\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\dc22-fdcac232_p0.log",
+      "observed_unique_calls": 27,
+      "observed_unique_results": 27,
+      "errors": [
+        {
+          "call_id": "call_2949a4fb1d884b74a987b316",
+          "error": "ValueError: too many values to unpack (expected 2)",
+          "code": "def cd(row,col,label):\n    b0=board(); r=action([{'action':'MOUSE','row':row,'col':col}]); b1=board()\n    ch=[(i,j,b0[i][j],b1[i][j]) for i in range(64) for j in range(64) if b0[i][j]!=b1[i][j]]\n    lp=[(i,j) for i,j in ch if j<38]\n    print(label,'noop' if r.get('no_op') else 'fx','n=',len(ch),'player',gpos(),'bar',b1[63].count('W'),'lvl',bool(r.get('level_completed')))\n    print('   left-panel changes:',lp[:14])\n    return lp\ncd(22,56,'GRAYsq')\ncd(22,46,'YELl')\n"
+        },
+        {
+          "call_id": "call_bb8512b70e32409c8d11193f",
+          "error": "StaleStateActionError: MOUSE(row=41, col=51) was not executed. The action immediately before it, MOUSE(row=35, col=51), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "cd(35,51,'REDBAR')\ncd(41,51,'BLUEplug')\n"
+        },
+        {
+          "call_id": "call_aa04979dc9f846c588f34c26",
+          "error": "KeyError: 'steps'",
+          "code": "for (r,c,lab) in [(29,49,'SQ2blue'),(29,54,'SQ3sky'),(29,59,'SQ4blue')]:\n    try:\n        cd(r,c,lab)\n    except Exception as e:\n        print(lab,'ERR',type(e).__name__)\n    tl=last_animation_timeline\n    if tl: print('   anim:',[ (s['bbox'], s['changes'][:3] if 'changes' in s else s['transitions']) for s in tl['steps'][:2]])\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\g50t-5849a774_p0.log",
+      "observed_unique_calls": 16,
+      "observed_unique_results": 16,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\ka59-38d34dbb_p0.log",
+      "observed_unique_calls": 21,
+      "observed_unique_results": 21,
+      "errors": [
+        {
+          "call_id": "call_8369bb77a5f843799599a2cc",
+          "error": "NameError: name 'r' is not defined",
+          "code": "for i,f in enumerate(last_animation_frames):\n    a=f.ascii.split('\\n')\n    row8=''.join(a[3*r+1][3*c+1] for c in range(13,19))\n    shaft=''.join(a[3*r+1][3*c+1] for c in range(7,11))\n    print(i,'socket[13-18]:',row8,' shaft[7-10]:',shaft)\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\ls20-9607627b_p0.log",
+      "observed_unique_calls": 32,
+      "observed_unique_results": 32,
+      "errors": [
+        {
+          "call_id": "call_b6f8fc1eba06447788e82fe5",
+          "error": "StaleStateActionError: RIGHT was not executed. The action immediately before it, RIGHT, was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "seq=['RIGHT','RIGHT','DOWN','RIGHT','RIGHT','RIGHT','RIGHT','DOWN']\nfor a in seq:\n    res=action([a])\n    if res.get('game_over') or res.get('level_completed'): print('END',a,res.get('state')); break\nprint('at',sb4(current_frame),'bar',bar(current_frame))\nres=action(['LEFT'])\nprint('after LEFT into (4,6):',sb4(current_frame),'bar',bar(current_frame),'anim',(res or {}).get('animation'))\nprint('timeline steps', [(s['step'],s['bbox']) for s in last_animation_timeline['steps']])\n"
+        },
+        {
+          "call_id": "call_86a410e5e5714bb5b9d55bde",
+          "error": "NameError: name 'bar' is not defined",
+          "code": "a=current_frame.ascii.split('\\n')\nprint('sprite', sb4(current_frame), 'bar', bar(current_frame))\nfor r in range(15,20): print(r, a[r][19:44])\n"
+        },
+        {
+          "call_id": "call_b9be7fa8a6634eac85d43deb",
+          "error": "TypeError: 'NoneType' object is not subscriptable",
+          "code": "plan=['LEFT','LEFT','LEFT','DOWN','DOWN','DOWN','LEFT','DOWN','DOWN','LEFT','LEFT','UP','DOWN','UP','UP','LEFT','LEFT','UP','DOWN','LEFT','LEFT','UP','UP','UP','DOWN','DOWN','RIGHT','UP','UP','UP','UP','RIGHT','UP','RIGHT','UP','UP','LEFT','LEFT','LEFT']\npos=sb4(current_frame)[:2]; print('start',pos,'bar',barv(current_frame),'legend',leg3(current_frame))\nend=None\nfor i,a in enumerate(plan):\n    pred=sim_step(pos,a)\n    res=action([a])\n    act=sb4(current_frame)[:2]\n    if res.get('game_over') or res.get('level_completed') or res.get('run_complete'):\n        print('EVENT at',i,a,res.get('state')); end=res; break\n    if act!=pred:\n        print('MISMATCH i',i,a,'from',pos,'pred',pred,'actual',act,'bar',barv(current_frame)); end='mismatch'; break\n    pos=act\nelse:\n    print('plan done, end pos',pos,'bar',barv(current_frame))\nprint('final', pos, 'bar', barv(current_frame), 'legend', leg3(current_frame), 'level', current_frame.level)\n"
+        },
+        {
+          "call_id": "call_03eabe04c8f6463496f73700",
+          "error": "IndexError: string index out of range",
+          "code": "a=current_frame.ascii.split('\\n')\ndef cellchar(r,c):\n    from collections import Counter\n    cnt=Counter(a[r*5+i][c*5+j] for i in range(5) for j in range(5))\n    return cnt.most_common(1)[0][0]\nprint('   '+''.join(str(c%10) for c in range(13)))\nfor r in range(0,11):\n    print(r, ' '.join(cellchar(r,c) for c in range(13)))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\m0r0-492f87ba_p0.log",
+      "observed_unique_calls": 26,
+      "observed_unique_results": 26,
+      "errors": [
+        {
+          "call_id": "call_ecf2c22170f443fd9549083a",
+          "error": "TypeError: can only concatenate str (not \"int\") to str",
+          "code": "import collections\ndef celltype(r,c):\n    if r<0 or r>6: return 'X'          # spike bands above/below rooms\n    if c<0 or c>8: return 'B'          # side background\n    if r in (2,4) and 3<=c<=5: return 'X'\n    if (c<=2) or (c>=6) or (r==3 and 3<=c<=5): return 'F'\n    return 'B'\nFLOOR=[(r,c) for r in range(7) for c in range(9) if celltype(r,c)=='F']\ndef solve(L0,R0,T0):\n    idx={p:i for i,p in enumerate(FLOOR)}\n    def step(s,a):\n        L,R,T,sel=s\n        dr,dc={'U':(-1,0),'D':(1,0),'L':(0,-1),'Rr':(0,1)}[a]\n        if sel:\n            t=(T[0]+dr,T[1]+dc); ty=celltype(*t)\n            if ty=='X': return 'DEAD'\n            if ty!='F' or t in (L,R): return None if ty!='F' else None\n            return (L,R,t,True)\n        tL=(L[0]+dr,L[1]+dc); tR=(R[0]+dr,R[1]-dc)\n        yl,yr=celltype(*tL),celltype(*tR)\n        if yl=='X' or yr=='X': return 'DEAD'\n        if yl!='F' or tL==R: tL=L\n        if yr!='F' or tR==L: tR=R\n        if tL==tR: return 'MERGE'\n        if (tL,tR)==(L,R): return None\n        return (tL,tR,L and T,False) if False else (tL,tR,T,False)\n    start=(L0,R0,T0,False); dist={start:0}; prev={}; q=collections.deque([start])\n    while q:\n        s=q.popleft()\n        for a in ['U','D','L','Rr','S','X']:\n            if a in ('S','X'):\n                n = (s[0],s[1],s[2],True) if a=='S' else (s[0],s[1],s[2],False)\n                if n==s: continue\n            else:\n                n=step(s,a)\n                if n=='MERGE':\n                    seq=[a]; t=s\n                    while t in prev: t0,aa=prev[t]; seq.append(aa); t=t0\n                    return dist[s]+1, list(reversed(seq))\n                if n is None or n in dist: continue\n            if n in dist: continue\n            dist[n]=dist[s]+1; prev[n]=(s,a); q.append(n)\n    return None,None\nln,seq=solve((4,1),(2,7),(3,3))\nprint('optimal len',ln,''.join(x.replace('Rr','R') for x in seq) if seq else None)\n"
+        },
+        {
+          "call_id": "call_29baffe6dd0c42dca065dd1f",
+          "error": "StaleStateActionError: LEFT was not executed. The action immediately before it, MOUSE(row=48, col=16), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "r=action([{'action':'MOUSE','row':48,'col':16}])\nprint('click',{x:v for x,v in r.items() if x in ('no_op','board_changed')})\ng=snap(current_frame)\nprint('row10:',g[10]); print('row11:',g[11])\nfor act in ['LEFT','UP','DOWN']:\n    b=snap(current_frame)\n    rr=action([act])\n    a=snap(current_frame)\n    d=[(i,j,b[i][j],a[i][j]) for i in range(13) for j in range(15) if b[i][j]!=a[i][j]]\n    print(act,d,{x:v for x,v in rr.items() if x in ('no_op','level_completed','game_over')})\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\s5i5-18d95033_p0.log",
+      "observed_unique_calls": 21,
+      "observed_unique_results": 21,
+      "errors": [
+        {
+          "call_id": "call_8e05af613a544c499288a36a",
+          "error": "KeyError: 'wv'",
+          "code": "def model_state(frame):\n    seg=frame.segmentation\n    comp={}\n    for n in seg['nodes']:\n        if n['pixels']<3: continue\n        b=n['boundary']; r0=min(p[0] for p in b);r1=max(p[0] for p in b);c0=min(p[1] for p in b);c1=max(p[1] for p in b)\n        if r0>43: continue\n        comp.setdefault(n['color'],[]).append((r0,r1,c0,c1,n['pixels']))\n    st={}\n    ws=comp.get('w',[])\n    if len(ws)==1:\n        r0,r1,c0,c1,p=ws[0]\n        a=frame.ascii.split('\\n')\n        rowcnt={}; colcnt={}\n        for r in range(r0,r1+1):\n            rowcnt[r]=sum(1 for c in range(c0,c1+1) if a[r][c]=='w')\n        for c in range(c0,c1+1):\n            colcnt[c]=sum(1 for r in range(r0,r1+1) if a[r][c]=='w')\n        wr=[r for r in rowcnt if rowcnt[r]>=15]; wc=[c for c in colcnt if colcnt[c]>=10]\n        st['wh']=(min(wr)-15,min(wc)-27,None)\n        vc=[c for c in colcnt if colcnt[c]>=10 and c not in wc]\n        vrows=[r for r in range(r0,r1+1) if a[r][min(vc) if vc else wc[0]]=='w'] if (vc or True) else []\n        # wv cols: cols whose count is small (3-ish) but span tall\n        tall=[c for c in colcnt if colcnt[c]>=10]\n        st['wv']=(min(wr)-15,min(tall)-36,None) if False else st['wv']\n        # recompute wv from cols with tall counts\n        st['wv']=(min([r for r in range(r0,r1+1) if any(a[r][c]=='w' for c in tall)])-21, min(tall)-36, None)\n    else:\n        h=max([c for c in ws if (c[3]-c[2]+1)>=10], key=lambda c:(c[3]-c[2]))\n        v=max([c for c in ws if (c[1]-c[0]+1)>=10], key=lambda c:(c[1]-c[0]))\n        st['wh']=(h[0]-15,h[2]-27,None); st['wv']=(v[0]-21,v[2]-36,None)\n    for k,col in zip(MKEYS(),('R','P','N','S','b','O')):\n        big=max([c for c in comp.get(col,[]) if c[4]>=4], key=lambda c:c[4])\n        r0,r1,c0,c1,p=big; d=MDIR(k)\n        L=(r1-r0+1) if d[0]!=0 else (c1-c0+1)\n        off={'R':(r1-37,c0-27),'P':(r0-4,c0-48),'N':(r1-25,c0-54),'S':(r0-27,c0-7),'b':(r0-36,c1-31),'O':(r0-21,c1-55)}[k]\n        st[k]=(off[0],off[1],L)\n    return tuple((st[k][0],st[k][1],st[k][2]) for k in MKEYS())\nfor fr in [t.after_frame for t in transitions if t.after_frame.level==3]:\n    print(fr.step, dict(zip(MKEYS(),model_state(fr))))\n"
+        },
+        {
+          "call_id": "call_9104b7f9b083430b90ff7983",
+          "error": "ImportError: Module 'time' is not allowed in the sandbox.",
+          "code": "def minh(state):\n    P=state[1]; S=state[3]\n    dp=(3+P[2]-1+P[0], 49+P[1]); ds=(28+S[0], 5+S[1]+S[2])\n    T1=[(28,43),(28,49)]\n    def md(a,b): return abs(a[0]-b[0])+abs(a[1]-b[1])\n    return min(md(dp,T1[0])+md(ds,T1[1]), md(dp,T1[1])+md(ds,T1[0]))\ns0=model_state(current_frame)\nprint('start h',minh(s0))\nACTS=['R+','R-','P+','P-','N+','N-','S+','S-','b+','b-','O+','O-']\nimport time\nt0=time.time()\nr=plan(actions=ACTS,max_nodes=40000,heuristic=minh)\nprint('found',r.get('found'),'len',r.get('length'),'expanded',r.get('expanded'),'time',round(time.time()-t0,1))\nprint(r.get('actions'))\n"
+        },
+        {
+          "call_id": "call_4ecc6f8f2a514f4cb4911724",
+          "error": "NameError: name 'heapq' is not defined",
+          "code": "def h_pink(s):\n    P=s[1]; dp=(3+P[2]-1+P[0],49+P[1]); return abs(dp[0]-28)+abs(dp[1]-49)\ndef h_sky(s):\n    S=s[3]; ds=(28+S[0],5+S[1]+S[2]); return abs(ds[0]-28)+abs(ds[1]-43)\ndef astar2(s0,hf,gof,maxexp=40000):\n    pq=[(hf(s0),0,s0,())]; seen={s0:0}; exp=0\n    while pq:\n        f,g,s,path=heapq.heappop(pq)\n        if seen.get(s,1e9)<g: continue\n        if gof(s): return ('found',path,exp)\n        exp+=1\n        if exp>maxexp: return ('budget',None,exp)\n        for a in ACTS:\n            n=fstep(s,a)\n            if n is None: continue\n            ng=g+1\n            if ng>=seen.get(n,1e9): continue\n            seen[n]=ng; heapq.heappush(pq,(ng+hf(n),ng,n,path+(a,)))\n    return ('exhausted',None,exp)\ns0=model_state(current_frame)\nr=astar2(s0,h_pink,lambda s:h_pink(s)==0,30000)\nprint('pink-only',r[0],'len',len(r[1]) if r[1] else None,'exp',r[2])\nif r[1]: print(r[1])\nr2=astar2(s0,h_sky,lambda s:h_sky(s)==0,30000)\nprint('sky-only',r2[0],'len',len(r2[1]) if r2[1] else None,'exp',r2[2])\nif r2[1]: print(r2[1])\n"
+        },
+        {
+          "call_id": "call_77eeed4de8e747aebaabb9d4",
+          "error": "TypeError: 'int' object is not subscriptable",
+          "code": "def crop(fr,r0,r1,c0,c1): return '\\n'.join(fr.ascii.split('\\n')[r][c0:c1+1] for r in range(r0,r1+1))\ntrs=[t for t in transitions if t.after_frame.level==3]\nf0=trs[0].before_frame\nprint('INITIAL sky region rows26-30 cols4-14'); print(crop(f0,26,30,4,14))\nfor t in trs:\n    fr=t.after_frame\n    if fr.step in (60,63):\n        print('step',fr.step); print(crop(fr,26,30,4,14))\n# find dot (r 1px) positions\nfor fr in [f0]+[t.after_frame for t in trs]:\n    dots=[(min(n['boundary'],key=lambda p:(p[0],p[1])),n['color']) for n in fr.segmentation['nodes'] if n['pixels']==1 and n['color']=='r']\n    print(fr.step,[ (p[0][0],p[0][1]) for p,c in dots])\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\sc25-635fd71a_p0.log",
+      "observed_unique_calls": 16,
+      "observed_unique_results": 16,
+      "errors": [
+        {
+          "call_id": "call_70f19ef3eaba46d5b15cc32b",
+          "error": "StaleStateActionError: MOUSE(row=37, col=53) was not executed. The action immediately before it, MOUSE(row=36, col=48), was a no-op - it produced no change inside the board area - so positions and paths computed since then may be wrong, which is why execution has been halted here. Re-read current_frame and last_action_call_result, work out why nothing moved, then act on what you find. (StaleStateActionError can be caught if a snippet has good reason to keep acting through no-ops.)",
+          "code": "for (r,c) in [(36,48),(37,53)]:\n    res = action([{'action':'MOUSE','row':r,'col':c}])\n    d = frame_diff()\n    print('click',(r,c),'noop',res.get('no_op'),'chg',d['changed_cell_count'],'bar',barlen(current_frame),'lc',res.get('level_completed'),'go',res.get('game_over'))\n    if res.get('level_completed') or res.get('game_over'): break\nprint('tip',tipnow(current_frame))\n"
+        }
+      ],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\su15-1944f8ab_p0.log",
+      "observed_unique_calls": 25,
+      "observed_unique_results": 25,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    },
+    {
+      "snapshot": "arc-agi-3\\analysis\\v3-hypotheses-20261101\\result-download\\submission-access-20261031\\hypotheses-target-output\\prompts\\tn36-ef4dde99_p0.log",
+      "observed_unique_calls": 18,
+      "observed_unique_results": 18,
+      "errors": [],
+      "bool_as_mapping_errors": 0,
+      "scope": "Retained context snapshot only; deduplicated by native tool-call ID."
+    }
+  ],
+  "observed_errors": 16,
+  "bool_as_mapping_errors": 0
+}
