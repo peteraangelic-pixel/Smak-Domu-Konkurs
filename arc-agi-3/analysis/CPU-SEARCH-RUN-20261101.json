@@ -2,7 +2,7 @@
   "backend": "rust-ctypes",
   "seconds_per_level": 3,
   "workers": 16,
-  "status": "started",
+  "status": "training space exhausted:2448 trials/144 configurations; redundant surrogate stopped; holdout finalizing",
   "node_cap": 600,
   "train_games": 17,
   "population": 48,
@@ -11,5 +11,6 @@
   "holdout_games": 8,
   "pid": 34868,
   "selector": "surrogate",
-  "qualification": "Offline engine search; not LLM policy or Kaggle score prediction"
+  "qualification": "Offline engine search; not LLM policy or Kaggle score prediction",
+  "supervisor_pid": 27232
 }
