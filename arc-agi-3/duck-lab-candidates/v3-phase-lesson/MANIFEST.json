@@ -1,0 +1,11 @@
+{
+  "sha256": "b6140e3400ae7f33c83413128db33fda24b4a8fec12bd60b1aa1b7a434626f62",
+  "base_sha256": "8d0195f92c5518a41d14edbfca596b72c27690f269f681bbaa9af0bc3d257bcc",
+  "changed_cells": [
+    1
+  ],
+  "extra_patches": 0,
+  "only_policy_change": "ARC3_SYSTEM_PROMPT_PREFIX",
+  "instruction": "Before searching a handwritten simulator, test its causal order against actual observations. Separate input activation, object movement, autonomous effects, and contact or merging. An input that leaves the selected object stationary may still advance other mechanics; test rather than assume this. Check whether targets are chosen before or after movement. Use your own functions or check_model with explicit adapters to compare compact predicted and observed states on recorded transitions. Repair a counterexample before increasing search depth. If two rules still fit, choose one inexpensive action where their predictions disagree. Avoid another inspection that cannot distinguish those rules.",
+  "qualification": "General causal-model validation instruction; no game-specific model, route, ID or prediction of score."
+}
