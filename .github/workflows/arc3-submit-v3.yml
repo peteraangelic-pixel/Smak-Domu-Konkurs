@@ -1,0 +1,32 @@
+name: Authorized exact v3 submission November 2
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: arc-codex-exact-v3-submit-20261102
+  cancel-in-progress: false
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet "kaggle==2.2.5" six
+      - name: Existing authentication
+        env:
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: python arc-agi-3/kaggle/ops/write_creds.py
+      - name: Verify pinned v3 and submit once
+        env:
+          KAGGLE_API_TOKEN: ${{ env.KAGGLE_API_TOKEN }}
+        run: python arc-agi-3/analysis/submit_exact_v3_20261102.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-v3-submit-20261102
+          path: arc-agi-3/analysis/v3-submit-20261102
+          retention-days: 14
