@@ -1,0 +1,324 @@
+[
+  {
+    "game": "m0r0",
+    "model_snippets": [
+      {
+        "call_id": "call_ea6c41aa90c74b7ca9c0b62e",
+        "functions": [
+          {
+            "name": "predict",
+            "args": [
+              "A",
+              "B",
+              "op",
+              "act"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "KEYS",
+          "frozenset",
+          "set"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_90b502b3f7fb43f6b807412c",
+        "functions": [
+          {
+            "name": "predict2",
+            "args": [
+              "A",
+              "B",
+              "op",
+              "act"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "KEYS",
+          "frozenset",
+          "set"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_db01cae04db0495a9d03f10b",
+        "functions": [
+          {
+            "name": "step_pair",
+            "args": [
+              "A",
+              "B",
+              "act"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "CELLS"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      }
+    ]
+  },
+  {
+    "game": "g50t",
+    "model_snippets": [
+      {
+        "call_id": "call_832c536a91254b4594bd36bb",
+        "functions": [
+          {
+            "name": "sim",
+            "args": [
+              "moves",
+              "recs",
+              "verbose"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "ADJ",
+          "GOAL",
+          "HOME",
+          "PAD",
+          "PUSH",
+          "START",
+          "any",
+          "enumerate",
+          "len",
+          "list",
+          "range",
+          "str"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_fa9c22126c844d459fcfcaa3",
+        "functions": [
+          {
+            "name": "simrun",
+            "args": [
+              "path",
+              "recs",
+              "strict"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "any",
+          "enumerate",
+          "len",
+          "range",
+          "str"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_5c0717ed0c3a4980892ab57a",
+        "functions": [
+          {
+            "name": "simrun",
+            "args": [
+              "path",
+              "recs",
+              "strict"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "any",
+          "enumerate",
+          "len",
+          "maze",
+          "range",
+          "str"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_ad208c453bd24245ade64235",
+        "functions": [
+          {
+            "name": "simrun",
+            "args": [
+              "path",
+              "recs",
+              "strict"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "enumerate",
+          "len",
+          "maze",
+          "range",
+          "str"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_a37e5516213644b1b826e7f1",
+        "functions": [
+          {
+            "name": "simok",
+            "args": [
+              "path",
+              "recs",
+              "strict"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "simrun"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      }
+    ]
+  },
+  {
+    "game": "ka59",
+    "model_snippets": [
+      {
+        "call_id": "call_5993b5400ced43e08921f531",
+        "functions": [
+          {
+            "name": "model_state5",
+            "args": [
+              "frame"
+            ]
+          },
+          {
+            "name": "step5",
+            "args": [
+              "state",
+              "action"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "B3",
+          "D",
+          "YOFF",
+          "dict",
+          "isinstance",
+          "list",
+          "range"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_564e39bd6e3841e687d1a516",
+        "functions": [
+          {
+            "name": "step5",
+            "args": [
+              "state",
+              "action"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "cells5",
+          "cs",
+          "dict",
+          "frozenset",
+          "isinstance",
+          "list",
+          "p",
+          "range"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_e5bd08f85f9e49b59de46e65",
+        "functions": [
+          {
+            "name": "model_state5",
+            "args": [
+              "frame"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "build_pass",
+          "comps2",
+          "enumerate",
+          "grid",
+          "min",
+          "range"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_8bae9e52c6004ba7829fe22c",
+        "functions": [
+          {
+            "name": "step5",
+            "args": [
+              "state",
+              "action"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "cs",
+          "dict",
+          "frozenset",
+          "int",
+          "isinstance",
+          "list",
+          "p",
+          "range",
+          "re",
+          "str",
+          "tuple"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      },
+      {
+        "call_id": "call_82b3f3371fa0451ea0426c20",
+        "functions": [
+          {
+            "name": "step5b",
+            "args": [
+              "state",
+              "action"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [
+          "cs",
+          "frozenset",
+          "len",
+          "p",
+          "print",
+          "range",
+          "tuple"
+        ],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      }
+    ]
+  },
+  {
+    "game": "ls20",
+    "model_snippets": [
+      {
+        "call_id": "call_08482c07065e44b0a0b05381",
+        "functions": [
+          {
+            "name": "step_dest",
+            "args": [
+              "LAB",
+              "PASS",
+              "launch",
+              "pos",
+              "ch"
+            ]
+          }
+        ],
+        "loaded_names_requiring_resolution": [],
+        "qualification": "Static free-name approximation,not a dependency certificate."
+      }
+    ]
+  }
+]
