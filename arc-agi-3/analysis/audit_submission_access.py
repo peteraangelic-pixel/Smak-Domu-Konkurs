@@ -28,6 +28,11 @@ def run(label,args):
 
 
 records=[]
+if os.environ.get('ARC_AUDIT_MODE')=='v3-result-status':
+    run('v3-result-57901324',['competitions','submission','57901324'])
+    run('v3-result-submissions',['competitions','submissions','arc-prize-2026-arc-agi-3','--csv'])
+    raise SystemExit(0)
+
 for label,args in [
     ('cli-version',['--version']),
     ('submission-v137',['competitions','submission','57811453']),
