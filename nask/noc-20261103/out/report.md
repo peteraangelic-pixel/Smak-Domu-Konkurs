@@ -1,6 +1,6 @@
 # Nocny skan NASK — raport automatyczny
 
-bieg: 2026-11-03T23:12:43+00:00 | żądań: 229 | limit: 4.5 req/s (regulamin ≤5) | GET-only, bez auth, 12 hostów z §5
+bieg: 2026-11-03T23:19:39+00:00 | żądań: 229 | limit: 4.5 req/s (regulamin ≤5) | GET-only, bez auth, 12 hostów z §5
 
 | sev | host | co | dowód |
 |---|---|---|---|
@@ -52,7 +52,7 @@ bieg: 2026-11-03T23:12:43+00:00 | żądań: 229 | limit: 4.5 req/s (regulamin �
 | INFO | bezpiecznewybory.pl | UA-browser status=403 len=369 | ct=text/html head='<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don\'t have permission to access "http&#58;&#47;&#47;bezpiecznewyb' |
 | INFO | bezpiecznymiesiac.pl | alive 200 len=96343 | {"server": "", "azure": true, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "CONFIG_NOCACHE", "powered": "", "cookies": ["Path"]} |
 | INFO | dataannotation.pllum.org.pl | alive 200 len=713 | {"server": "", "azure": true, "envoy": true, "nextjs": false, "cloudflare": false, "cache": "CONFIG_NOCACHE", "powered": "", "cookies": []} |
-| INFO | dns.pl | alive 200 len=51132 | {"server": "", "azure": false, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "", "powered": "", "cookies": ["SESID"]} |
+| INFO | dns.pl | alive 200 len=51148 | {"server": "", "azure": false, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "", "powered": "", "cookies": ["SESID"]} |
 | INFO | dns.pl | ekspozycja /.well-known/security.txt | status=307 ct= len=0 head='' |
 | INFO | dyzurnet.pl | alive 200 len=106937 | {"server": "cloudflare", "azure": false, "envoy": false, "nextjs": false, "cloudflare": true, "cache": "", "powered": "", "cookies": ["locale"]} |
 | INFO | dyzurnet.pl | robots.txt ścieżki | /api/ |
@@ -60,7 +60,7 @@ bieg: 2026-11-03T23:12:43+00:00 | żądań: 229 | limit: 4.5 req/s (regulamin �
 | INFO | nask.pl | alive 302 len=0 | {"server": "", "azure": false, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "", "powered": "", "cookies": []} |
 | INFO | oad.nask.pl | alive 200 len=75666 | {"server": "", "azure": true, "envoy": true, "nextjs": false, "cloudflare": false, "cache": "CONFIG_NOCACHE", "powered": "", "cookies": []} |
 | INFO | pllum.org.pl | alive 200 len=133988 | {"server": "", "azure": true, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "CONFIG_NOCACHE", "powered": "", "cookies": ["x-ms-routing-name"]} |
-| INFO | science.nask.pl | alive 200 len=162344 | {"server": "", "azure": false, "envoy": false, "nextjs": true, "cloudflare": false, "cache": "", "powered": "", "cookies": ["stickounet"]} |
-| INFO | secure.edu.pl | nie odpowiada (HTTPS/443) | {"ts": "2026-11-03T23:09:04+00:00", "module": "sweep", "host": "secure.edu.pl", "path": "/", "url": "https://secure.edu.pl/", "error": "URLError: <urlopen error timed out>", "t": 15.25} |
+| INFO | science.nask.pl | alive 200 len=161608 | {"server": "", "azure": false, "envoy": false, "nextjs": true, "cloudflare": false, "cache": "", "powered": "", "cookies": ["stickounet"]} |
+| INFO | secure.edu.pl | nie odpowiada (HTTPS/443) | {"ts": "2026-11-03T23:15:26+00:00", "module": "sweep", "host": "secure.edu.pl", "path": "/", "url": "https://secure.edu.pl/", "error": "URLError: <urlopen error timed out>", "t": 16.43} |
 | INFO | zglos-dezinformacje.nask.pl | alive 200 len=43912 | {"server": "", "azure": true, "envoy": false, "nextjs": false, "cloudflare": false, "cache": "CONFIG_NOCACHE", "powered": "", "cookies": []} |
 | INFO | zglos-dezinformacje.nask.pl | sitemap.xml: 2 URL-i | https://zglos-dezinformacje.nask.pl/; https://zglos-dezinformacje.nask.pl/en |

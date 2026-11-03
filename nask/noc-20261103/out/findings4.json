@@ -4,55 +4,62 @@
   "host": "dataannotation.pllum.org.pl",
   "what": "/admin/ status 200",
   "evidence": "ct=text/html len=713 loc= head='<!doctype html>\\n<html lang=\"en\">\\n  <head>\\n    <meta charset=\"UTF-8\" />\\n    <meta name=\"viewport\" content=\"width=device-w'",
-  "ts": "2026-11-03T23:14:17+00:00"
+  "ts": "2026-11-03T23:21:13+00:00"
  },
  {
   "sev": "INFO",
   "host": "dataannotation.pllum.org.pl",
   "what": "/api/v1/ status 404",
   "evidence": "ct=application/json len=22 loc= head='{\"detail\":\"Not Found\"}'",
-  "ts": "2026-11-03T23:14:18+00:00"
+  "ts": "2026-11-03T23:21:14+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "API /api/zone-stats otwarte (application/json)",
-  "evidence": "len=11759 head='{\"errors\":{},\"lang\":\"pl\",\"stats\":{\"time\":\"2026-11-04 00:13 CET\",\"day\":\"2026-11-03\",\"rows\":[[\"\",\"suma\",\"2756528\",\"100.00 %\",\"6506855\",\"100.00 %\",\"2.36\",\"+1085\",\"+7606\",\"+26125\",\"+191046\"],[1,\"pl\",\"2316211\",\"84.03 %\",\"5436873\",\"83.56 %\",\"2.35\",\"+893\",\"'",
-  "ts": "2026-11-03T23:13:58+00:00"
+  "evidence": "len=11759 head='{\"errors\":{},\"lang\":\"pl\",\"stats\":{\"time\":\"2026-11-03 23:56 CET\",\"day\":\"2026-11-03\",\"rows\":[[\"\",\"suma\",\"2756528\",\"100.00 %\",\"6506855\",\"100.00 %\",\"2.36\",\"+1085\",\"+7606\",\"+26125\",\"+191046\"],[1,\"pl\",\"2316211\",\"84.03 %\",\"5436873\",\"83.56 %\",\"2.35\",\"+893\",\"'",
+  "ts": "2026-11-03T23:21:07+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "API /api/count-deleted-domains → HTML (SPA-catch-all)",
   "evidence": "len=17",
-  "ts": "2026-11-03T23:14:01+00:00"
+  "ts": "2026-11-03T23:21:11+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "API /api/registrars-services otwarte (application/json)",
   "evidence": "len=78 head='[\"transfer\",\"ipv6\",\"prio\",\"bookblocked\",\"dnssec\",\"dnssecready\",\"registrylock\"]'",
-  "ts": "2026-11-03T23:14:01+00:00"
+  "ts": "2026-11-03T23:21:11+00:00"
  },
  {
   "sev": "INFO",
   "host": "dyzurnet.pl",
   "what": "/api status 404",
   "evidence": "ct=text/html len=38981 loc= head='<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,'",
-  "ts": "2026-11-03T23:14:18+00:00"
+  "ts": "2026-11-03T23:21:14+00:00"
+ },
+ {
+  "sev": "INFO",
+  "host": "science.nask.pl",
+  "what": "API /api/downloadFile kontrakt",
+  "evidence": "status=400 head='{\"error\":\"Invalid file id\"}'",
+  "ts": "2026-11-03T23:21:12+00:00"
  },
  {
   "sev": "INFO",
   "host": "science.nask.pl",
   "what": "API /api/search?q=test kontrakt",
   "evidence": "status=400 head='{\"error\":\"Query must be at least 3 characters\"}'",
-  "ts": "2026-11-03T23:14:16+00:00"
+  "ts": "2026-11-03T23:21:12+00:00"
  },
  {
   "sev": "INFO",
   "host": "science.nask.pl",
   "what": "API /api/contact kontrakt",
   "evidence": "status=405 head='{\"error\":\"Method not allowed\"}'",
-  "ts": "2026-11-03T23:14:17+00:00"
+  "ts": "2026-11-03T23:21:13+00:00"
  }
 ]
