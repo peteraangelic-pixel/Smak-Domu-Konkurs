@@ -45,12 +45,15 @@ jobs:
           python-version: "3.12"
 
       - name: Skan (limiter 4.5 rps, 12 hostów)
+        if: github.event_name != 'push'
         run: python3 nask/noc-20261103/nightscan.py
 
       - name: Pobierz JS bundle + sourcemapy
+        if: github.event_name != 'push'
         run: python3 nask/noc-20261103/jsfetch.py
 
       - name: jsdig (offline minerał)
+        if: github.event_name != 'push'
         run: python3 nask/noc-20261103/jsdig.py
 
       - name: Bieg 4 (probe odkrytych tras)
