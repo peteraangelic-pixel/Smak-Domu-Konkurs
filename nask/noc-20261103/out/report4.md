@@ -1,6 +1,6 @@
 # Nocny skan NASK — BIEG 4 (probe odkrytych tras API)
 
-bieg: 2026-11-03T23:21:16+00:00 | żądań: 16 | limit 4.5 rps | GET-only, bez auth, 12 hostów §5
+bieg: 2026-11-03T23:25:30+00:00 | żądań: 16 | limit 4.5 rps | GET-only, bez auth, 12 hostów §5
 
 | sev | host | co | dowód |
 |---|---|---|---|
@@ -10,6 +10,5 @@ bieg: 2026-11-03T23:21:16+00:00 | żądań: 16 | limit 4.5 rps | GET-only, bez a
 | INFO | dns.pl | API /api/count-deleted-domains → HTML (SPA-catch-all) | len=17 |
 | INFO | dns.pl | API /api/registrars-services otwarte (application/json) | len=78 head='["transfer","ipv6","prio","bookblocked","dnssec","dnssecready","registrylock"]' |
 | INFO | dyzurnet.pl | /api status 404 | ct=text/html len=38981 loc= head='<!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width,' |
-| INFO | science.nask.pl | API /api/downloadFile kontrakt | status=400 head='{"error":"Invalid file id"}' |
 | INFO | science.nask.pl | API /api/search?q=test kontrakt | status=400 head='{"error":"Query must be at least 3 characters"}' |
 | INFO | science.nask.pl | API /api/contact kontrakt | status=405 head='{"error":"Method not allowed"}' |
