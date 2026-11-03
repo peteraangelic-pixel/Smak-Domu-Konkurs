@@ -19,6 +19,7 @@ on:
       - "nask/noc-20261103/TRIGGER.json"
       - "nask/noc-20261103/bieg2.py"
       - "nask/noc-20261103/bieg3.py"
+      - "nask/noc-20261103/bieg4.py"
   schedule:
     - cron: "0 1 * * *"
 
@@ -51,9 +52,10 @@ jobs:
       - name: jsdig (offline minerał)
         run: python3 nask/noc-20261103/jsdig.py
 
-      - name: Bieg 3 (JS dig w runnerze + probe celowane)
+      - name: Bieg 4 (probe odkrytych tras)
         run: |
           python3 nask/noc-20261103/bieg3.py
+          python3 nask/noc-20261103/bieg4.py
           rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/*.html
 
 
