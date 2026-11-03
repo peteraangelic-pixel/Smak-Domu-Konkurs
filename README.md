@@ -9,3 +9,6 @@ Projekt przeniesiony z repozytorium `peteraangelic-pixel/Pokemon`
 
 Wymagane sekrety Kaggle (nie są w repo): `KAGGLE_API_TOKEN` lub `KAGGLE_USERNAME` + `KAGGLE_KEY`.
 Workflowy CI nie zostały skopiowane; trzeba je dodać ręcznie, świadomie.
+
+## ARC-AGI-3 (2026-10) — KONKURS ZAKOŃCZONY
+Best wynik: **26.25** (submisja 57247568). Pełne archiwum: `arc-agi-3/` (pakiety v11–v13.7, OCENA, SYNC §1–§30, peer-review, ops r001–r122). Kontynuacja badań AI→AI i nowy projekt (bug bounty hack.cert.pl): repo `peteraangelic-pixel/NASK`.
