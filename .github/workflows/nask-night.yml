@@ -17,6 +17,7 @@ on:
       - "nask/noc-20261103/jsdig.py"
       - "nask/noc-20261103/jsdig-rs/**"
       - "nask/noc-20261103/TRIGGER.json"
+      - "nask/noc-20261103/bieg2.py"
   schedule:
     - cron: "0 1 * * *"
 
@@ -49,20 +50,27 @@ jobs:
       - name: jsdig (offline minerał)
         run: python3 nask/noc-20261103/jsdig.py
 
+      - name: Bieg 2 (pełne HTML + JS + probe API)
+        run: |
+          python3 nask/noc-20261103/bieg2.py
+          rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/html
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nask-night-full-${{ github.run_id }}
+          path: nask/noc-20261103/out/
+          retention-days: 14
+
       - name: Komit wyników (bez JS — JS w artifactcie)
         run: |
           git config user.name "nask-night-bot"
           git config user.email "nask-night-bot@users.noreply.github.com"
-          rm -rf nask/noc-20261103/out/js
+          rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/html
           git add nask/noc-20261103/out/
           git commit -m "nask-night: skan nocny (limiter 4.5rps, GET-only, 12 hostow) — wyniki + audyt zadan" || echo "nic nowego"
           git push origin HEAD:arena/5ed750ef-smak-domu-konkurs
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: nask-night-js-${{ github.run_id }}
-          path: nask/noc-20261103/out/
-          retention-days: 14
 
   rust-build:
     runs-on: ubuntu-latest
