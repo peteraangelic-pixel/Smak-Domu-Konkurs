@@ -18,6 +18,7 @@ on:
       - "nask/noc-20261103/jsdig-rs/**"
       - "nask/noc-20261103/TRIGGER.json"
       - "nask/noc-20261103/bieg2.py"
+      - "nask/noc-20261103/bieg3.py"
   schedule:
     - cron: "0 1 * * *"
 
@@ -50,10 +51,10 @@ jobs:
       - name: jsdig (offline minerał)
         run: python3 nask/noc-20261103/jsdig.py
 
-      - name: Bieg 2 (pełne HTML + JS + probe API)
+      - name: Bieg 3 (JS dig w runnerze + probe celowane)
         run: |
-          python3 nask/noc-20261103/bieg2.py
-          rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/html
+          python3 nask/noc-20261103/bieg3.py
+          rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/*.html
 
 
       - uses: actions/upload-artifact@v4
