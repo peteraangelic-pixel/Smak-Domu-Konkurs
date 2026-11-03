@@ -20,6 +20,7 @@ on:
       - "nask/noc-20261103/bieg2.py"
       - "nask/noc-20261103/bieg3.py"
       - "nask/noc-20261103/bieg4.py"
+      - "nask/noc-20261103/bieg5.py"
   schedule:
     - cron: "0 1 * * *"
 
@@ -56,6 +57,7 @@ jobs:
         run: |
           python3 nask/noc-20261103/bieg3.py
           python3 nask/noc-20261103/bieg4.py
+          python3 nask/noc-20261103/bieg5.py
           rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/*.html
 
 
