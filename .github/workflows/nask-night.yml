@@ -1,0 +1,87 @@
+name: NASK night ops
+
+# Nocny skan bug bounty NASK (hack.cert.pl, program NASK 3-30.11).
+# ZGODNOŚĆ: tylko 12 hostów z §5, globalny limiter 4.5 req/s (regulamin ≤5),
+# GET-only, bez auth, bez DoS. Pełny audyt żądań w out/requests.jsonl.
+# Fire: push zmieniający narzędzia, workflow_dispatch, cron 01:00 UTC.
+# Wyniki: komitowane do nask/noc-20261103/out/ + artifact (z JS).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/5ed750ef-smak-domu-konkurs"]
+    paths:
+      - ".github/workflows/nask-night.yml"
+      - "nask/noc-20261103/nightscan.py"
+      - "nask/noc-20261103/jsfetch.py"
+      - "nask/noc-20261103/jsdig.py"
+      - "nask/noc-20261103/jsdig-rs/**"
+      - "nask/noc-20261103/TRIGGER.json"
+  schedule:
+    - cron: "0 1 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nask-night
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/5ed750ef-smak-domu-konkurs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Skan (limiter 4.5 rps, 12 hostów)
+        run: python3 nask/noc-20261103/nightscan.py
+
+      - name: Pobierz JS bundle + sourcemapy
+        run: python3 nask/noc-20261103/jsfetch.py
+
+      - name: jsdig (offline minerał)
+        run: python3 nask/noc-20261103/jsdig.py
+
+      - name: Komit wyników (bez JS — JS w artifactcie)
+        run: |
+          git config user.name "nask-night-bot"
+          git config user.email "nask-night-bot@users.noreply.github.com"
+          rm -rf nask/noc-20261103/out/js
+          git add nask/noc-20261103/out/
+          git commit -m "nask-night: skan nocny (limiter 4.5rps, GET-only, 12 hostow) — wyniki + audyt zadan" || echo "nic nowego"
+          git push origin HEAD:arena/5ed750ef-smak-domu-konkurs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nask-night-js-${{ github.run_id }}
+          path: nask/noc-20261103/out/
+          retention-days: 14
+
+  rust-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/5ed750ef-smak-domu-konkurs
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - name: Build linux + windows (dla 5950X/WSL)
+        run: |
+          cd nask/noc-20261103/jsdig-rs
+          cargo build --release
+          rustup target add x86_64-pc-windows-gnu 2>/dev/null || true
+          cargo check 2>&1 | tail -2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jsdig-linux-${{ github.run_id }}
+          path: nask/noc-20261103/jsdig-rs/target/release/jsdig
+          retention-days: 14

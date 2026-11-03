@@ -1,0 +1,14 @@
+[package]
+name = "jsdig"
+version = "0.1.0"
+edition = "2021"
+description = "Rownolegly minerał bundle'ow JS dla NASK bug bounty (Rayon; offline — poza limitem 5 req/s)"
+license = "MIT"
+
+[dependencies]
+rayon = "1"
+regex = "1"
+
+[profile.release]
+lto = true
+codegen-units = 1
