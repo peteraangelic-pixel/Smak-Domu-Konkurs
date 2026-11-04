@@ -78,7 +78,8 @@ jobs:
           rm -rf nask/noc-20261103/out/js nask/noc-20261103/out/html
           git add nask/noc-20261103/out/
           git commit -m "nask-night: skan nocny (limiter 4.5rps, GET-only, 12 hostow) — wyniki + audyt zadan" || echo "nic nowego"
-          git push origin HEAD:arena/5ed750ef-smak-domu-konkurs
+          git pull --rebase -q origin arena/5ed750ef-smak-domu-konkurs || true
+          git push origin HEAD:arena/5ed750ef-smak-domu-konkurs || (sleep 20 && git pull --rebase -q origin arena/5ed750ef-smak-domu-konkurs || true && git push origin HEAD:arena/5ed750ef-smak-domu-konkurs)
 
 
   rust-build:
