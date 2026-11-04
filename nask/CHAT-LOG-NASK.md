@@ -36,3 +36,9 @@
   (`uploaded_to`, logotypy); `localPatterns:void` w konfiguracji Next. Reszta tras w lazy-chunks
   → do wyciągnięcia przez DevTools usera przy pierwszym przejściu formularza.
 - Wyniki: out/{report6,jsdig6,js-manifest-6}, audyt w out/requests.jsonl.
+
+## 04.11, ~15:00 — przegląd 3: repo NASK (a29 + codex)
+
+- a29 tip b2cf80a4: scaffold Rust naprawiony (rust/common: limiter+scope), nask-lab skonsolidowany, drive_materials=lustro Drive; README wciąż z błędną pulą „1 mln" i mieszaniem 5 programów (do poprawy przy prawach push).
+- codex a4fb58df: jednorazowa operacja ekspozycji 75 żądań @1 rps z kontrolą hashy regulaminów i szyfrowaniem dowodów — 0 kandydatów; oni dotknęli Władysławowo (my nie — zakaz usera); monitor gałęzi wycofany.
+- Wniosek: 5. niezależne potwierdzenie „anonimowa powierzchnia pusta"; wszystkie sesje czekają na konta usera i GO na sendForm.

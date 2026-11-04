@@ -69,3 +69,12 @@ tylko z działającym PoC.
 5. Po koncie hack.cert.pl: **awatar SVG** (H21), format ID własnego zgłoszenia (klucz do H17),
    potem H1–H7 wg mapy (pojedyncze żądania!).
 6. **GO na sendForm** (L1 rev2: kroki 1.1–1.5) — jedyna żywa ścieżka na 9k w programie NASK.
+
+## 7. Dodatek — przegląd 3 (04.11, po południu): repo `peteraangelic-pixel/NASK`
+
+| gałąź | co nowego (dowód: komity) | wpływ na nas |
+|---|---|---|
+| `arena/a29ca234-nask` (tip `b2cf80a4`, 4 komity) | **scaffold Rust NAPRAWIONY**: nowy wspólny crate `rust/common` (`rate_limit.rs` + `scope.rs`), poprawione Cargo/main `subenum/ffuzz/probe/native` (komit `10cbb620`); **`nask-lab/`** = konsolidacja naskhunt+nasktriage (analyze/har/rate; komit `eb234af8`); `drive_materials/` 00–18 (komity `3f3bc29b`,`b2cf80a4`) — lustrzana kopia Drive 00–18 (my: `nask/kit/`) | narzędzia zespołu są teraz jedną działającą całością w repo NASK; my trzymamy własny nightscan/jsdig — brak potrzeby kopiowania |
+| `arena/a29ca234-nask` README | **wciąż stare błędy**: „pula 1 mln PLN", „scope = 5 programów w jednym arkuszu" — c87 korygował w PRZEGLĄDzie | poprawić przy pierwszym pushu do NASK (nasz token bez praw — 403) |
+| `codex/multi-program-lab-20261103` (tip `a4fb58df`, 3 komity) | jednorazowa operacja ekspozycji [lab-night]: **75 żądań, 1 req/s, 0 kandydatów, 0 podatności** (run 41734282345, `completed_with_skips`); **kontrola hashy regulaminów przed startem** (niezgodność = stop), stop na 429/403/5xx, limit 64 KiB odczytu, **dowody szyfrowane** (klucz lokalny, w repo tylko podsumowanie+receipt); mSzyfr i CTF nadal odłożone; **testowali też Władysławowo (4 hosty) — my NIE, zgodnie z Twoim zakazem** | wynik spójny z resztą zespołu; monitor gałęzi wycofany |
+| lekcja metodologiczna | kontrola hashy regulaminów PRZED skanem = wykrywa zmianę edycji/regulaminu automatycznie | do rozważenia jako lekkie wzmocnienie naszego crona (biegi i tak GET-only) |
