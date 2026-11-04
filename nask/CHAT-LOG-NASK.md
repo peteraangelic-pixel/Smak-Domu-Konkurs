@@ -25,3 +25,14 @@
   dyzurnet, science; opc. HIVE). Push do repo NASK nadal 403 (brak praw tokena).
 - Infra: workflow `nask-night.yml` — cron 01:00 UTC (pełny skan) + push (biegi celowane);
   `jsdig-rs` (Rust+Rayon) buduje się w Actions OK (binarka w artefaktach dla 5950X).
+
+## 04.11, ~13:50 — bieg 6 wykonany (mapa dyzurnet+dns)
+
+- Run 41818357455 zielony (po fixie: bot robi pull --rebase przed push, retry 20s).
+- dns.pl: 10 tras /api/* potwierdzonych w JS (Angular: `app-main-page-domain-browser-form`,
+  whoisHref→/whois); referencja `https://panel.dns.pl/pl/index` w bundlu — POZA zakresem
+  (guard codexa: niepotwierdzone w §5), tylko odnotowana.
+- dyzurnet: 10/18 chunków zminowanych (~0,5 MB) — brak nowych tras API; WP-media JSON w chunku
+  (`uploaded_to`, logotypy); `localPatterns:void` w konfiguracji Next. Reszta tras w lazy-chunks
+  → do wyciągnięcia przez DevTools usera przy pierwszym przejściu formularza.
+- Wyniki: out/{report6,jsdig6,js-manifest-6}, audyt w out/requests.jsonl.
