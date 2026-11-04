@@ -1,6 +1,6 @@
 # Nocny skan NASK — BIEG 3 (JS dig z kontekstem + probe celowane)
 
-bieg: 2026-11-03T23:25:08+00:00 | żądań: 69 | limit 4.5 rps | GET-only, bez auth, 12 hostów §5
+bieg: 2026-11-04T11:05:37+00:00 | żądań: 75 | limit 4.5 rps | GET-only, bez auth, 12 hostów §5
 
 Uwaga: pełny digest JS → `jsdig3.json` (konteksty ±50 znaków).
 
