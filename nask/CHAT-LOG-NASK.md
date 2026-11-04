@@ -1,5 +1,17 @@
 # CHAT-LOG — projekt NASK bug bounty (kontynuacja konwencji z ARC)
 
+## 04.11, ~13:30 — przegląd 2 gałęzi + Drive (19 plików)
+
+- Nowe komity: c87 (rawpath 1–4, przegląd 6 gałęzi, RUNBOOK-REV2, rejestr L1–L12), 7911
+  (256 sond/7 przebiegów + raport), a450 (HAR triage offline), g6d08 (S8/S9, mwdb 2.20.0
+  zamknięty, HIPOTEZY-ZAMKNIETE ×15), gc4ee (runda 7: **H10 obalone** — /admin/logs = catch-all,
+  H14 116sos domknięte). Drive: nowy kit 13–19 (mapa /api/v1 hack.cert.pl z H1–H7!,
+  mSzyfr=Matrix, n6portal, rank pieniędzy, 19-zip 3,2 MB zarchiwizowany przez nas).
+- Mój wkład: INTEGRACJA-ZESPOLU-20261104-POLOUDNIE.md, korekty REJESTRU (H10/H14 + H17–H22),
+  **bieg 6** (mapa chunków JS dyzurnet+dns — brakująca robota zespołu), archiwum kitu.
+- Konsensus 6 sesji: anonimowa powierzchnia wytarta (~2500+ żądań, 0 vulnów); pieniądze
+  za kontami: mSzyfr > hack.cert.pl (portal) > CERT panele; NASK: sendForm (GO usera).
+
 ## 04.11, ~00:40 — nocna zmiana zakończona (sesja Arena `5ed750ef`)
 
 - User dał GO na nocne szukanie luk (nie tylko zglos-dezinformacje; Władysławowo wykluczone).

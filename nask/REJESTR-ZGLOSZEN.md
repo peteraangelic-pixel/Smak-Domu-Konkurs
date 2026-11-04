@@ -33,13 +33,19 @@ Reguła zespołu: **hipotezę wpisujesz PRZED testowaniem**; first-wins obowiąz
 | H7 | 5 hostów Azure | XFH refleksja → cache poisoning | 18 | **ZMIERZONE** | brak refleksji — odłożone do ręcznego testu z przeglądarki |
 | H8 | wszystkie | cookie bez flag z realnym scenariuszem | wykl. | świadomie pominięte | pułapka regulaminowa |
 | **H9** | science.nask.pl | `/api/downloadFile` — „Invalid file id" → enum id po uploadzie WŁASNEGO pliku | 9.2/3.2 | **FALSYFIKOWANY jako enum** (Gemma-B runda 6: wszystkie 200 = publiczne media z `/api/media/…`; parametr `fileId` liczbowy; sweepy 18800–18868/40330–40358/12510–12520/13225–13240 bez niepublicznych) | resztka: BAC tylko z znanym niepublicznym ID (po zalogowaniu) |
-| **H10** | dataannotation | HIVE: FastAPI `/api/v1` + trasy `/admin/logs` (guardy tylko klienta) | 9/10 | **BLOKADA: brak publicznej rejestracji** (`/register`→404); `/api/v1/users/1`→405 (trasa jest); authz routera OK. Konto TYLKO od organizatora (wniosek złożyć dziś) | 4 500–10 000 zł **po kontach** |
+| **H10** | dataannotation | HIVE: FastAPI `/api/v1` + trasy `/admin/logs` (guardy tylko klienta) | 9/10 | **BLOKADA: brak publicznej rejestracji** (`/register`→404); authz routera OK (401); **`/admin/logs` OBALONE przez Gemma-B rundę 7** (= catch-all SPA 713 B, `/api/v1/admin/logs`→404 — mój „guard klienta" był artefaktem pomiaru). Konto TYLKO od organizatora | 4 500–10 000 zł **po kontach** |
 | H11 | zglos-dezinformacje | P0–P2 (IDOR/upload/SSRF); **kontrakt znany**: `POST /api/sendForm` (accept/email/file png-jpeg≤20MB/reason≤250/urls×50/reCAPTCHA v3) | 7/9/5 | **GŁÓWNY WEKTOR** — testy walidacji urls (SSRF) i typów plików to żądania ZAPISUJĄCE + captcha → czeka na GO usera; payloady gotowe (Gemma-B `NASK/IDEAS`) | 9 000–20 000 zł |
 | H12 | dns.pl | domain-browser/who-is-xml — poznać kształt parametrów z chunków JS | 4/12 | **UŚPIONA**: 3/5 tras z bundla martwe (Gemma-B); live tylko publiczne zone-stats/registrars-services; dns.pl = Drupal | 4 000–9 000 zł (wymaga nowej mapy z chunków) |
 | H13 | dyzurnet.pl | `/api` (robots) — mapa z chunków | 9/12 | OTWARTA (nikt nie zmapował; media `/media/…` publiczne) | 4 000–9 000 zł |
-| **H14** | 116sos.pl | `fetch-cookie-hash`, `centres-search`, `announcements`, `og-image` | 9/12 | **CZEKA NA AWARIĘ** — host 502 od ~23:00 (Gemma-B przerwała testy) | ? |
+| **H14** | 116sos.pl | `fetch-cookie-hash`, `centres-search`, `announcements`, `og-image` | 9/12 | **DOMKNIĘTE** (Gemma-B runda 7, host wrócił): cookie-hash = stała 30 B (nie pochodna sesji, XFH bez wpływu); centres-search **ignoruje q/id** — zwraca publiczną listę ośrodków (13,3 kB) | 0 |
 | **H15** | oad.nask.pl | `/podglad-pdf?url=` SSRF/LFI | 5/15 | **MARTWE** (c87: prefiks `/media/` walidowany, poza nim 500 bez danych) | 0 — nie wracać |
 | **H16** | nask.pl (www?) | `/api/search` — obiekty WP, 73 strony | 3/12 | obserwowane (Gemma-B); **pułapka zakresu: `www.nask.pl` ≠ literał `nask.pl`** — najpierw pytanie do organizatora | ? |
+| **H17** | hack.cert.pl (program CERT) | **IDOR H1–H7** na `/api/v1` (cudze `reports/{id}`, `internal-notes`, `attachments/…/download`, `reward-offers` stany, `users/{uid}/role`) — pełna mapa w `kit/19` (16-MAPA-ENDPOINTOW) | 3/9/12 | **OTWARTA — czeka konto + własne zgłoszenie testowe** (najpierw format ID!); pojedyncze żądania, zero zrzutów | 9 000–20 000 zł |
+| **H18** | mSzyfr (komunikator.narodowy.gov.pl) | Element/Matrix: IDOR rozmów (2 WŁASNE konta), ATO resetem, join po room-id/alias, invite-linki | 2/3/9 | OTWARTA — czeka 2 konta; bundle tylko z przeglądarki (catch-all 200); auth: `mas.komunikator…` | 9 000–20 000 zł |
+| **H19** | n6portal.cert.pl (CERT) | `/org_config` vs zwykły user, MFA-confirm bez MFA, `/api_key` po ID, `sources` | 9/12 | OTWARTA — czeka konto (mapa z bundla w `kit/19`, dodatek 2) | 4 000–9 000 zł |
+| **H20** | oad.nask.pl | PowerBI embed `autoAuth=true` — co pokazuje publiczny raport (pasywne oględziny) | 3 | OTWARTA (przeglądarka usera; prawdopodobnie agregaty = zero) | 0–4 000 zł |
+| **H21** | hack.cert.pl | awatar SVG (stored XSS) — instrukcja Gemmy, 15 min po koncie | 8 | OTWARTA | 600–4 000 zł |
+| **H22** | mwdb.cert.pl | XSS Rich attributes (#1272/#1274) | 8 | **ZAMKNIĘTA** — produkcja 2.20.0, poprawka wdrożona (Gemma-A 04.11, sonda S8) | 0 |
 
 Szczegóły: `noc-20261103/RESULTS-NOC1.md`.
 
