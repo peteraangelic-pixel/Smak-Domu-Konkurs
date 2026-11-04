@@ -32,11 +32,14 @@ Reguła zespołu: **hipotezę wpisujesz PRZED testowaniem**; first-wins obowiąz
 | H6 | bundle JS T1/T2 | sekrety/endpointy w JS | 12.2/3 | **ZMIERZONE** | 47 bundle'ów/7,3 MB: **0 sekretów**, 0 map; natomiast MAPA API (H9–H13) |
 | H7 | 5 hostów Azure | XFH refleksja → cache poisoning | 18 | **ZMIERZONE** | brak refleksji — odłożone do ręcznego testu z przeglądarki |
 | H8 | wszystkie | cookie bez flag z realnym scenariuszem | wykl. | świadomie pominięte | pułapka regulaminowa |
-| **H9** | science.nask.pl | `/api/downloadFile` — „Invalid file id" → enum id po uploadzie WŁASNEGO pliku | 9.2/3.2 | **OTWARTA** (kontrakt potwierdzony) | 2 000–4 500 zł |
-| **H10** | dataannotation | HIVE: FastAPI `/api/v1` + trasy `/admin/logs` (guardy tylko klienta) | 9/10 | **OTWARTA** (czeka konto) | 4 500–10 000 zł |
-| H11 | zglos-dezinformacje | P0–P2 (IDOR/upload/SSRF) | 7/9/5 | OTWARTA (czeka konto) | 9 000–20 000 zł |
-| H12 | dns.pl | domain-browser/who-is-xml — poznać kształt parametrów z chunków JS | 4/12 | OTWARTA | 4 000–9 000 zł |
-| H13 | dyzurnet.pl | `/api` (robots) — mapa z chunków | 9/12 | OTWARTA | 4 000–9 000 zł |
+| **H9** | science.nask.pl | `/api/downloadFile` — „Invalid file id" → enum id po uploadzie WŁASNEGO pliku | 9.2/3.2 | **FALSYFIKOWANY jako enum** (Gemma-B runda 6: wszystkie 200 = publiczne media z `/api/media/…`; parametr `fileId` liczbowy; sweepy 18800–18868/40330–40358/12510–12520/13225–13240 bez niepublicznych) | resztka: BAC tylko z znanym niepublicznym ID (po zalogowaniu) |
+| **H10** | dataannotation | HIVE: FastAPI `/api/v1` + trasy `/admin/logs` (guardy tylko klienta) | 9/10 | **BLOKADA: brak publicznej rejestracji** (`/register`→404); `/api/v1/users/1`→405 (trasa jest); authz routera OK. Konto TYLKO od organizatora (wniosek złożyć dziś) | 4 500–10 000 zł **po kontach** |
+| H11 | zglos-dezinformacje | P0–P2 (IDOR/upload/SSRF); **kontrakt znany**: `POST /api/sendForm` (accept/email/file png-jpeg≤20MB/reason≤250/urls×50/reCAPTCHA v3) | 7/9/5 | **GŁÓWNY WEKTOR** — testy walidacji urls (SSRF) i typów plików to żądania ZAPISUJĄCE + captcha → czeka na GO usera; payloady gotowe (Gemma-B `NASK/IDEAS`) | 9 000–20 000 zł |
+| H12 | dns.pl | domain-browser/who-is-xml — poznać kształt parametrów z chunków JS | 4/12 | **UŚPIONA**: 3/5 tras z bundla martwe (Gemma-B); live tylko publiczne zone-stats/registrars-services; dns.pl = Drupal | 4 000–9 000 zł (wymaga nowej mapy z chunków) |
+| H13 | dyzurnet.pl | `/api` (robots) — mapa z chunków | 9/12 | OTWARTA (nikt nie zmapował; media `/media/…` publiczne) | 4 000–9 000 zł |
+| **H14** | 116sos.pl | `fetch-cookie-hash`, `centres-search`, `announcements`, `og-image` | 9/12 | **CZEKA NA AWARIĘ** — host 502 od ~23:00 (Gemma-B przerwała testy) | ? |
+| **H15** | oad.nask.pl | `/podglad-pdf?url=` SSRF/LFI | 5/15 | **MARTWE** (c87: prefiks `/media/` walidowany, poza nim 500 bez danych) | 0 — nie wracać |
+| **H16** | nask.pl (www?) | `/api/search` — obiekty WP, 73 strony | 3/12 | obserwowane (Gemma-B); **pułapka zakresu: `www.nask.pl` ≠ literał `nask.pl`** — najpierw pytanie do organizatora | ? |
 
 Szczegóły: `noc-20261103/RESULTS-NOC1.md`.
 
