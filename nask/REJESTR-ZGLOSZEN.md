@@ -61,3 +61,16 @@ Szczegóły: `noc-20261103/RESULTS-NOC1.md`.
 
 Tier 1: niski 600 / średni 4 000 / wysoki 9 000 / krytyczny 20 000 zł.
 Tier 2: 300 / 2 000 / 4 500 / 10 000 zł.
+
+## Hipotezy nocnego operatora (Drive 20/22, 04–05.11) — status po moich pomiarach
+
+| id | host | hipoteza | klasa | status |
+|---|---|---|---|---|
+| D1/D2 | dns.pl | POST `/api/who-is-xml/{loc}`/`/api/domain-browser/{loc}` bez captcha → dane > publiczny whois | 3.3/12.2 | **NIEOSIĄGALNE skryptem** (bieg 7: 3 POST-y = catch-all HTML 51 kB; SPA dodaje sesję/CSRF) → **test z DevTools usera: Replay z pustym captcha, porównać pola z whois www** |
+| D3 | dns.pl | registrars-list sort/order SQLi | 9.2 | do usera (kontekst SPA) |
+| — | dns.pl | XFH→`<script src>` + shared cache = poisoning poz.18 | 18 | **NIEPOTWIERDZONE** (bieg 7: 6 ścieżek, 0 odbić w oknie 400 B; operator: brak cache na /) — wątek zamknięty |
+| — | bezpiecznapoczta.cert.pl | /check-domain/scan → SSRF przez własną domenę A→127.0.0.1 | 5 | **CZEKA NA DOMENĘ USERA** (program CERT; nikt o tym hoście nie pamięta — najczystszy punkt SSRF zakresu) |
+| — | mas.komunikator.narodowy.gov.pl | DCR `/oauth2/registration` aktywny → klient OAuth z naszym redirect_uri = ATO 20k | 2 | **NAJWYŻSZY PRIORYTET po GO** (wymaga POST + domena usera; rejestracja zamknięta, ale DCR żyje) |
+| — | m.cert.pl | Mattermost 11.7.14 — cel #1 gdy będzie konto gościnne | 9 | czeka konto |
+| L14 | bezpiecznymiesiac.pl/ecsm/zglos-inicjatywe/ | ta sama klasa co sendForm, mniejsza konkurencja | 7/13/8 | czeka GO |
+| L23 | zglos-dezinformacje | sendForm **bez tworzenia rekordu** (brak accept/puste urls/zero captcha) | 7/13 | czeka jawne GO; UWAGA: 22-RAPORT mierzył 403 bez tokenu reCAPTCHA + Zod 422 = walidacja dobrze zbudowana → L23 pewnie zamknie się negatywnie |

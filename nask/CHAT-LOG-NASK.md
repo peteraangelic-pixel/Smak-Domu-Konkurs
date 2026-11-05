@@ -42,3 +42,11 @@
 - a29 tip b2cf80a4: scaffold Rust naprawiony (rust/common: limiter+scope), nask-lab skonsolidowany, drive_materials=lustro Drive; README wciąż z błędną pulą „1 mln" i mieszaniem 5 programów (do poprawy przy prawach push).
 - codex a4fb58df: jednorazowa operacja ekspozycji 75 żądań @1 rps z kontrolą hashy regulaminów i szyfrowaniem dowodów — 0 kandydatów; oni dotknęli Władysławowo (my nie — zakaz usera); monitor gałęzi wycofany.
 - Wniosek: 5. niezależne potwierdzenie „anonimowa powierzchnia pusta"; wszystkie sesje czekają na konta usera i GO na sendForm.
+
+## 05.11, ~12:30 — przegląd 4 + bieg 7
+
+- Repo NASK bez zmian (a29=b2cf80a4, codex=a4fb58df); nowe gałęzie Pokemon (b7cc/b856/b98d/bd18) = ARC/bateria, nie NASK.
+- Drive 25 plików: 20-DELTA (kontrakty dns.pl D1–D4, dyzurnet, stats.eadministracja poza §5), 22-RAPORT-NOC (~1400 żądań, 5 programów, 8 wektorów: XFH-dns.pl, sendForm, bezpiecznapoczta SSRF, Mattermost 11.7.14, MAS DCR!), 23-SYNTESA (mwdb OAuth ZAMKNIĘTY kodem: nonce/podpis/redirect_uri; dns.pl=Symfony vs Drupal — spór, bez znaczenia dla testów).
+- c87 korekta #41: pełny sendForm ODRADZONY (tworzy prawdziwe zgłoszenie); L23 bez-rekordu po GO; L14 zglos-inicjatywe; L0.5 PowerBI 2 min; L20 deleted_domains.txt 10 s (user).
+- bieg 7 (10 żądań): D1/D2 = catch-all HTML (kontrakt wymaga kontekstu SPA → DevTools user); XFH 6 ścieżek = 0 odbić, wątek zamknięty.
+- Konsensus 7 sesji: ~3500 żądań, 0 podatności. Priorytety: konto hack.cert.pl → H1–H7; mas DCR (GO); bezpiecznapoczta (domena usera); mSzyfr/mattermost po kontach.
