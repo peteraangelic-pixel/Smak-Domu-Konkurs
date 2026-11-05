@@ -1,0 +1,30 @@
+[
+ {
+  "sev": "MED",
+  "host": "dns.pl",
+  "what": "D1 bez-captcha: 200 text/html (sprawdzić treść: dane > publiczny whois?)",
+  "evidence": "len=51220 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n<script type=\"text/javascript\">\\n  var _event_transid=\\'2072802415\\';\\n</script>\\n\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>\\n    <title>DNS | Krajowy '",
+  "ts": "2026-11-05T11:18:02+00:00"
+ },
+ {
+  "sev": "MED",
+  "host": "dns.pl",
+  "what": "D1 pusta-captcha: 200 text/html (sprawdzić treść: dane > publiczny whois?)",
+  "evidence": "len=51210 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n<script type=\"text/javascript\">\\n  var _event_transid=\\'2072802416\\';\\n</script>\\n\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>\\n    <title>DNS | Krajowy '",
+  "ts": "2026-11-05T11:18:03+00:00"
+ },
+ {
+  "sev": "MED",
+  "host": "dns.pl",
+  "what": "D1-form: 200 text/html; charset=UTF-8",
+  "evidence": "len=51223 head=b'<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n<script type=\"text/javascript\">\\n  var _event_transid=\\'2072802418\\';\\n</script>\\n\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>\\n    <title>DNS | Krajowy '",
+  "ts": "2026-11-05T11:18:04+00:00"
+ },
+ {
+  "sev": "INFO",
+  "host": "dns.pl",
+  "what": "D2: domain-browser 200 bez tokenu (text/html)",
+  "evidence": "len=51229 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n<script type=\"text/javascript\">\\n  var _event_transid=\\'2072802417\\';\\n</script>\\n\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>\\n    <title>DNS | Krajowy '",
+  "ts": "2026-11-05T11:18:03+00:00"
+ }
+]

@@ -3,63 +3,49 @@
   "sev": "INFO",
   "host": "dns.pl",
   "what": "/api/domain-browser/nask.pl status 404",
-  "evidence": "ct=text/html len=40920 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
-  "ts": "2026-11-04T11:05:47+00:00"
+  "evidence": "ct=text/html len=40919 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
+  "ts": "2026-11-05T11:16:35+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "/api/who-is-xml/nask.pl status 404",
-  "evidence": "ct=text/html len=40934 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
-  "ts": "2026-11-04T11:05:48+00:00"
+  "evidence": "ct=text/html len=40908 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
+  "ts": "2026-11-05T11:16:36+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "/api/who-is-xml?domain=nask.pl status 404",
-  "evidence": "ct=text/html len=40923 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
-  "ts": "2026-11-04T11:05:48+00:00"
+  "evidence": "ct=text/html len=40903 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
+  "ts": "2026-11-05T11:16:37+00:00"
  },
  {
   "sev": "INFO",
   "host": "dns.pl",
   "what": "/api/domain-browser?domain=nask.pl status 404",
-  "evidence": "ct=text/html len=40913 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
-  "ts": "2026-11-04T11:05:49+00:00"
+  "evidence": "ct=text/html len=40915 head='<!DOCTYPE html>\\n<html lang=\"pl\"\\n    >\\n<head>\\n    <meta charset=\"utf-8\"/>\\n    <meta name=\"viewport\" content=\"width=device'",
+  "ts": "2026-11-05T11:16:37+00:00"
  },
  {
   "sev": "INFO",
   "host": "science.nask.pl",
-  "what": "/api/downloadFile?file=README.txt status 400",
-  "evidence": "ct=application/json len=27 disp= head='{\"error\":\"Invalid file id\"}'",
-  "ts": "2026-11-04T11:05:50+00:00"
+  "what": "/api/downloadFile?file=README.txt zwisa >25s (dlugotrwala operacja?)",
+  "evidence": "URLError:<urlopen error timed out> t>25s",
+  "ts": "2026-11-05T11:17:02+00:00"
  },
  {
   "sev": "INFO",
   "host": "science.nask.pl",
   "what": "/api/downloadFile?name=test.txt status 400",
   "evidence": "ct=application/json len=27 disp= head='{\"error\":\"Invalid file id\"}'",
-  "ts": "2026-11-04T11:05:50+00:00"
- },
- {
-  "sev": "INFO",
-  "host": "science.nask.pl",
-  "what": "/api/search q=abc%27 status 400",
-  "evidence": "refleksja=False head='{\"error\":\"Query must be at least 3 characters\"}'",
-  "ts": "2026-11-04T11:05:51+00:00"
+  "ts": "2026-11-05T11:17:03+00:00"
  },
  {
   "sev": "INFO",
   "host": "science.nask.pl",
   "what": "/api/search q=%3Cb%3Exss%3C%2Fb%3E status 400",
   "evidence": "refleksja=False head='{\"error\":\"Query must be at least 3 characters\"}'",
-  "ts": "2026-11-04T11:05:51+00:00"
- },
- {
-  "sev": "INFO",
-  "host": "science.nask.pl",
-  "what": "/api/search q=%7B%7B7%2A7%7D%7D status 400",
-  "evidence": "refleksja=False head='{\"error\":\"Query must be at least 3 characters\"}'",
-  "ts": "2026-11-04T11:05:52+00:00"
+  "ts": "2026-11-05T11:17:29+00:00"
  }
 ]

@@ -1,6 +1,6 @@
 # Nocny skan NASK — BIEG 6 (mapa chunków JS: dyzurnet.pl + dns.pl)
 
-bieg: 2026-11-04T11:05:59+00:00 | żądań: 16 | limit 4.5 rps | GET-only, 2 hosty §5
+bieg: 2026-11-05T11:18:01+00:00 | żądań: 16 | limit 4.5 rps | GET-only, 2 hosty §5
 
 Pełny digest: `jsdig6.json`
 
